@@ -21,7 +21,7 @@ frame:SetScript("OnEvent", function()
     local destGUID = eventInfo[8]
     local destName = eventInfo[9]
 
-    killCount++;
+    MyrkTools.killCount = MyrkTools.killCount + 1;
     DEFAULT_CHAT_FRAME:AddMessage("|cffff0000Mob died:|r " .. (destName or "Unknown") .. " , Total kills: " .. MyrkTools.killCount)
   end
 end)
@@ -58,13 +58,13 @@ end
 
 
 function RogueAFKDead() 
-  if(MyrkTools.dead) { -- Not tested
+  if(MyrkTools.dead) then -- Not tested
     if(now - MyrkTools.deadTime > 300) then
       DEFAULT_CHAT_FRAME:AddMessage("You are dead for too long, logging out." .. now)
       Logout()
     end
     return;
-  }
+  end
 
 
   MyrkTools.dead = true;
