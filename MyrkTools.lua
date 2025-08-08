@@ -1,5 +1,5 @@
 DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[MyrkTools]|r Loaded " .. now)
-local now = time();
+-- local now = time();
 
 MyrkTools = {
   dead = false,
@@ -68,18 +68,18 @@ function RogueAFKDead()
 
 
   MyrkTools.dead = true;
-  MyrkTools.deadTime = time();
+  MyrkTools.deadTime = 0;--time();
 end
 
 
 MyrkTools.pullTick = 0;
 function RoguePull()
-  if(MyrkTools.pullTick % 5 == 0) then
+  if(math.fmod(MyrkTools.pullTick, 5) == 0) then
     ClearTarget() -- Try a new target
   end
   TargetNearestEnemy() 
   CastSpellByName("Shoot Bow")
-  MyrkTools.pullTick++;
+  MyrkTools.pullTick = MyrkTools.pullTick + 1;
 end
 
 function RogueCombat() 

@@ -1,0 +1,1 @@
+/script Myrktools:RogueAFK()
