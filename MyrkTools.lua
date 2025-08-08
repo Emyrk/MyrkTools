@@ -1,5 +1,5 @@
 DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[MyrkTools]|r Loaded " .. now)
--- local now = time();
+local now = GetTime();
 
 MyrkTools = {
   dead = false,
@@ -68,7 +68,7 @@ function RogueAFKDead()
 
 
   MyrkTools.dead = true;
-  MyrkTools.deadTime = 0;--time();
+  MyrkTools.deadTime = GetTime();
 end
 
 
