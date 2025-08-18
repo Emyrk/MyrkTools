@@ -18,6 +18,10 @@ function MyrkPriest:Priest()
     return
   end
 
+  if not InCombat() then
+    return
+  end
+
   -- Healing has been covered, so now consider offensive abilities.
   if not HostileTarget() then
     -- Do not even try to attack non-hostile targets.

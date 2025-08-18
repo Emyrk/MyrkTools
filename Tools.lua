@@ -44,6 +44,10 @@ function BoolToString(val, yes, no)
   end
 end
 
+function InCombat()
+  return UnitAffectingCombat("player") == true
+end
+
 -- function MyrkTools:DebugSlot()
 --   for slot = 1, 120 do
 --     local t, id = GetActionText(slot)
