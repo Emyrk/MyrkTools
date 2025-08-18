@@ -1,11 +1,33 @@
 local now = GetTime();
 DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[MyrkTools]|r Loaded " .. now)
 
+MyrkAddon = LibStub("AceAddon-3.0"):NewAddon("MyrkAddon")
+
 MyrkTools = {
   dead = false,
   deadTime = 0,
   killCount = 0,
 }
+
+local initialized = false
+
+function MyrkAddon:OnInitialize()
+  if initialized then return end
+  initialized = true
+  MyrkPriest:Initialize()
+  DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[MyrkTools]|r Initialized " .. now)
+end
+
+-- Fire Init at the right time on Turtle/1.12
+local loader = CreateFrame("Frame")
+loader:RegisterEvent("VARIABLES_LOADED")  -- 1.12 init point
+loader:RegisterEvent("PLAYER_LOGIN")      -- fallback once fully logged in
+loader:SetScript("OnEvent", function(_, event)
+  DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[MyrkTools]|r Event! " .. now)
+  if event == "VARIABLES_LOADED" or event == "PLAYER_LOGIN" then
+    Initialize()
+  end
+end)
 
 -- function MyrkTools:Test()
 --   SendChatMessage("Test", SELF)
