@@ -92,5 +92,5 @@ function MyrkPriest:Initialize()
   end
   --
 
-  MyrkAddon:RegisterChatCommand("sqh", "SafeQuickHeal")
+  -- MyrkAddon:RegisterChatCommand("mm", "SafeQuickHeal")
 end
