@@ -12,7 +12,7 @@ function MyrkPriest:Priest()
   -- TODO: Hots? Power Word Shield?
   --   1. When moving, cast HOTs instead of trying to cast a channeled ability
   --   2. When should we Power Word Shield?
-  local busy = SafeQuickHeal()
+  local busy = QHExport.BusyQuickHeal()
   if busy then
     AutoMyrk:Info("Quickheal", 1, 1, 0)
     return
@@ -78,15 +78,6 @@ function Wanding()
   end
 
   return false
-end
-
-function MyrkAddon:SafeQuickHeal(input)
-  local wanding = Wanding()
-  local healing = QHExport.BusyQuickHeal()
-  if not healing and wanding then
-    MyrkPriest:Wand()
-  end
-  return healing
 end
 
 function MyrkPriest:Initialize()
