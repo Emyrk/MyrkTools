@@ -1,8 +1,6 @@
 local now = GetTime();
 DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[MyrkTools]|r Loaded " .. now)
 
-MyrkAddon = LibStub("AceAddon-3.0"):NewAddon("MyrkAddon")
-
 MyrkTools = {
   dead = false,
   deadTime = 0,
@@ -54,7 +52,7 @@ end
 --   -- Do nothing if the player is not ready for combat
 --   if h/m < 0.9 and not combat then
 --     if not buffed("Stealth") then
---       CastSpellByName("Stealth") 
+--       CastSpellByName("Stealth")
 --     end
 --     return
 --   end
@@ -68,7 +66,7 @@ end
 -- end
 
 
--- function RogueAFKDead() 
+-- function RogueAFKDead()
 --   if(MyrkTools.dead) then -- Not tested
 --     if(now - MyrkTools.deadTime > 300) then
 --       DEFAULT_CHAT_FRAME:AddMessage("You are dead for too long, logging out." .. now)
@@ -88,12 +86,12 @@ end
 --   if(math.fmod(MyrkTools.pullTick, 5) == 0) then
 --     ClearTarget() -- Try a new target
 --   end
---   TargetNearestEnemy() 
+--   TargetNearestEnemy()
 --   CastSpellByName("Shoot Bow")
 --   MyrkTools.pullTick = MyrkTools.pullTick + 1;
 -- end
 
--- function RogueCombat() 
+-- function RogueCombat()
 --   local h=UnitHealth("player")
 --   local m=UnitHealthMax("player")
 

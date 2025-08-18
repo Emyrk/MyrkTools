@@ -1,14 +1,15 @@
+MyrkAddon = LibStub("AceAddon-3.0"):NewAddon("MyrkAddon", "AceConsole-3.0")
 MyrkTools = {}
 
 -- Primary frame
 local f = CreateFrame("MessageFrame", "AutoMyrk", UIParent)
-f:SetWidth(800)         -- very wide
-f:SetHeight(200)        -- very tall
+f:SetWidth(800)  -- very wide
+f:SetHeight(200) -- very tall
 f:SetPoint("CENTER", UIParent, "CENTER", 500, -400)
 f:SetInsertMode("TOP")
-f:SetFont(STANDARD_TEXT_FONT, 12, "OUTLINE")  -- massive font
-f:SetTimeVisible(1.0)   -- stays visible for 3 seconds
-f:SetFadeDuration(1.0)  -- 1 sec fade
+f:SetFont(STANDARD_TEXT_FONT, 12, "OUTLINE") -- massive font
+f:SetTimeVisible(1.0)                        -- stays visible for 3 seconds
+f:SetFadeDuration(1.0)                       -- 1 sec fade
 f:SetJustifyH("CENTER")
 f:SetJustifyV("MIDDLE")
 f:SetClampedToScreen(true)

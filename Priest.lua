@@ -12,7 +12,7 @@ function MyrkPriest:Priest()
   -- TODO: Hots? Power Word Shield?
   --   1. When moving, cast HOTs instead of trying to cast a channeled ability
   --   2. When should we Power Word Shield?
-  local busy = QHExport.BusyQuickHeal()
+  local busy = SafeQuickHeal()
   if busy then
     AutoMyrk:Info("Quickheal", 1, 1, 0)
     return
@@ -53,13 +53,7 @@ end
 
 -- Wand will use our wand as the offensive ability.
 function MyrkPriest:Wand()
-  if MyrkPriest.WandSlot == 0 then
-    -- If wand is not on the bars, that is an issue.
-    -- TODO: Throw an error.
-    return false
-  end
-
-  if IsAutoRepeatAction(MyrkPriest.WandSlot) == 1 then
+  if Wanding() then
     -- If we are already shooting, do not cast "Shoot" again.
     -- It would cancel the auto-shot.
     AutoMyrk:Info("Already shooting", 1, 1, 0)
@@ -70,6 +64,29 @@ function MyrkPriest:Wand()
   CastSpellByName("Shoot");
   AutoMyrk:Info("Shoot", 1, 1, 0)
   return true
+end
+
+function Wanding()
+  if MyrkPriest.WandSlot == 0 then
+    -- If wand is not on the bars, that is an issue.
+    -- TODO: Throw an error.
+    return false
+  end
+
+  if IsAutoRepeatAction(MyrkPriest.WandSlot) == 1 then
+    return true
+  end
+
+  return false
+end
+
+function MyrkAddon:SafeQuickHeal(input)
+  local wanding = Wanding()
+  local healing = QHExport.BusyQuickHeal()
+  if not healing and wanding then
+    MyrkPriest:Wand()
+  end
+  return healing
 end
 
 function MyrkPriest:Initialize()
@@ -83,4 +100,6 @@ function MyrkPriest:Initialize()
     end
   end
   --
+
+  MyrkAddon:RegisterChatCommand("sqh", "SafeQuickHeal")
 end
