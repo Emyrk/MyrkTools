@@ -1,1 +1,1 @@
-/script Myrktools:RogueAFK()
+Why are you looking here?!
