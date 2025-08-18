@@ -23,7 +23,7 @@ f:RegisterForDrag("LeftButton")
 -- f:SetScript("OnDragStop", function(self) self:StopMovingOrSizing() end)
 
 -- helper function
-function AutoMyrk:Warn(msg, r, g, b)
+function AutoMyrk:Info(msg, r, g, b)
   self:AddMessage(msg, r or 1, g or 0.2, b or 0.2)
 end
 
