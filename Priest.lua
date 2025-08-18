@@ -7,7 +7,7 @@ MyrkPriest.manaThreshold = 0.60
 -- Priest is the function to automate priest functionality.
 -- It will decide when to heal or attack based on various conditions.
 function MyrkPriest:Priest()
-  -- Always attempt to throw a heal first. 
+  -- Always attempt to throw a heal first.
   -- If someone in the party needs healing, this will keep them alive!
   -- TODO: Hots? Power Word Shield?
   --   1. When moving, cast HOTs instead of trying to cast a channeled ability
@@ -35,21 +35,19 @@ function MyrkPriest:Priest()
   if smiting then
     return
   end
-
 end
 
 -- Smite will only cast if we have enough mana reserved for healing.
 function MyrkPriest:Smite()
-  local m=UnitMana("player")/UnitManaMax("player");
-  if m>MyrkPriest.manaThreshold then 
-     CastSpellByName("Smite"); 
+  local m = UnitMana("player") / UnitManaMax("player");
+  if m > MyrkPriest.manaThreshold then
+    CastSpellByName("Smite");
     AutoMyrk:Info("Smite ", 1, 1, 0)
     return true
-  else 
-    CastSpellByName("Shoot"); 
-    AutoMyrk:Info("Not enough mana ", 1, 1, 0)
-    return false
   end
+
+  CastSpellByName("Shoot");
+  AutoMyrk:Info("Not enough mana ", 1, 1, 0)
   return false
 end
 
@@ -61,7 +59,7 @@ function MyrkPriest:Wand()
     return false
   end
 
-  if IsAutoRepeatAction(MyrkPriest.WandSlot) then
+  if IsAutoRepeatAction(MyrkPriest.WandSlot) == 1 then
     -- If we are already shooting, do not cast "Shoot" again.
     -- It would cancel the auto-shot.
     AutoMyrk:Info("Already shooting", 1, 1, 0)
@@ -69,7 +67,8 @@ function MyrkPriest:Wand()
   end
 
   -- This starts the auto-shooting
-  CastSpellByName("Shoot"); 
+  CastSpellByName("Shoot");
+  AutoMyrk:Info("Shoot", 1, 1, 0)
   return true
 end
 
