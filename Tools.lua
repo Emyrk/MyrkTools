@@ -1,6 +1,10 @@
 MyrkAddon = LibStub("AceAddon-3.0"):NewAddon("MyrkAddon", "AceConsole-3.0")
 MyrkTools = {}
 
+function MyrkTools:Initialize()
+
+end
+
 -- Primary frame
 local f = CreateFrame("MessageFrame", "AutoMyrk", UIParent)
 f:SetWidth(800)  -- very wide

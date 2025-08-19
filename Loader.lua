@@ -1,19 +1,48 @@
 local now = GetTime();
 DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[MyrkTools]|r Loaded " .. now)
 
-MyrkTools = {
-  dead = false,
-  deadTime = 0,
-  killCount = 0,
-}
-
 local initialized = false
 
 function MyrkAddon:OnInitialize()
   if initialized then return end
   initialized = true
+  MyrkTools:Initialize()
+  MyrkLogs:Initialize()
   MyrkPriest:Initialize()
+  MyrkAddon:RegisterChatCommand("myrk", "Console")
+
   DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[MyrkTools]|r Initialized " .. now)
+end
+
+function MyrkAddon:Console(input)
+  -- normalize input: trim and lowercase the first word
+  input = input or ""
+
+  if input == "" or input == "help" then
+    self:ShowHelp()
+    return
+  end
+
+  if input == "logs" then
+    -- `/myrk logs` -> open your log window
+    if MyrkLogs and MyrkLogs.CreateLogWindow then
+      MyrkLogs:CreateLogWindow()
+    else
+      self:Print("Logs module not loaded.")
+    end
+    return
+  end
+
+  -- unknown subcommand
+  self:Print(("Unknown command: '%s'"):format(input))
+  self:ShowHelp()
+end
+
+function MyrkAddon:ShowHelp()
+  -- AceConsole-3.0 gives you :Print; fallback below if needed
+  self:Print("MyrkAddon commands:")
+  self:Print("  /myrk logs     - open the log window")
+  self:Print("  /myrk help     - show this help")
 end
 
 -- function MyrkTools:Test()

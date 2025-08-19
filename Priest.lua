@@ -1,12 +1,39 @@
 MyrkPriest = {
-  WandSlot = 0
+  WandSlot = 0,
+  IsPriest = false
 }
 
 MyrkPriest.manaThreshold = 0.60
 
+function MyrkPriest:Initialize()
+  local localizedClass, englishClass = UnitClass("player")
+  if englishClass ~= "PRIEST" then
+    return
+  end
+  MyrkPriest.IsPriest = true
+
+  -- We need to find the wand on our action bars to detect if we are wanding already.
+  for slot = 1, 120 do
+    local _, _, id = GetActionText(slot)
+    if id == 5019 then
+      MyrkPriest.WandSlot = slot
+      DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[MyrkTools]|r Wand slot found = " .. slot)
+      break
+    end
+  end
+  --
+
+  -- MyrkAddon:RegisterChatCommand("mm", "SafeQuickHeal")
+end
+
 -- Priest is the function to automate priest functionality.
 -- It will decide when to heal or attack based on various conditions.
 function MyrkPriest:Priest()
+  if not MyrkPriest.IsPriest then
+    AutoMyrk:Info("Not a priest", 1, 1, 0)
+    return
+  end
+
   -- Always attempt to throw a heal first.
   -- If someone in the party needs healing, this will keep them alive!
   -- TODO: Hots? Power Word Shield?
@@ -19,6 +46,7 @@ function MyrkPriest:Priest()
   end
 
   if not InCombat() then
+    AutoMyrk:Info("Not in combat", 1, 1, 0)
     return
   end
 
@@ -82,19 +110,4 @@ function Wanding()
   end
 
   return false
-end
-
-function MyrkPriest:Initialize()
-  -- We need to find the wand on our action bars to detect if we are wanding already.
-  for slot = 1, 120 do
-    local _, _, id = GetActionText(slot)
-    if id == 5019 then
-      MyrkPriest.WandSlot = slot
-      DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[MyrkTools]|r Wand slot found = " .. slot)
-      break
-    end
-  end
-  --
-
-  -- MyrkAddon:RegisterChatCommand("mm", "SafeQuickHeal")
 end
