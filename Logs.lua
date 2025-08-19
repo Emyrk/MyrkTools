@@ -1,6 +1,5 @@
 local AceGUI = LibStub("AceGUI-3.0")
 
-MyrkLogDB = {}
 MyrkLogs = {
   maxLines = 100,
   logBuffer = {}
@@ -14,7 +13,24 @@ local LEVEL_COLORS = {
 }
 local COLOR_END = "|r"
 
+-- Define default values for frame position
+local defaults = {
+    profile = {
+        framePosition = {
+            point = "CENTER",
+            relativeTo = "UIParent", 
+            relativePoint = "CENTER",
+            xOffset = 0,
+            yOffset = 0,
+            width = 600,
+            height = 300
+        }
+    }
+}
+
+
 function MyrkLogs:Initialize()
+  self.db = LibStub("AceDB-3.0"):New("MyrkLogsDB", defaults, true)
   MyrkLogs:CreateLogWindow()
   MyrkLogs:Info("MyrkLogs Initialized")
 end
@@ -29,8 +45,9 @@ function MyrkLogs:CreateLogWindow()
   f:SetTitle("Myrk Log")
   f:SetStatusText("Lines: 0")
   f:SetLayout("Fill")
-  f:SetWidth(600)
-  f:SetHeight(400)
+  f:SetStatusTable(self.db.profile.framePosition)
+  -- f:SetWidth(600)
+  -- f:SetHeight(400)
   f:SetCallback("OnClose", function(widget)
     AceGUI:Release(widget)
     self.logWindow = nil
