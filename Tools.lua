@@ -49,7 +49,7 @@ function BoolToString(val, yes, no)
 end
 
 function InCombat()
-  return UnitAffectingCombat("player") == true
+  return UnitAffectingCombat("player") == 1
 end
 
 -- function MyrkTools:DebugSlot()

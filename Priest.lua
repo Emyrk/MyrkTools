@@ -30,7 +30,7 @@ end
 -- It will decide when to heal or attack based on various conditions.
 function MyrkPriest:Priest()
   if not MyrkPriest.IsPriest then
-    AutoMyrk:Info("Not a priest", 1, 1, 0)
+    MyrkPriest:Info("Not a priest, aborting priest behavior")
     return
   end
 
@@ -41,30 +41,40 @@ function MyrkPriest:Priest()
   --   2. When should we Power Word Shield?
   local busy = QHExport.BusyQuickHeal()
   if busy then
-    AutoMyrk:Info("Quickheal", 1, 1, 0)
+    MyrkPriest:Info("Quick healing")
     return
   end
 
+
+  local targetName, _ = UnitName("target")
+  local targetHealth = UnitHealth("target") / UnitHealthMax("target")
+  local targetInfo = "Target = ??"
+  if targetName ~= "" and targetName ~= nil and targetHealth ~= nil then
+    targetInfo = string.format("Target: %s|%.0f%%", targetName, targetHealth * 100)
+  end
+
   if not InCombat() then
-    AutoMyrk:Info("Not in combat", 1, 1, 0)
+    MyrkPriest:Debug(string.format("Not in combat, will not attack"))
     return
   end
 
   -- Healing has been covered, so now consider offensive abilities.
   if not HostileTarget() then
     -- Do not even try to attack non-hostile targets.
-    AutoMyrk:Info("Not a hostile target ", 1, 1, 0)
+    MyrkPriest:Debug(string.format("%s is not a hostile target, skipping attack", targetInfo))
     return
   end
 
   local wanding = MyrkPriest:Wand()
   if wanding then
+    MyrkPriest:Info(string.format("Wanding %s", targetInfo))
     return
   end
 
   -- TODO: Dots?
   local smiting = MyrkPriest:Smite()
   if smiting then
+    MyrkPriest:Info(string.format("Smiting %s", targetInfo))
     return
   end
 end
@@ -110,4 +120,21 @@ function Wanding()
   end
 
   return false
+end
+
+-- Convenience wrappers
+function MyrkPriest:Debug(msg)
+  MyrkLogs:Debug(string.format("PST: %s", msg))
+end
+
+function MyrkPriest:Info(msg)
+  MyrkLogs:Info(string.format("PST: %s", msg))
+end
+
+function MyrkPriest:Warn(msg)
+  MyrkLogs:Warn(string.format("PST: %s", msg))
+end
+
+function MyrkPriest:Error(msg)
+  MyrkLogs:Error(string.format("PST: %s", msg))
 end

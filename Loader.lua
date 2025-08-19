@@ -34,7 +34,7 @@ function MyrkAddon:Console(input)
   end
 
   -- unknown subcommand
-  self:Print(("Unknown command: '%s'"):format(input))
+  self:Print(string.format("Unknown command: '%s'", input))
   self:ShowHelp()
 end
 
