@@ -41,7 +41,7 @@ function MyrkPriest:Priest()
   --   2. When should we Power Word Shield?
   local busy, resp = QHExport.BusyQuickHeal()
   if busy then
-    MyrkPriest:Info("Quick healing")
+    MyrkPriest:Debug("Quick healing is busy")
     return
   end
 
