@@ -89,9 +89,6 @@ MyrkLogs.debounce = {
 }
 
 function MyrkLogs:SendLogToParty(level, msg)
-  if true then
-    -- Disable log sending for now
-  end
   if not self.syncEnabled then return end
    
   local inParty = GetNumPartyMembers() > 0
