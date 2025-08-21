@@ -43,8 +43,8 @@ if _G.ChatThrottleLib then
 		-- 	_G.SendAddonMessage = _G.ChatThrottleLib.ORIG_SendAddonMessage
 		-- end
 	end
-	_G.ChatThrottleLib.ORIG_SendChatMessage = nil
-	_G.ChatThrottleLib.ORIG_SendAddonMessage = nil
+	-- _G.ChatThrottleLib.ORIG_SendChatMessage = nil
+	-- _G.ChatThrottleLib.ORIG_SendAddonMessage = nil
 end
 
 if not _G.ChatThrottleLib then
@@ -213,9 +213,9 @@ function ChatThrottleLib:Init()
 		-- Use secure hooks as of v16. Old regular hook support yanked out in v21.
 		self.securelyHooked = true
 		--SendChatMessage
-		hooksecurefunc("SendChatMessage", function(text, chattype, language, destination)
-			return ChatThrottleLib.Hook_SendChatMessage(text, chattype, language, destination)
-		end)
+		-- hooksecurefunc("SendChatMessage", function(text, chattype, language, destination)
+		-- 	return ChatThrottleLib.Hook_SendChatMessage(text, chattype, language, destination)
+		-- end)
 		--SendAddonMessage
 		hooksecurefunc("SendAddonMessage", function(prefix, text, chattype, destination)
 			return ChatThrottleLib.Hook_SendAddonMessage(prefix, text, chattype, destination)
@@ -230,15 +230,15 @@ end
 
 local bMyTraffic = false
 
-function ChatThrottleLib.Hook_SendChatMessage(text, chattype, language, destination)
-	if bMyTraffic then
-		return
-	end
-	local self = ChatThrottleLib
-	local size = strlen(tostring(text or "")) + strlen(tostring(destination or "")) + self.MSG_OVERHEAD
-	self.avail = self.avail - size
-	self.nBypass = self.nBypass + size	-- just a statistic
-end
+-- function ChatThrottleLib.Hook_SendChatMessage(text, chattype, language, destination)
+-- 	if bMyTraffic then
+-- 		return
+-- 	end
+-- 	local self = ChatThrottleLib
+-- 	local size = strlen(tostring(text or "")) + strlen(tostring(destination or "")) + self.MSG_OVERHEAD
+-- 	self.avail = self.avail - size
+-- 	self.nBypass = self.nBypass + size	-- just a statistic
+-- end
 function ChatThrottleLib.Hook_SendAddonMessage(prefix, text, chattype, destination)
 	if bMyTraffic then
 		return
@@ -409,52 +409,52 @@ function ChatThrottleLib:Enqueue(prioname, pipename, msg)
 	self.bQueueing = true
 end
 
-function ChatThrottleLib:SendChatMessage(prio, prefix,   text, chattype, language, destination, queueName, callbackFn, callbackArg)
-	if not self or not prio or not prefix or not text or not self.Prio[prio] then
-		error('Usage: ChatThrottleLib:SendChatMessage("{BULK||NORMAL||ALERT}", "prefix", "text"[, "chattype"[, "language"[, "destination"]]]', 2)
-	end
-	if callbackFn and type(callbackFn)~="function" then
-		error('ChatThrottleLib:ChatMessage(): callbackFn: expected function, got '..type(callbackFn), 2)
-	end
+-- function ChatThrottleLib:SendChatMessage(prio, prefix,   text, chattype, language, destination, queueName, callbackFn, callbackArg)
+-- 	if not self or not prio or not prefix or not text or not self.Prio[prio] then
+-- 		error('Usage: ChatThrottleLib:SendChatMessage("{BULK||NORMAL||ALERT}", "prefix", "text"[, "chattype"[, "language"[, "destination"]]]', 2)
+-- 	end
+-- 	if callbackFn and type(callbackFn)~="function" then
+-- 		error('ChatThrottleLib:ChatMessage(): callbackFn: expected function, got '..type(callbackFn), 2)
+-- 	end
 
-	local nSize = strlen(text)
+-- 	local nSize = strlen(text)
 
---[[   -- Vanilla dont have limit?
+-- --[[   -- Vanilla dont have limit?
 
-	if nSize>255 then
-		error("ChatThrottleLib:SendChatMessage(): message length cannot exceed 255 bytes", 2)
-	end
-]]
-	nSize = nSize + self.MSG_OVERHEAD
+-- 	if nSize>255 then
+-- 		error("ChatThrottleLib:SendChatMessage(): message length cannot exceed 255 bytes", 2)
+-- 	end
+-- ]]
+-- 	nSize = nSize + self.MSG_OVERHEAD
 
-	-- Check if there's room in the global available bandwidth gauge to send directly
-	if not self.bQueueing and nSize < self:UpdateAvail() then
-		self.avail = self.avail - nSize
-		bMyTraffic = true
-		_G.SendChatMessage(text, chattype, language, destination)
-		bMyTraffic = false
-		self.Prio[prio].nTotalSent = self.Prio[prio].nTotalSent + nSize
-		if callbackFn then
-			callbackFn (callbackArg, true)
-		end
-		-- USER CALLBACK MAY ERROR
-		return
-	end
+-- 	-- Check if there's room in the global available bandwidth gauge to send directly
+-- 	if not self.bQueueing and nSize < self:UpdateAvail() then
+-- 		self.avail = self.avail - nSize
+-- 		bMyTraffic = true
+-- 		_G.SendChatMessage(text, chattype, language, destination)
+-- 		bMyTraffic = false
+-- 		self.Prio[prio].nTotalSent = self.Prio[prio].nTotalSent + nSize
+-- 		if callbackFn then
+-- 			callbackFn (callbackArg, true)
+-- 		end
+-- 		-- USER CALLBACK MAY ERROR
+-- 		return
+-- 	end
 
-	-- Message needs to be queued
-	local msg = NewMsg()
-	msg.f = _G.SendChatMessage
-	msg[1] = text
-	msg[2] = chattype or "SAY"
-	msg[3] = language
-	msg[4] = destination
-	msg.n = 4
-	msg.nSize = nSize
-	msg.callbackFn = callbackFn
-	msg.callbackArg = callbackArg
+-- 	-- Message needs to be queued
+-- 	local msg = NewMsg()
+-- 	msg.f = _G.SendChatMessage
+-- 	msg[1] = text
+-- 	msg[2] = chattype or "SAY"
+-- 	msg[3] = language
+-- 	msg[4] = destination
+-- 	msg.n = 4
+-- 	msg.nSize = nSize
+-- 	msg.callbackFn = callbackFn
+-- 	msg.callbackArg = callbackArg
 
-	self:Enqueue(prio, queueName or (prefix..(chattype or "SAY")..(destination or "")), msg)
-end
+-- 	self:Enqueue(prio, queueName or (prefix..(chattype or "SAY")..(destination or "")), msg)
+-- end
 
 
 function ChatThrottleLib:SendAddonMessage(prio, prefix, text, chattype, target, queueName, callbackFn, callbackArg)
