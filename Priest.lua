@@ -105,13 +105,13 @@ function MyrkPriest:Wand()
   if Wanding() then
     -- If we are already shooting, do not cast "Shoot" again.
     -- It would cancel the auto-shot.
-    MyrkPriest:Info("Already shooting", 1, 1, 0)
+    MyrkPriest:Debug("Already shooting", 1, 1, 0)
     return true
   end
 
   -- This starts the auto-shooting
   CastSpellByName("Shoot");
-  MyrkPriest:Info("Shoot", 1, 1, 0)
+  MyrkPriest:Debug("Shoot", 1, 1, 0)
   return true
 end
 
