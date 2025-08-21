@@ -1,35 +1,8 @@
-MyrkAddon = LibStub("AceAddon-3.0"):NewAddon("MyrkAddon", "AceConsole-3.0")
+MyrkAddon = LibStub("AceAddon-3.0"):NewAddon("MyrkAddon", "AceConsole-3.0", "AceComm-3.0", "AceEvent-3.0")
 MyrkTools = {}
 
 function MyrkTools:Initialize()
 
-end
-
--- Primary frame
-local f = CreateFrame("MessageFrame", "AutoMyrk", UIParent)
-f:SetWidth(800)  -- very wide
-f:SetHeight(200) -- very tall
-f:SetPoint("CENTER", UIParent, "CENTER", 500, -400)
-f:SetInsertMode("TOP")
-f:SetFont(STANDARD_TEXT_FONT, 12, "OUTLINE") -- massive font
-f:SetTimeVisible(1.0)                        -- stays visible for 3 seconds
-f:SetFadeDuration(1.0)                       -- 1 sec fade
-f:SetJustifyH("CENTER")
-f:SetJustifyV("MIDDLE")
-f:SetClampedToScreen(true)
-f:Show()
-
-
--- make it movable
-f:SetMovable(true)
-f:EnableMouse(true)
-f:RegisterForDrag("LeftButton")
--- f:SetScript("OnDragStart", function(self) self:StartMoving() end)
--- f:SetScript("OnDragStop", function(self) self:StopMovingOrSizing() end)
-
--- helper function
-function AutoMyrk:Info(msg, r, g, b)
-  self:AddMessage(msg, r or 1, g or 0.2, b or 0.2)
 end
 
 function HostileTarget()

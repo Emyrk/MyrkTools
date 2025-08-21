@@ -11,7 +11,33 @@ function MyrkAddon:OnInitialize()
   MyrkPriest:Initialize()
   MyrkAddon:RegisterChatCommand("myrk", "Console")
 
+  self:RegisterComm(MyrkLogs.addonPrefix, "OnCommReceived")
   DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[MyrkTools]|r Initialized " .. now)
+end
+
+function MyrkAddon:OnEnable()
+  -- Register events
+  self:RegisterEvent("PARTY_MEMBERS_CHANGED", "UpdatePartyMembers")
+  self:RegisterEvent("RAID_ROSTER_UPDATE", "UpdatePartyMembers")
+end
+
+function MyrkAddon:UpdatePartyMembers()
+  -- This can be used for UI updates if needed
+  -- The actual communication is handled by AceComm automatically
+end
+
+local playerName = UnitName("player")
+function MyrkAddon:OnCommReceived(prefix, message, distribution, sender)
+    if not MyrkLogs.syncEnabled then return end
+  if sender == playerName then
+    return
+  end
+
+  local level = string.sub(message, 1, 3)
+  local msg = string.sub(message, 4)
+  
+  -- Parse the message (format: "level|timestamp|msg")
+  MyrkLogs:Log(level, "[" .. sender .. "]" .. msg, false)
 end
 
 function MyrkAddon:Console(input)

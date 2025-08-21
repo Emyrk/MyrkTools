@@ -2,7 +2,8 @@ local AceGUI = LibStub("AceGUI-3.0")
 
 MyrkLogs = {
   maxLines = 100,
-  logBuffer = {}
+  logBuffer = {},
+  addonPrefix = "MyrkLogs"
 }
 
 local LEVEL_COLORS = {
@@ -24,8 +25,9 @@ local defaults = {
             yOffset = 0,
             width = 600,
             height = 300
-        }
-    }
+        },
+        syncEnabled = true, -- whether to sync logs with other players
+    },
 }
 
 
@@ -33,6 +35,7 @@ function MyrkLogs:Initialize()
   self.db = LibStub("AceDB-3.0"):New("MyrkLogsDB", defaults, true)
   MyrkLogs:CreateLogWindow()
   MyrkLogs:Info("MyrkLogs Initialized")
+  self.syncEnabled = self.db.profile.syncEnabled
 end
 
 function MyrkLogs:CreateLogWindow()
@@ -44,7 +47,7 @@ function MyrkLogs:CreateLogWindow()
   local f = AceGUI:Create("Frame")
   f:SetTitle("Myrk Log")
   f:SetStatusText("Lines: 0")
-  f:SetLayout("Fill")
+  f:SetLayout("Flow")
   f:SetStatusTable(self.db.profile.framePosition)
   -- f:SetWidth(600)
   -- f:SetHeight(400)
@@ -53,6 +56,16 @@ function MyrkLogs:CreateLogWindow()
     self.logWindow = nil
     self.logEdit = nil
   end)
+
+    -- Add sync toggle button
+  local syncButton = AceGUI:Create("Button")
+  syncButton:SetText(self.syncEnabled and "Sync: ON" or "Sync: OFF")
+  syncButton:SetWidth(100)
+  syncButton:SetCallback("OnClick", function()
+    self:ToggleSync()
+    syncButton:SetText(self.syncEnabled and "Sync: ON" or "Sync: OFF")
+  end)
+  f:AddChild(syncButton)
 
   local edit = AceGUI:Create("MultiLineEditBox")
   edit:SetLabel(nil)
@@ -75,6 +88,33 @@ MyrkLogs.debounce = {
   lastTime = 0,
 }
 
+function MyrkLogs:SendLogToParty(level, msg)
+  if true then
+    -- Disable log sending for now
+  end
+  if not self.syncEnabled then return end
+   
+  local inParty = GetNumPartyMembers() > 0
+  local inRaid = GetNumRaidMembers() > 0
+  
+  if not inParty and not inRaid then return end
+
+  local formatted = level .. msg
+  
+  -- Send to appropriate group
+  if inRaid then
+    MyrkAddon:SendCommMessage(self.addonPrefix, formatted, "RAID")
+  elseif inParty then
+    MyrkAddon:SendCommMessage(self.addonPrefix, formatted, "PARTY")
+  end
+end
+
+function MyrkLogs:ToggleSync()
+  self.syncEnabled = not self.syncEnabled
+  self.db.profile.syncEnabled = self.syncEnabled -- Save to DB
+  local status = self.syncEnabled and "enabled" or "disabled"
+  self:Info("Log sync " .. status)
+end
 
 function MyrkLogs:RefreshLogText()
   if not self.logEdit then return end
@@ -102,7 +142,7 @@ function MyrkLogs:DebounceText()
 end
 
 -- Core log function with level
-function MyrkLogs:Log(level, msg)
+function MyrkLogs:Log(level, msg, broadcast)
   local d = self.debounce
   if d.repeatCount > 0 then
     local repeated = date("%H:%M:%S", d.lastTime) ..
@@ -122,6 +162,13 @@ function MyrkLogs:Log(level, msg)
   if lineCount > self.maxLines then
     table.remove(MyrkLogs.logBuffer, self.maxLines - lineCount)
   end
+
+  if broadcast == nil or broadcast == true then
+  -- if level ~= "DBG" then
+    self:SendLogToParty(level, msg)
+  -- end
+  end
+
   self:RefreshLogText()
 end
 

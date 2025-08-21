@@ -91,12 +91,12 @@ function MyrkPriest:Smite()
   local m = UnitMana("player") / UnitManaMax("player");
   if m > MyrkPriest.manaThreshold then
     CastSpellByName("Smite");
-    AutoMyrk:Info("Smite ", 1, 1, 0)
+    MyrkPriest:Info("Smite ", 1, 1, 0)
     return true
   end
 
   CastSpellByName("Shoot");
-  AutoMyrk:Info("Not enough mana ", 1, 1, 0)
+  MyrkPriest:Info("Not enough mana ", 1, 1, 0)
   return false
 end
 
@@ -105,13 +105,13 @@ function MyrkPriest:Wand()
   if Wanding() then
     -- If we are already shooting, do not cast "Shoot" again.
     -- It would cancel the auto-shot.
-    AutoMyrk:Info("Already shooting", 1, 1, 0)
+    MyrkPriest:Info("Already shooting", 1, 1, 0)
     return true
   end
 
   -- This starts the auto-shooting
   CastSpellByName("Shoot");
-  AutoMyrk:Info("Shoot", 1, 1, 0)
+  MyrkPriest:Info("Shoot", 1, 1, 0)
   return true
 end
 
