@@ -164,9 +164,9 @@ function MyrkLogs:Log(level, msg, broadcast)
   end
 
   if broadcast == nil or broadcast == true then
-  -- if level ~= "DBG" then
-    self:SendLogToParty(level, msg)
-  -- end
+    if level ~= "DBG" then
+      self:SendLogToParty(level, msg)
+    end
   end
 
   self:RefreshLogText()
