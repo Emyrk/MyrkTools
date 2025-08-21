@@ -49,7 +49,13 @@ function MyrkAddon:Console(input)
     return
   end
 
-  if input == "logs" then
+  if input == "logs" or input == "logs reset" then
+    if input == "logs reset" then
+      -- Reset the logs
+      MyrkLogs:Reset()
+      self:Print("Logs have been reset.")
+    end
+
     -- `/myrk logs` -> open your log window
     if MyrkLogs and MyrkLogs.CreateLogWindow then
       MyrkLogs:CreateLogWindow()

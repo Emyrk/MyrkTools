@@ -82,6 +82,13 @@ function MyrkLogs:CreateLogWindow()
   self:RefreshLogText()
 end
 
+function MyrkLogs:Reset()
+  self.logBuffer = {}
+  self:RefreshLogText()
+  self.db.profile.framePosition = defaults.profile.framePosition -- reset frame positions
+  self.logWindow:Hide()
+end
+
 MyrkLogs.debounce = {
   lastText = nil,  -- last DEBUG message text
   repeatCount = 0, -- how many extra times we've seen it (beyond the first line we logged)
