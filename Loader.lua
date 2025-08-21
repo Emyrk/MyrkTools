@@ -28,7 +28,7 @@ end
 
 local playerName = UnitName("player")
 function MyrkAddon:OnCommReceived(prefix, message, distribution, sender)
-    if not MyrkLogs.syncEnabled then return end
+  if not MyrkLogs.syncEnabled then return end
   if sender == playerName then
     return
   end

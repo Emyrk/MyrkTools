@@ -57,15 +57,18 @@ function MyrkLogs:CreateLogWindow()
     self.logEdit = nil
   end)
 
-    -- Add sync toggle button
-  local syncButton = AceGUI:Create("Button")
-  syncButton:SetText(self.syncEnabled and "Sync: ON" or "Sync: OFF")
-  syncButton:SetWidth(100)
-  syncButton:SetCallback("OnClick", function()
-    self:ToggleSync()
-    syncButton:SetText(self.syncEnabled and "Sync: ON" or "Sync: OFF")
+  -- Add sync toggle button
+  local syncCheckbox = AceGUI:Create("CheckBox")
+  syncCheckbox:SetLabel("Sync Logs")
+  syncCheckbox:SetValue(self.syncEnabled)
+  syncCheckbox:SetCallback("OnValueChanged", function(widget, event, _)
+    local value = widget:GetValue()
+    self.syncEnabled = value
+    self.db.profile.syncEnabled = value -- Save to DB
+    local status = value and "enabled" or "disabled"
+    self:Info("Log sync " .. status)
   end)
-  f:AddChild(syncButton)
+  f:AddChild(syncCheckbox)
 
   local edit = AceGUI:Create("MultiLineEditBox")
   edit:SetLabel(nil)
@@ -111,13 +114,6 @@ function MyrkLogs:SendLogToParty(level, msg)
   elseif inParty then
     MyrkAddon:SendCommMessage(self.addonPrefix, formatted, "PARTY")
   end
-end
-
-function MyrkLogs:ToggleSync()
-  self.syncEnabled = not self.syncEnabled
-  self.db.profile.syncEnabled = self.syncEnabled -- Save to DB
-  local status = self.syncEnabled and "enabled" or "disabled"
-  self:Info("Log sync " .. status)
 end
 
 function MyrkLogs:RefreshLogText()
