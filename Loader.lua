@@ -7,11 +7,45 @@ function MyrkAddon:OnInitialize()
   if initialized then return end
   initialized = true
   MyrkTools:Initialize()
-  MyrkLogs:Initialize()
   MyrkPriest:Initialize()
   MyrkAddon:RegisterChatCommand("myrk", "Console")
 
+  -- Register communication
+  MyrkAddon:RegisterComm("myrk", "OnCommReceived")
+
   DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[MyrkTools]|r Initialized " .. now)
+end
+
+function MyrkAddon:OnEnable()
+  -- Register events
+  self:RegisterEvent("PARTY_MEMBERS_CHANGED", "UpdatePartyMembers")
+  self:RegisterEvent("RAID_ROSTER_UPDATE", "UpdatePartyMembers")
+end
+
+function MyrkAddon:UpdatePartyMembers()
+  -- This can be used for UI updates if needed
+  -- The actual communication is handled by AceComm automatically
+end
+
+function MyrkAddon:OnCommReceived(prefix, message, distribution, sender)
+  if not self.syncEnabled then return end
+  
+  -- Parse the message (format: "level|timestamp|msg")
+  local level, timestamp, msg = string.match(message, "([^|]+)|([^|]+)|(.+)")
+  if level and timestamp and msg then
+    -- Add remote log entry with sender info
+    local color = LEVEL_COLORS[level] or ""
+    local line = timestamp .. " [" .. level .. "] " .. color .. "[" .. sender .. "] " .. msg .. COLOR_END
+    table.insert(MyrkLogs.logBuffer, line)
+    
+    -- Maintain buffer size
+    local lineCount = table.getn(MyrkLogs.logBuffer)
+    if lineCount > MyrkLogs.maxLines then
+      table.remove(MyrkLogs.logBuffer, 1)
+    end
+    
+    self:RefreshLogText()
+  end
 end
 
 function MyrkAddon:Console(input)

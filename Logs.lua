@@ -24,15 +24,45 @@ local defaults = {
             yOffset = 0,
             width = 600,
             height = 300
-        }
+        },
+        syncEnabled = true, -- whether to sync logs with other players
     }
 }
-
 
 function MyrkLogs:Initialize()
   self.db = LibStub("AceDB-3.0"):New("MyrkLogsDB", defaults, true)
   MyrkLogs:CreateLogWindow()
   MyrkLogs:Info("MyrkLogs Initialized")
+  
+  -- Load sync setting from saved variables
+  self.syncEnabled = self.db.profile.syncEnabled
+  DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[MyrkLogs]|r Initialized " .. now)
+end
+
+function MyrkLogs:SendLogToParty(level, msg)
+  if not self.syncEnabled then return end
+  
+  local inParty = GetNumPartyMembers() > 0
+  local inRaid = GetNumRaidMembers() > 0
+  
+  if not inParty and not inRaid then return end
+  
+  local timestamp = date("%H:%M:%S")
+  local message = level .. "|" .. timestamp .. "|" .. tostring(msg)
+  
+  -- Send to appropriate group
+  if inRaid then
+    MyrkAddon:SendCommMessage(self.addonPrefix, message, "RAID")
+  elseif inParty then
+    MyrkAddon:SendCommMessage(self.addonPrefix, message, "PARTY")
+  end
+end
+
+function MyrkLogs:ToggleSync()
+  self.syncEnabled = not self.syncEnabled
+  self.db.profile.syncEnabled = self.syncEnabled -- Save to DB
+  local status = self.syncEnabled and "enabled" or "disabled"
+  self:Info("Log sync " .. status)
 end
 
 function MyrkLogs:CreateLogWindow()
@@ -44,7 +74,7 @@ function MyrkLogs:CreateLogWindow()
   local f = AceGUI:Create("Frame")
   f:SetTitle("Myrk Log")
   f:SetStatusText("Lines: 0")
-  f:SetLayout("Fill")
+  f:SetLayout("Flow")
   f:SetStatusTable(self.db.profile.framePosition)
   -- f:SetWidth(600)
   -- f:SetHeight(400)
@@ -53,6 +83,16 @@ function MyrkLogs:CreateLogWindow()
     self.logWindow = nil
     self.logEdit = nil
   end)
+
+  -- Add sync toggle button
+  local syncButton = AceGUI:Create("Button")
+  syncButton:SetText(self.syncEnabled and "Sync: ON" or "Sync: OFF")
+  syncButton:SetWidth(100)
+  syncButton:SetCallback("OnClick", function()
+    self:ToggleSync()
+    syncButton:SetText(self.syncEnabled and "Sync: ON" or "Sync: OFF")
+  end)
+  f:AddChild(syncButton)
 
   local edit = AceGUI:Create("MultiLineEditBox")
   edit:SetLabel(nil)
@@ -121,6 +161,10 @@ function MyrkLogs:Log(level, msg)
   local lineCount = table.getn(MyrkLogs.logBuffer)
   if lineCount > self.maxLines then
     table.remove(MyrkLogs.logBuffer, self.maxLines - lineCount)
+  end
+
+  if level ~= "DBG" then
+    self:SendLogToParty(level, msg)
   end
   self:RefreshLogText()
 end
