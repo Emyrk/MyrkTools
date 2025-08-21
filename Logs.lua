@@ -24,7 +24,8 @@ local defaults = {
             xOffset = 0,
             yOffset = 0,
             width = 600,
-            height = 300
+            height = 300,
+            shown = true
         },
         syncEnabled = true, -- whether to sync logs with other players
     },
@@ -33,12 +34,18 @@ local defaults = {
 
 function MyrkLogs:Initialize()
   self.db = LibStub("AceDB-3.0"):New("MyrkLogsDB", defaults, true)
-  MyrkLogs:CreateLogWindow()
-  MyrkLogs:Info("MyrkLogs Initialized")
   self.syncEnabled = self.db.profile.syncEnabled
+  self.shown = self.db.profile.framePosition.shown
+
+  if self.shown then
+    self:CreateLogWindow()
+  end
+  MyrkLogs:Info("MyrkLogs Initialized")
 end
 
 function MyrkLogs:CreateLogWindow()
+  self.shown = true
+  self.db.profile.framePosition.shown = true
   if self.logWindow then
     self.logWindow:Show()
     return
@@ -55,6 +62,8 @@ function MyrkLogs:CreateLogWindow()
     AceGUI:Release(widget)
     self.logWindow = nil
     self.logEdit = nil
+    self.shown = false
+    self.db.profile.framePosition.shown = false
   end)
 
   -- Add sync toggle button
