@@ -39,12 +39,19 @@ function MyrkPriest:Priest()
   -- TODO: Hots? Power Word Shield?
   --   1. When moving, cast HOTs instead of trying to cast a channeled ability
   --   2. When should we Power Word Shield?
-  local busy = QHExport.BusyQuickHeal()
+  local busy, resp = QHExport.BusyQuickHeal()
   if busy then
     MyrkPriest:Info("Quick healing")
     return
   end
 
+  if resp and resp.targeting and resp.targeting.castable ~= nil and not resp.targeting.castable then
+    local hotBusy, _ = QHExport.BusyQuickHOT()
+    if hotBusy then
+      MyrkPriest:Info("Quick hot healing")
+      return
+    end
+  end
 
   local targetName, _ = UnitName("target")
   local targetHealth = UnitHealth("target") / UnitHealthMax("target")
