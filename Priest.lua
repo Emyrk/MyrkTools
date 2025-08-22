@@ -3,7 +3,7 @@ MyrkPriest = {
   IsPriest = false
 }
 
-MyrkPriest.manaThreshold = 0.60
+MyrkPriest.manaThreshold = 0.95
 
 function MyrkPriest:Initialize()
   local localizedClass, englishClass = UnitClass("player")
@@ -72,31 +72,25 @@ function MyrkPriest:Priest()
     return
   end
 
+  -- TODO: Dots?
+  local m = UnitMana("player") / UnitManaMax("player");
+  if m > MyrkPriest.manaThreshold then
+    local smiting = MyrkPriest:Smite()
+    if smiting then
+      return
+    end
+  end
+
   local wanding = MyrkPriest:Wand()
   if wanding then
     MyrkPriest:Info(string.format("Wanding %s", targetInfo))
-    return
-  end
-
-  -- TODO: Dots?
-  local smiting = MyrkPriest:Smite()
-  if smiting then
-    MyrkPriest:Info(string.format("Smiting %s", targetInfo))
     return
   end
 end
 
 -- Smite will only cast if we have enough mana reserved for healing.
 function MyrkPriest:Smite()
-  local m = UnitMana("player") / UnitManaMax("player");
-  if m > MyrkPriest.manaThreshold then
-    CastSpellByName("Smite");
-    MyrkPriest:Info("Smite ", 1, 1, 0)
-    return true
-  end
-
-  CastSpellByName("Shoot");
-  MyrkPriest:Info("Not enough mana ", 1, 1, 0)
+  CastSpellByName("Smite");
   return false
 end
 

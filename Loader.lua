@@ -11,7 +11,8 @@ function MyrkAddon:OnInitialize()
   MyrkPriest:Initialize()
   MyrkAddon:RegisterChatCommand("myrk", "Console")
 
-  self:RegisterComm(MyrkLogs.addonPrefix, "OnCommReceived")
+  -- Buggy
+  -- self:RegisterComm(MyrkLogs.addonPrefix, "OnCommReceived")
   DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[MyrkTools]|r Initialized " .. now)
 end
 

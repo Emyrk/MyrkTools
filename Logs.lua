@@ -82,7 +82,7 @@ function MyrkLogs:CreateLogWindow()
   local edit = AceGUI:Create("MultiLineEditBox")
   edit:SetLabel(nil)
   edit:DisableButton(true) -- hide "Okay" button
-  edit:SetNumLines(20)
+  edit:SetNumLines(MyrkLogs.maxLines)
   edit:SetMaxLetters(0)    -- unlimited
   edit:SetFullWidth(true)
   edit:SetFullHeight(true)
@@ -108,6 +108,9 @@ MyrkLogs.debounce = {
 }
 
 function MyrkLogs:SendLogToParty(level, msg)
+  if true then
+    return -- buggy
+  end
   if not self.syncEnabled then return end
    
   local inParty = GetNumPartyMembers() > 0
