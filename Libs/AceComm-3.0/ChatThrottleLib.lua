@@ -519,7 +519,8 @@ end
 -----------------------------------------------------------------------
 -- Get the ball rolling!
 
-ChatThrottleLib:Init()
+-- No, this bugs things out.
+-- ChatThrottleLib:Init()
 
 --[[ WoWBench debugging snippet
 if(WOWB_VER) then

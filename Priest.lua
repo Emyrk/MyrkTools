@@ -3,6 +3,11 @@ MyrkPriest = {
   IsPriest = false
 }
 
+-- Do not heal warlocks
+-- Do not interrupt drinking
+-- If flying, do nothing
+-- If dead do nothing
+
 MyrkPriest.manaThreshold = 0.95
 
 function MyrkPriest:Initialize()
