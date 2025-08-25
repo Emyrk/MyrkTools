@@ -4,9 +4,7 @@ MyrkPriest = {
 }
 
 -- Do not heal warlocks
--- Do not interrupt drinking
 -- If flying, do nothing
--- If dead do nothing
 
 MyrkPriest.manaThreshold = 0.95
 
@@ -34,10 +32,26 @@ end
 -- Priest is the function to automate priest functionality.
 -- It will decide when to heal or attack based on various conditions.
 function MyrkPriest:Priest()
+  MyrkPriest:Info("Info")
   if not MyrkPriest.IsPriest then
     MyrkPriest:Info("Not a priest, aborting priest behavior")
     return
   end
+
+  if UnitIsDead("player") then
+     MyrkPriest:Debug("Player is dead, nothing to do")
+    return
+  end
+
+  local m = UnitMana("player") / UnitManaMax("player");
+  if MyrkTools:IsDrinking() then
+    if m < 0.97 then
+      MyrkPriest:Debug("Player is drinking, wait")
+      return
+    end
+
+  end
+
 
   -- Always attempt to throw a heal first.
   -- If someone in the party needs healing, this will keep them alive!
@@ -78,7 +92,6 @@ function MyrkPriest:Priest()
   end
 
   -- TODO: Dots?
-  local m = UnitMana("player") / UnitManaMax("player");
   if m > MyrkPriest.manaThreshold then
     local smiting = MyrkPriest:Smite()
     if smiting then

@@ -25,14 +25,17 @@ function InCombat()
   return UnitAffectingCombat("player") == 1
 end
 
--- function MyrkTools:DebugSlot()
---   for slot = 1, 120 do
---     local t, id = GetActionText(slot)
---     if t == "spell" then
---       local name = GetSpellName(id, BOOKTYPE_SPELL)
---       if name == "Shoot" then
---         print("Shoot is in slot", slot)
---       end
---     end
---   end
--- end
+-- Add this to your Tools.lua file
+function MyrkTools:IsDrinking()
+    for i = 1, 32 do
+        local buffTexture, buffApplications = UnitBuff("player", i)
+        if not buffTexture then
+            break
+        end
+
+        if string.find(buffTexture, "Interface\\Icons\\INV_Drink_%d+") then
+            return true
+        end
+    end
+    return false
+end

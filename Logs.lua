@@ -131,12 +131,10 @@ end
 function MyrkLogs:RefreshLogText()
   if not self.logEdit then return end
   self.logEdit:SetDisabled(false)
-  self.logEdit:SetText(table.concat(MyrkLogs.logBuffer, "\n") ..
-    self:DebounceText())
+  self.logEdit:SetText(table.concat(MyrkLogs.logBuffer, "\n") .. self:DebounceText())
   -- scroll to bottom
   local eb = self.logEdit.editBox
-  eb:HighlightText(0, 0)
-  -- eb:SetCursorPosition(eb:GetNumLetters())
+  -- eb:HighlightText(0, 0)
   self.logEdit:SetDisabled(true)
 
   if self.logWindow then
