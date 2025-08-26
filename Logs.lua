@@ -94,8 +94,6 @@ function MyrkLogs:CreateLogWindow()
   scrollFrame:SetJustifyH("LEFT")
   scrollFrame:SetFading(false)
   scrollFrame:SetMaxLines(maxLines)
-  scrollFrame:SetInsertMode("BOTTOM")
-  scrollFrame:SetHyperlinksEnabled(false)
   scrollFrame:EnableMouseWheel(true)
   scrollFrame:SetScript("OnMouseWheel", function(self, delta)
     if delta > 0 then
