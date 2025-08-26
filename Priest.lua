@@ -31,7 +31,6 @@ end
 -- Priest is the function to automate priest functionality.
 -- It will decide when to heal or attack based on various conditions.
 function MyrkPriest:Priest()
-  MyrkPriest:Info("Info")
   if not MyrkPriest.IsPriest then
     MyrkPriest:Info("Not a priest, aborting priest behavior")
     return
