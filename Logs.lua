@@ -96,9 +96,9 @@ function MyrkLogs:CreateLogWindow()
   scrollFrame:SetMaxLines(maxLines)
   scrollFrame:EnableMouseWheel(true)
   scrollFrame:SetScript("OnMouseWheel", function(self, delta)
-    if delta > 0 then
+    if delta and delta > 0 then
       self:PageUp()
-    else
+    elseif delta and delta < 0 then
       self:PageDown()
     end
   end)
