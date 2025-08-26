@@ -1,10 +1,3 @@
-MyrkAddon = LibStub("AceAddon-3.0"):NewAddon("MyrkAddon", "AceConsole-3.0", "AceEvent-3.0", "AceComm-3.0")
-MyrkTools = {}
-
-function MyrkTools:Initialize()
-
-end
-
 function HostileTarget()
   if not UnitExists("target") then return false end
   if UnitIsDead("target") then return false end
@@ -26,7 +19,7 @@ function InCombat()
 end
 
 -- Add this to your Tools.lua file
-function MyrkTools:IsDrinking()
+function IsDrinking()
     for i = 1, 32 do
         local buffTexture, buffApplications = UnitBuff("player", i)
         if not buffTexture then

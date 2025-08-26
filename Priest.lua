@@ -1,14 +1,13 @@
-MyrkPriest = {
-  WandSlot = 0,
-  IsPriest = false
-}
+MyrkPriest = MyrkAddon:NewModule("MyrkPriest")
 
 -- Do not heal warlocks
 -- If flying, do nothing
 
-MyrkPriest.manaThreshold = 0.95
+MyrkPriest.manaThreshold = 0.95;
+MyrkPriest.WandSlot = 0;
+MyrkPriest.IsPriest = false;
 
-function MyrkPriest:Initialize()
+function MyrkPriest:OnEnable()
   local localizedClass, englishClass = UnitClass("player")
   if englishClass ~= "PRIEST" then
     return
@@ -20,7 +19,7 @@ function MyrkPriest:Initialize()
     local _, _, id = GetActionText(slot)
     if id == 5019 then
       MyrkPriest.WandSlot = slot
-      DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[MyrkTools]|r Wand slot found = " .. slot)
+      DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[MyrkPriest]|r Wand slot found = " .. slot)
       break
     end
   end
@@ -44,7 +43,7 @@ function MyrkPriest:Priest()
   end
 
   local m = UnitMana("player") / UnitManaMax("player");
-  if MyrkTools:IsDrinking() then
+  if IsDrinking() then
     if m < 0.97 then
       MyrkPriest:Debug("Player is drinking, wait")
       return
