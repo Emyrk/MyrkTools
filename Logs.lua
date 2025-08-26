@@ -102,7 +102,6 @@ function MyrkLogs:CreateLogWindow()
       scrollFrame:PageDown()
     end
   end)
-
   -- Prevent text selection and focus issues
   scrollFrame:SetScript("OnMouseDown", function() end)
   scrollFrame:SetScript("OnMouseUp", function() end)
