@@ -97,9 +97,9 @@ function MyrkLogs:CreateLogWindow()
   scrollFrame:EnableMouseWheel(true)
   scrollFrame:SetScript("OnMouseWheel", function(self, delta)
     if delta > 0 then
-      self:ScrollUp()
+      self:PageUp()
     else
-      self:ScrollDown()
+      self:PageDown()
     end
   end)
   -- Prevent text selection and focus issues
