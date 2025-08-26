@@ -44,7 +44,7 @@ function MyrkPriest:Priest()
   end
 
   local m = UnitMana("player") / UnitManaMax("player");
-  if MyrkTools:IsDrinking() then
+  if IsDrinking() then
     if m < 0.97 then
       MyrkPriest:Debug("Player is drinking, wait")
       return

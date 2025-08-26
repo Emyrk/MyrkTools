@@ -1,8 +1,9 @@
+-- MyrkLogs module
+MyrkLogs = MyrkAddon:NewModule("MyrkLogs")
+
 local AceGUI = LibStub("AceGUI-3.0")
 
-local MyrkLogs = MyrkAddon:NewModule("MyrkLogs")
-
-function MyrkLogs:Initialize()
+function MyrkLogs:OnEnable()
   self.db = LibStub("AceDB-3.0"):New("MyrkLogsDB", defaults, true)
   self.syncEnabled = self.db.profile.syncEnabled
   self.shown = self.db.profile.framePosition.shown
@@ -10,7 +11,7 @@ function MyrkLogs:Initialize()
   if self.shown then
     self:CreateLogWindow()
   end
-  DEFAULT_CHAT_FRAME:AddMessage("|cff8888ff[MyrkLogs]|r Initialized ")
+  DEFAULT_CHAT_FRAME:AddMessage("|cff8888ff[MyrkLogs]|r Enabled ")
 end
 
 local maxLines = 100;

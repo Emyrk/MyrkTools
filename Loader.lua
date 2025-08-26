@@ -1,7 +1,7 @@
 function MyrkAddon:OnEnable()
   -- Register events
-  self:RegisterEvent("PARTY_MEMBERS_CHANGED", "UpdatePartyMembers")
-  self:RegisterEvent("RAID_ROSTER_UPDATE", "UpdatePartyMembers")
+  -- self:RegisterEvent("PARTY_MEMBERS_CHANGED", "UpdatePartyMembers")
+  -- self:RegisterEvent("RAID_ROSTER_UPDATE", "UpdatePartyMembers")
 end
 
 function MyrkAddon:UpdatePartyMembers()
@@ -23,42 +23,7 @@ function MyrkAddon:OnCommReceived(prefix, message, distribution, sender)
   MyrkLogs:Log(level, "[" .. sender .. "]" .. msg, false)
 end
 
-function MyrkAddon:Console(input)
-  -- normalize input: trim and lowercase the first word
-  input = input or ""
 
-  if input == "" or input == "help" then
-    self:ShowHelp()
-    return
-  end
-
-  if input == "logs" or input == "logs reset" then
-    if input == "logs reset" then
-      -- Reset the logs
-      MyrkLogs:Reset()
-      self:Print("Logs have been reset.")
-    end
-
-    -- `/myrk logs` -> open your log window
-    if MyrkLogs and MyrkLogs.CreateLogWindow then
-      MyrkLogs:CreateLogWindow()
-    else
-      self:Print("Logs module not loaded.")
-    end
-    return
-  end
-
-  -- unknown subcommand
-  self:Print(string.format("Unknown command: '%s'", input))
-  self:ShowHelp()
-end
-
-function MyrkAddon:ShowHelp()
-  -- AceConsole-3.0 gives you :Print; fallback below if needed
-  self:Print("MyrkAddon commands:")
-  self:Print("  /myrk logs     - open the log window")
-  self:Print("  /myrk help     - show this help")
-end
 
 -- function MyrkTools:Test()
 --   SendChatMessage("Test", SELF)
