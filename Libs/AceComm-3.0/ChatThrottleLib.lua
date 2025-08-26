@@ -1,3 +1,5 @@
+-- Emyrk this breaks everything
+
 --
 -- ChatThrottleLib by Mikk
 --
