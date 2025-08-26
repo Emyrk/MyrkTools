@@ -4,7 +4,6 @@ local initialized = false
 function MyrkAddon:OnInitialize()
   if initialized then return end
   initialized = true
-  MyrkPriest:Initialize()
   MyrkAddon:RegisterChatCommand("myrk", "Console")
 
   -- Buggy
