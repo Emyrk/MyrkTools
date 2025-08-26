@@ -61,7 +61,7 @@ function MyrkLogs:CreateLogWindow()
   f:SetCallback("OnClose", function(widget)
     AceGUI:Release(widget)
     self.logWindow = nil
-    self.logEdit = nil
+    self.logScrollFrame = nil
     self.shown = false
     self.db.profile.framePosition.shown = false
   end)
@@ -79,18 +79,38 @@ function MyrkLogs:CreateLogWindow()
   end)
   f:AddChild(syncCheckbox)
 
-  local edit = AceGUI:Create("MultiLineEditBox")
-  edit:SetLabel(nil)
-  edit:DisableButton(true) -- hide "Okay" button
-  edit:SetNumLines(maxLines)
-  edit:SetMaxLetters(0)    -- unlimited
-  edit:SetFullWidth(true)
-  edit:SetFullHeight(true)
-  edit:SetDisabled(true) -- makes it read-only
-  f:AddChild(edit)
+  -- Create a simple group to hold our custom ScrollingMessageFrame
+  local group = AceGUI:Create("SimpleGroup")
+  group:SetFullWidth(true)
+  group:SetFullHeight(true)
+  group:SetLayout("Fill")
+  f:AddChild(group)
+
+  -- Create the ScrollingMessageFrame directly using WoW API
+  local scrollFrame = CreateFrame("ScrollingMessageFrame", nil, group.frame)
+  scrollFrame:SetPoint("TOPLEFT", group.frame, "TOPLEFT", 10, -10)
+  scrollFrame:SetPoint("BOTTOMRIGHT", group.frame, "BOTTOMRIGHT", -10, 10)
+  scrollFrame:SetFontObject(ChatFontNormal)
+  scrollFrame:SetJustifyH("LEFT")
+  scrollFrame:SetFading(false)
+  scrollFrame:SetMaxLines(maxLines)
+  scrollFrame:SetInsertMode("BOTTOM")
+  scrollFrame:SetHyperlinksEnabled(false)
+  scrollFrame:EnableMouseWheel(true)
+  scrollFrame:SetScript("OnMouseWheel", function(self, delta)
+    if delta > 0 then
+      self:ScrollUp()
+    else
+      self:ScrollDown()
+    end
+  end)
+  -- Prevent text selection and focus issues
+  scrollFrame:SetScript("OnMouseDown", function() end)
+  scrollFrame:SetScript("OnMouseUp", function() end)
+  scrollFrame:EnableMouse(true)
 
   self.logWindow = f
-  self.logEdit = edit
+  self.logScrollFrame = scrollFrame
   self:RefreshLogText()
 end
 
@@ -129,13 +149,23 @@ function MyrkLogs:SendLogToParty(level, msg)
 end
 
 function MyrkLogs:RefreshLogText()
-  if not self.logEdit then return end
-  self.logEdit:SetDisabled(false)
-  self.logEdit:SetText(table.concat(logBuffer, "\n") .. self:DebounceText())
-  -- scroll to bottom
-  local eb = self.logEdit.editBox
-  -- eb:HighlightText(0, 0)
-  self.logEdit:SetDisabled(true)
+  if not self.logScrollFrame then return end
+  
+  -- Clear existing messages
+  self.logScrollFrame:Clear()
+  
+  -- Add all log messages
+  for i, line in ipairs(logBuffer) do
+    self.logScrollFrame:AddMessage(line)
+  end
+  
+  -- Add debounce text if any
+  local debounceText = self:DebounceText()
+  if debounceText and debounceText ~= "" then
+    -- Remove leading newline since we're adding as separate message
+    debounceText = string.gsub(debounceText, "^\n", "")
+    self.logScrollFrame:AddMessage(debounceText)
+  end
 
   if self.logWindow then
     self.logWindow:SetStatusText(string.format("Lines: %s", (table.getn(logBuffer))))
