@@ -1,10 +1,21 @@
 local AceGUI = LibStub("AceGUI-3.0")
 
-MyrkLogs = {
-  maxLines = 100,
-  logBuffer = {},
-  addonPrefix = "MyrkLogs"
-}
+local MyrkLogs = MyrkAddon:NewModule("MyrkLogs")
+
+function MyrkLogs:Initialize()
+  self.db = LibStub("AceDB-3.0"):New("MyrkLogsDB", defaults, true)
+  self.syncEnabled = self.db.profile.syncEnabled
+  self.shown = self.db.profile.framePosition.shown
+
+  if self.shown then
+    self:CreateLogWindow()
+  end
+  DEFAULT_CHAT_FRAME:AddMessage("|cff8888ff[MyrkLogs]|r Initialized ")
+end
+
+local maxLines = 100;
+local logBuffer = {};
+local addonPrefix = "MyrkLogs";
 
 local LEVEL_COLORS = {
   DBG = "|cffaaaaaa", -- grey
@@ -30,18 +41,6 @@ local defaults = {
         syncEnabled = true, -- whether to sync logs with other players
     },
 }
-
-
-function MyrkLogs:Initialize()
-  self.db = LibStub("AceDB-3.0"):New("MyrkLogsDB", defaults, true)
-  self.syncEnabled = self.db.profile.syncEnabled
-  self.shown = self.db.profile.framePosition.shown
-
-  if self.shown then
-    self:CreateLogWindow()
-  end
-  MyrkLogs:Info("MyrkLogs Initialized")
-end
 
 function MyrkLogs:CreateLogWindow()
   self.shown = true
@@ -82,7 +81,7 @@ function MyrkLogs:CreateLogWindow()
   local edit = AceGUI:Create("MultiLineEditBox")
   edit:SetLabel(nil)
   edit:DisableButton(true) -- hide "Okay" button
-  edit:SetNumLines(MyrkLogs.maxLines)
+  edit:SetNumLines(maxLines)
   edit:SetMaxLetters(0)    -- unlimited
   edit:SetFullWidth(true)
   edit:SetFullHeight(true)
@@ -95,7 +94,7 @@ function MyrkLogs:CreateLogWindow()
 end
 
 function MyrkLogs:Reset()
-  self.logBuffer = {}
+  logBuffer = {}
   self:RefreshLogText()
   self.db.profile.framePosition = defaults.profile.framePosition -- reset frame positions
   self.logWindow:Hide()
@@ -122,23 +121,23 @@ function MyrkLogs:SendLogToParty(level, msg)
   
   -- Send to appropriate group
   if inRaid then
-    MyrkAddon:SendCommMessage(self.addonPrefix, formatted, "RAID")
+    MyrkAddon:SendCommMessage(addonPrefix, formatted, "RAID")
   elseif inParty then
-    MyrkAddon:SendCommMessage(self.addonPrefix, formatted, "PARTY")
+    MyrkAddon:SendCommMessage(addonPrefix, formatted, "PARTY")
   end
 end
 
 function MyrkLogs:RefreshLogText()
   if not self.logEdit then return end
   self.logEdit:SetDisabled(false)
-  self.logEdit:SetText(table.concat(MyrkLogs.logBuffer, "\n") .. self:DebounceText())
+  self.logEdit:SetText(table.concat(logBuffer, "\n") .. self:DebounceText())
   -- scroll to bottom
   local eb = self.logEdit.editBox
   -- eb:HighlightText(0, 0)
   self.logEdit:SetDisabled(true)
 
   if self.logWindow then
-    self.logWindow:SetStatusText(string.format("Lines: %s", (table.getn(MyrkLogs.logBuffer))))
+    self.logWindow:SetStatusText(string.format("Lines: %s", (table.getn(logBuffer))))
   end
 end
 
@@ -157,7 +156,7 @@ function MyrkLogs:Log(level, msg, broadcast)
   if d.repeatCount > 0 then
     local repeated = date("%H:%M:%S", d.lastTime) ..
         " [" .. "DBG" .. "] " .. LEVEL_COLORS["DBG"] .. "---> log repeated x" .. tostring(d.repeatCount) .. COLOR_END
-    table.insert(MyrkLogs.logBuffer, repeated)
+    table.insert(logBuffer, repeated)
   end
 
   local now = GetTime()
@@ -167,10 +166,10 @@ function MyrkLogs:Log(level, msg, broadcast)
 
   local color = LEVEL_COLORS[level] or ""
   local line = date("%H:%M:%S") .. " [" .. level .. "] " .. color .. tostring(msg) .. COLOR_END
-  table.insert(MyrkLogs.logBuffer, line)
-  local lineCount = table.getn(MyrkLogs.logBuffer)
-  if lineCount > self.maxLines then
-    table.remove(MyrkLogs.logBuffer, self.maxLines - lineCount)
+  table.insert(logBuffer, line)
+  local lineCount = table.getn(logBuffer)
+  if lineCount > maxLines then
+    table.remove(logBuffer, maxLines - lineCount)
   end
 
   if broadcast == nil or broadcast == true then

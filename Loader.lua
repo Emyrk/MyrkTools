@@ -1,21 +1,3 @@
-local now = GetTime();
-DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[MyrkTools]|r Loaded " .. now)
-
-local initialized = false
-
-function MyrkAddon:OnInitialize()
-  if initialized then return end
-  initialized = true
-  MyrkTools:Initialize()
-  MyrkLogs:Initialize()
-  MyrkPriest:Initialize()
-  MyrkAddon:RegisterChatCommand("myrk", "Console")
-
-  -- Buggy
-  -- self:RegisterComm(MyrkLogs.addonPrefix, "OnCommReceived")
-  DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[MyrkTools]|r Initialized " .. now)
-end
-
 function MyrkAddon:OnEnable()
   -- Register events
   self:RegisterEvent("PARTY_MEMBERS_CHANGED", "UpdatePartyMembers")
