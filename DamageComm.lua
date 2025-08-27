@@ -28,15 +28,26 @@ function DamageComm:DamageCommHookPfUI()
 
     local HookRefreshUnit = pfUI.uf.RefreshUnit
     function pfUI.uf:RefreshUnit(unit, component)
-      -- run pfUI's original logic first so sizes are up-to-date
+      -- Always run pfUI’s original logic
       HookRefreshUnit(this, unit, component)
+      -- print all table elements of the unit
+      -- for k, v in pairs(unit) do
+      --   DEFAULT_CHAT_FRAME:AddMessage("unit["..k.."]="..tostring(v))
+      -- end
 
-      if not unit or not unit.hp or not unit.config then return end
+      -- Only party members (party1..party4)
+      if not unit or not (unit.label == "party" or unit.label == "player") then
+        if unit and unit.incDmg then unit.incDmg:Hide() end
+        return
+      end
+
       local unitstr = (unit.label or "") .. (unit.id or "")
-      if unitstr == "" then return end
-      if not UnitExists(unitstr) then return end
+      if unitstr == "" or not UnitExists(unitstr) then
+        if unit.incDmg then unit.incDmg:Hide() end
+        return
+      end
 
-      -- create once
+      -- Create once
       if not unit.incDmg then
         unit.incDmg = CreateFrame("Frame", nil, unit.hp)
         unit.incDmg.tex = unit.incDmg:CreateTexture(nil, "OVERLAY")
@@ -50,63 +61,43 @@ function DamageComm:DamageCommHookPfUI()
       local width  = unit.config.width
       local height = unit.config.height
       local health, maxHealth = UnitHealth(unitstr), UnitHealthMax(unitstr)
-      if maxHealth <= 0 then unit.incDmg:Hide() return end
-
-      local dmg = getIncomingDamage(unitstr)
-      if not dmg or dmg <= 0 or health <= 0 then
-        unit.incDmg:Hide()
-        return
+      if maxHealth <= 0 or health <= 0 then unit.incDmg:Hide() 
+        return 
       end
 
-      -- clamp damage to current health (only show the part that can actually remove visible HP)
+      local dmg = getIncomingDamage(unitstr)
+      if not dmg or dmg <= 0 then unit.incDmg:Hide() return end
+
+      -- Clamp to visible health
       if dmg > health then dmg = health end
 
-      -- size: half height as requested
+      -- Half-height red strip anchored to the top so the bottom half stays visible
       local barH = math.max(1, math.floor(height / 2))
       unit.incDmg:SetHeight(barH)
+      unit.incDmg.tex:SetVertexColor(0.9, 0.15, 0.15, 1)
 
       if unit.config.verticalbar == "0" then
-        -- horizontal bars
+        -- Horizontal bars
         local healthWidth = width * (health / maxHealth)
-        local dmgWidth = width * (dmg / maxHealth)
-
+        local dmgWidth    = width * (dmg   / maxHealth)
         unit.incDmg:ClearAllPoints()
+
         if unit.config.invert_healthbar == "1" then
-          -- inverted: health fills from right -> left. Overlay at the right edge of the health region.
-          local x = width - dmgWidth
+          -- Inverted: health fills right->left; place band at the right edge of the health region
+          local x = width - healthWidth
           unit.incDmg:SetPoint("TOPLEFT", unit.hp.bar, "TOPLEFT", x, 0)
         else
-          -- normal: health fills left -> right. Overlay at the right edge of the health region.
+          -- Normal: health fills left->right; place band at the right edge of the health region
           local x = healthWidth - dmgWidth
           if x < 0 then x = 0 end
           unit.incDmg:SetPoint("TOPLEFT", unit.hp.bar, "TOPLEFT", x, 0)
         end
 
         unit.incDmg:SetWidth(dmgWidth)
-        unit.incDmg.tex:SetVertexColor(0.9, 0.15, 0.15, 1)
         unit.incDmg:Show()
       else
-        -- vertical bars (optional draft; confirm desired orientation)
-        -- Assumption: bar grows bottom -> top when not inverted.
-        local healthHeight = height * (health / maxHealth)
-        local dmgHeight = height * (dmg / maxHealth)
-        if unit.config.invert_healthbar == "1" then
-          -- inverted: top -> bottom. Draw at top edge of health region.
-          local y = 0 -- top anchored, use height/positioning as needed
-          unit.incDmg:ClearAllPoints()
-          unit.incDmg:SetPoint("TOPLEFT", unit.hp.bar, "TOPLEFT", 0, -y)
-          unit.incDmg:SetPoint("TOPRIGHT", unit.hp.bar, "TOPRIGHT", 0, -y)
-          unit.incDmg:SetHeight(dmgHeight)
-        else
-          -- normal: bottom -> top. Draw at top edge (inside health).
-          local y = healthHeight - dmgHeight
-          unit.incDmg:ClearAllPoints()
-          unit.incDmg:SetPoint("TOPLEFT", unit.hp.bar, "BOTTOMLEFT", 0, y)
-          unit.incDmg:SetPoint("TOPRIGHT", unit.hp.bar, "BOTTOMRIGHT", 0, y)
-          unit.incDmg:SetHeight(dmgHeight)
-        end
-        unit.incDmg.tex:SetVertexColor(0.9, 0.15, 0.15, 1)
-        unit.incDmg:Show()
+        -- Optional: implement if you use vertical health bars. For now, hide.
+        unit.incDmg:Hide()
       end
     end
   end)
