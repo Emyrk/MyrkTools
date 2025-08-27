@@ -8,7 +8,7 @@ function MyrkAddon:OnInitialize()
 
   -- Buggy
   -- self:RegisterComm(MyrkLogs.addonPrefix, "OnCommReceived")
-  DEFAULT_CHAT_FRAME:AddMessage("|cff8888ff[MyrkTools]|r Initialized ")
+  DEFAULT_CHAT_FRAME:AddMessage("|cff8888ff[MyrkTools]|r Initialized")
 end
 
 function MyrkAddon:Console(input)
