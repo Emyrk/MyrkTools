@@ -98,16 +98,16 @@ function DamageComm:DamageCommHookPfUI()
         local dmgWidth    = width * (dmg   / maxHealth)
         unit.incDmg:ClearAllPoints()
 
-        unit.incDmg:SetPoint("TOPLEFT", 0, "TOPLEFT", x, 0)
+        unit.incDmg:SetPoint("BOTTOMLEFT", 0, "BOTTOMLEFT", x, 0)
         if unit.config.invert_healthbar == "1" then
           -- Inverted: health fills right->left; place band at the right edge of the health region
           -- TODO: This works like healcomm
           local x = width - healthWidth
-          unit.incDmg:SetPoint("TOPLEFT", unit.hp.bar, "TOPLEFT", x, 0)
+          unit.incDmg:SetPoint("BOTTOMLEFT", unit.hp.bar, "BOTTOMLEFT", x, 0)
         else
           -- Start from the left.
           local x = healthWidth - dmgWidth
-          unit.incDmg:SetPoint("TOPLEFT", 0, "TOPLEFT", x, 0)
+          unit.incDmg:SetPoint("BOTTOMLEFT", 0, "BOTTOMLEFT", x, 0)
           -- Normal: health fills left->right; place band at the right edge of the health region
           -- local x = healthWidth - dmgWidth
           -- if x < 0 then x = 0 end
