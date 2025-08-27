@@ -30,4 +30,4 @@ Tools.lua
 Logs.lua
 Priest.lua
 Loader.lua
-PartyMonitor/PartyMonitor.xml
+DamageComm.lua
