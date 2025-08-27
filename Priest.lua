@@ -90,7 +90,10 @@ function MyrkPriest:Priest()
   end
 
   -- TODO: Dots?
-  if m > MyrkPriest.manaThreshold then
+
+  local inInstance, _ = IsInInstance()
+  -- save your mana in an instance
+  if not inInstance and m > MyrkPriest.manaThreshold then
     local smiting = MyrkPriest:Smite()
     if smiting then
       return
