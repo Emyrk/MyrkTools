@@ -1,3 +1,6 @@
+local MAJOR_VERSION = "DamageComm-1.0"
+local MINOR_VERSION = "$Revision: 0 $"
+
 DamageComm = MyrkAddon:NewModule("MyrkDamageComm")
 
 function DamageComm:OnEnable()
@@ -14,7 +17,7 @@ function DamageComm:OnEnable()
   DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[MyrkDamageComm]|r Loaded")
 end
 
-function DamageComm:UnitGetIncomingDamage(unitname)
+function UnitGetIncomingDamage(unitname)
   -- Cleanup if necessary
   -- ShaguDPS.data["taken"]
   if not ShaguDPS.data or 
@@ -78,7 +81,7 @@ function DamageComm:DamageCommHookPfUI()
       end
 
       local name, _ = UnitName(unitstr)
-      local dmg = DamageComm:UnitGetIncomingDamage(name)
+      local dmg = UnitGetIncomingDamage(name)
       if not dmg or dmg <= 0 then unit.incDmg:Hide() return end
 
       -- Clamp to visible health
@@ -120,3 +123,8 @@ function DamageComm:DamageCommHookPfUI()
     end
   end)
 end
+
+
+DamageCommLib = {}
+DamageCommLib.UnitGetIncomingDamage = UnitGetIncomingDamage
+AceLibrary:Register(DamageCommLib, MAJOR_VERSION, MINOR_VERSION)
