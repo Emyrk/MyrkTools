@@ -1,31 +1,43 @@
 DamageComm = MyrkAddon:NewModule("MyrkDamageComm")
 
 function DamageComm:OnEnable()
+  if not pfUI then
+    DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[MyrkDamageComm]|r not loaded, no pfUI found")
+    return
+  end
+
+  if not ShaguDPS then
+    DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[MyrkDamageComm]|r not loaded, no ShaguDPS found")
+    return
+  end
   self:DamageCommHookPfUI()
   DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[MyrkDamageComm]|r Loaded")
 end
 
+function DamageComm:UnitGetIncomingDamage(unitname)
+  -- Cleanup if necessary
+  -- ShaguDPS.data["taken"]
+  if not ShaguDPS.data or 
+    not ShaguDPS.data["recent"] or 
+    not ShaguDPS.data["recent"][1] or 
+    not ShaguDPS.data["recent"][1][unitname] or
+    not ShaguDPS.data["recent"][1][unitname]["_sum"] then
+    return 0
+  end
+
+  if ShaguDPS.data["taken"][1][unitname]["_tick"] then
+    local now = GetTime()
+    if now - ShaguDPS.data["taken"][1][unitname]["_tick"] > 5 then
+      return 0
+    end
+  end
+
+  local recent = ShaguDPS.data["recent"][1][unitname]["_sum"]
+  return recent or 0
+end
+
 function DamageComm:DamageCommHookPfUI()
   pfUI:RegisterModule("DamageOverlay", "vanilla:tbc", function()
-    local getIncomingDamage = function(unitstr)
-      -- Adapt this to your DamageComm API.
-      -- A) If you provide a UnitGetIncomingDamage(unit) API:
-      if DamageComm and DamageComm.UnitGetIncomingDamage then
-        return DamageComm:UnitGetIncomingDamage(unitstr) or 0
-      end
-      if DamageComm and DamageComm.GetIncomingDamage then
-        return DamageComm:GetIncomingDamage(unitstr) or 0
-      end
-      -- B) If you ship an Ace library:
-      if AceLibrary and AceLibrary:HasInstance("DamageComm-1.0") then
-        local DC = AceLibrary("DamageComm-1.0")
-        if DC and DC.UnitGetIncomingDamage then
-          return DC:UnitGetIncomingDamage(unitstr) or 0
-        end
-      end
-      return 200
-    end
-
     local HookRefreshUnit = pfUI.uf.RefreshUnit
     function pfUI.uf:RefreshUnit(unit, component)
       -- Always run pfUI’s original logic
@@ -65,14 +77,15 @@ function DamageComm:DamageCommHookPfUI()
         return 
       end
 
-      local dmg = getIncomingDamage(unitstr)
+      local name, _ = UnitName(unitstr)
+      local dmg = DamageComm:UnitGetIncomingDamage(name)
       if not dmg or dmg <= 0 then unit.incDmg:Hide() return end
 
       -- Clamp to visible health
       if dmg > health then dmg = health end
 
       -- Half-height red strip anchored to the top so the bottom half stays visible
-      local barH = math.max(1, math.floor(height / 2))
+      local barH = math.max(1, math.floor(height / 4))
       unit.incDmg:SetHeight(barH)
       unit.incDmg.tex:SetVertexColor(0.9, 0.15, 0.15, 1)
 

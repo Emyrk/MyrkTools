@@ -32,3 +32,17 @@ function IsDrinking()
     end
     return false
 end
+
+function PrintTable(t, indent)
+  indent = indent or 0
+  local spacing = string.rep("  ", indent)
+  
+  for k, v in pairs(t) do
+    if type(v) == "table" then
+      print(spacing .. tostring(k) .. ":")
+      PrintTable(v, indent + 1)
+    else
+      print(spacing .. tostring(k) .. ": " .. tostring(v))
+    end
+  end
+end
