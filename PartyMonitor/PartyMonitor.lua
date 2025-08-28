@@ -17,3 +17,7 @@ function PartyMonitor:UpdatePartyMembers()
   -- Reload the party members
   self.party.Refresh()
 end
+
+local MAJOR_VERSION = "PartyMonitor-1.0"
+local MINOR_VERSION = "$Revision: 0 $"
+AceLibrary:Register(PartyMonitor.party, MAJOR_VERSION, MINOR_VERSION)

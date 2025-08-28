@@ -6,7 +6,7 @@ DecisionEngine.__index = DecisionEngine
 
 function DecisionEngine:New()
     local instance = {
-        partyMonitor = nil, -- Set by AutoHeal module
+        partyMonitor = nil, -- Set by module
         tankList = {}, -- Manually configured tank list
         config = {
             emergencyThreshold = 0.15, -- 15% health for emergency
@@ -42,6 +42,7 @@ function DecisionEngine:evaluateDecision(decision)
 end
 
 -- Target resolution helpers
+-- TODO: @Emyrk, this should instead return a set of ids.
 function DecisionEngine:resolveTank()
     -- Return first available tank from tank list
     for _, tankName in ipairs(self.tankList) do
@@ -53,6 +54,8 @@ function DecisionEngine:resolveTank()
     return nil
 end
 
+-- TODO: Shouldn't we use the party monitor?
+---@return table containing a list of party member ids
 function DecisionEngine:resolveParty()
     -- Return all party members including player
     local members = {}

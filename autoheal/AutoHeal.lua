@@ -5,6 +5,7 @@ AutoHeal = MyrkAddon:NewModule("MyrkAutoHeal")
 HealComm = AceLibrary("HealComm-1.0")
 DamageComm = AceLibrary("DamageComm-1.0")
 Logs = AceLibrary("MyrkLogs-1.0")
+-- Party = AceLibrary("PartyMonitor-1.0")
 
 function AutoHeal:OnEnable()
     -- Initialize the decision engine
@@ -22,24 +23,26 @@ end
 
 function AutoHeal:OnPartyChanged()
     -- Could auto-detect tanks here or refresh manual list
+    -- TODO: PartyMonitor can maybe allow annotations?
 end
 
 -- Main healing function to be called from keybinds or automation
 function AutoHeal:PerformHealing()
     if not self.engine then
-        MyrkLogs.Error("AutoHeal engine not initialized")
+        Logs.Error("AutoHeal engine not initialized")
         return false
     end
-    
-    -- Get the current party state from PartyMonitor
-    local partyMonitor = MyrkAddon:GetModule("MyrkPartyMonitor")
-    if not partyMonitor then
-        DEFAULT_CHAT_FRAME:AddMessage("|cffff0000[MyrkAutoHeal]|r PartyMonitor not found")
-        return false
+
+    if not self.engine.partyMonitor then
+        -- Get the current party state from PartyMonitor
+        local partyMonitor = MyrkAddon:GetModule("MyrkPartyMonitor")
+        if not partyMonitor then
+            DEFAULT_CHAT_FRAME:AddMessage("|cffff0000[MyrkAutoHeal]|r PartyMonitor not found")
+            return false
+        end
+        self.engine.partyMonitor = partyMonitor
     end
-    
-    self.engine.partyMonitor = partyMonitor
-    
+        
     -- Execute the healing strategy
     local decision = self.engine:doFirst(HealingStrategy)
     

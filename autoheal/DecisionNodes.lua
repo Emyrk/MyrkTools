@@ -1,6 +1,31 @@
 -- DecisionNodes.lua
 -- Individual decision node functions for the healing decision tree
 
+-- Busy will allow whatever action was previously decided on to finish before
+-- continuing. So if the previous decision is to cast a spell, this will
+-- wait for that cast to finish.
+function Busy()
+    return function(engine)
+        if engine.busy then
+            return Action:Busy("engine is busy")
+        end
+
+        -- TODO: Spell monitoring setup for busy tracking. Match QuickHeal
+
+    end
+end
+
+function CancelOverHeal()
+    return function(engine)
+        if not engine.busy then
+            return nil
+        end
+
+        -- Detect overheal somehow and do 'SpellStopCasting()'
+        return nil
+    end
+end
+
 -- Quick exit if already casting
 function AlreadyCasting()
     return function(engine)
