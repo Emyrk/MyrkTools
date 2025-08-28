@@ -104,7 +104,7 @@ end
 
 function UnitName(unit)
   if UnitExists(unit) then
-    return unit, nil -- Return unit name and realm (nil for same realm)
+    return mockData.units[unit].name, nil
   end
   return nil, nil
 end

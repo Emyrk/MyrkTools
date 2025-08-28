@@ -3,10 +3,10 @@
 
 local WoWAPIMock = require('tests.wow_api_mock')
 
--- Load the original Party system (with bugs)
+-- Load and test the fixed version
 dofile('PartyMonitor/party.lua')
 
-describe("Party System (Original Implementation)", function()
+describe("Party System", function()
   local party
   
   before_each(function()
@@ -19,181 +19,11 @@ describe("Party System (Original Implementation)", function()
     
     -- Always set up the player
     WoWAPIMock.setUnitData("player", {
-      name = "TestPlayer",
+      name = "Priests",
       health = 100,
       maxHealth = 100,
-      class = "Warrior",
-      englishClass = "WARRIOR"
-    })
-  end)
-  
-  describe("Party:New", function()
-    it("should create a new party instance", function()
-      local newParty = Party:New()
-      assert.is_not_nil(newParty)
-      assert.is_table(newParty.players)
-    end)
-  end)
-  
-  describe("Party:Refresh - Basic Functionality", function()
-    
-    it("should execute without crashing", function()
-      party.Refresh(party) -- Note: original code expects self as parameter
-      assert.is_table(party.players)
-    end)
-    
-    it("should call RefreshID for player and party1-4", function()
-      -- This tests that the function structure works
-      -- Even with bugs, it should attempt to process all units
-      party.Refresh(party)
-      
-      -- The function should complete without error
-      assert.is_table(party.players)
-    end)
-    
-  end)
-  
-  describe("Party:RefreshID - Edge Cases", function()
-    
-    it("should handle non-existent units", function()
-      -- Test with unit that doesn't exist
-      party.RefreshID(party, "party1")
-      
-      -- Should not crash and should not add the unit
-      assert.is_nil(party.players["party1"])
-    end)
-    
-    it("should remove existing players when they no longer exist", function()
-      -- Manually add a party member (simulating previous state)
-      party.players["party1"] = {
-        id = "party1",
-        name = "PartyMember1",
-        hp = 80,
-        hpmax = 100,
-        class = "PRIEST"
-      }
-      
-      -- Verify member exists
-      assert.is_not_nil(party.players["party1"])
-      
-      -- Call RefreshID on non-existent unit (simulating member leaving)
-      party.RefreshID(party, "party1")
-      
-      -- Should be removed
-      assert.is_nil(party.players["party1"])
-    end)
-    
-  end)
-  
-  describe("Party:RemoveID", function()
-    
-    it("should remove player from party", function()
-      -- Add a player
-      party.players["party1"] = { id = "party1", name = "TestMember" }
-      
-      -- Verify it exists
-      assert.is_not_nil(party.players["party1"])
-      
-      -- Remove it
-      party.RemoveID(party, "party1")
-      
-      -- Verify it's gone
-      assert.is_nil(party.players["party1"])
-    end)
-    
-    it("should handle removing non-existent player", function()
-      -- Try to remove player that doesn't exist
-      party.RemoveID(party, "party1")
-      
-      -- Should not crash
-      assert.is_table(party.players)
-    end)
-    
-  end)
-  
-end)
-
--- Test the AllyPlayer class
-describe("AllyPlayer", function()
-  
-  before_each(function()
-    WoWAPIMock.resetMockData()
-  end)
-  
-  describe("AllyPlayer:New", function()
-    
-    it("should create a new ally player instance", function()
-      local player = AllyPlayer:New("party1")
-      
-      assert.is_not_nil(player)
-      assert.are.equal("party1", player.id)
-      assert.are.equal("", player.name)
-      assert.are.equal(-1, player.hp)
-      assert.are.equal(-1, player.hpmax)
-      assert.are.equal("", player.class)
-    end)
-    
-  end)
-  
-  describe("AllyPlayer:Refresh", function()
-    
-    it("should update player stats from WoW API", function()
-      -- Set up mock data
-      WoWAPIMock.setUnitData("party1", {
-        name = "TestPlayer",
-        health = 85,
-        maxHealth = 120,
-        class = "Priest",
-        englishClass = "PRIEST"
-      })
-      
-      local player = AllyPlayer:New("party1")
-      player.Refresh(player) -- Note: original expects self as parameter
-      
-      assert.are.equal("TestPlayer", player.name)
-      assert.are.equal(85, player.hp)
-      assert.are.equal(120, player.hpmax)
-      assert.are.equal("PRIEST", player.class)
-    end)
-    
-    it("should handle non-existent unit", function()
-      local player = AllyPlayer:New("party1")
-      
-      -- This should not crash even if unit doesn't exist
-      player.Refresh(player)
-      
-      -- Values should be nil/empty for non-existent unit
-      assert.is_nil(player.name)
-      assert.are.equal(0, player.hp)
-      assert.are.equal(0, player.hpmax)
-      assert.is_nil(player.class)
-    end)
-    
-  end)
-  
-end)
-
--- Load and test the fixed version
-dofile('tests/party_fixed.lua')
-
-describe("Party System (Fixed Implementation)", function()
-  local party
-  
-  before_each(function()
-    -- Reset mock data before each test
-    WoWAPIMock.resetMockData()
-    WoWAPIMock.setTime(100)
-    
-    -- Create a new party instance
-    party = Party:New()
-    
-    -- Always set up the player
-    WoWAPIMock.setUnitData("player", {
-      name = "TestPlayer",
-      health = 100,
-      maxHealth = 100,
-      class = "Warrior",
-      englishClass = "WARRIOR"
+      class = "Priest",
+      englishClass = "PRIEST"
     })
   end)
   

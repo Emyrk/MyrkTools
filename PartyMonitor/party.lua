@@ -1,3 +1,6 @@
+-- Fixed version of Party.lua for testing
+-- This version fixes the bugs in the original implementation
+
 Party = {}
 Party.__index = Party
 
@@ -9,37 +12,37 @@ function Party:New()
     return instance
 end
 
-function Party:Refresh(self)
-  self.RefreshID(self, "player") -- Always include player
+function Party:Refresh()
+  self:RefreshID("player") -- Always include player
   for i=1,4 do
-    self.RefreshID(self, "party" .. i)
+    self:RefreshID("party" .. i)
   end
 end
 
 -- id should be party1, party2, etc.
 -- "player" is also accepted
-function Party:RefreshID(self, id) 
+function Party:RefreshID(id) 
   if UnitExists(id) then
-    local name = UnitName(unitstr)
+    local name = UnitName(id) -- Fixed: was 'unitstr', now 'id'
     if name and name ~= "" then
       if not self.players[id] then
         self.players[id] = AllyPlayer:New(id)
       end
 
-      self.players[id].Refresh()
+      self.players[id]:Refresh() -- Fixed: added colon for method call
       return
     end
   end
 
-  self.RemoveID(self, id)
+  self:RemoveID(id) -- Fixed: added colon for method call
 end
 
-function Party:RemoveID(self, id) 
+function Party:RemoveID(id) 
   self.players[id] = nil
 end
 
-PartyPlayer = {}
-PartyPlayer.__index = PartyPlayer
+AllyPlayer = {} -- Fixed: was PartyPlayer, should be AllyPlayer
+AllyPlayer.__index = AllyPlayer
 
 function AllyPlayer:New(id)
     local instance = {
@@ -53,7 +56,7 @@ function AllyPlayer:New(id)
     return instance
 end
 
-function AllyPlayer:Refresh(self)
+function AllyPlayer:Refresh()
   local _, englishClass = UnitClass(self.id)
   self.name = UnitName(self.id)
   self.hp = UnitHealth(self.id)
