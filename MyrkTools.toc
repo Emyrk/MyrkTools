@@ -31,3 +31,14 @@ Logs.lua
 Priest.lua
 Loader.lua
 DamageComm.lua
+
+# PartyMonitor
+PartyMonitor/party.lua
+PartyMonitor/PartyMonitor.lua
+
+# AutoHeal System
+autoheal/DecisionEngine.lua
+autoheal/DecisionNodes.lua
+autoheal/HealingStrategy.lua
+autoheal/AutoHeal.lua
+autoheal/init.lua
