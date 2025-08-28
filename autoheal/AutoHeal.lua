@@ -2,6 +2,9 @@
 -- Uses a modular decision tree approach for flexible healing strategies
 
 AutoHeal = MyrkAddon:NewModule("MyrkAutoHeal")
+HealComm = AceLibrary("HealComm-1.0")
+DamageComm = AceLibrary("DamageComm-1.0")
+Logs = AceLibrary("MyrkLogs-1.0")
 
 function AutoHeal:OnEnable()
     -- Initialize the decision engine
@@ -24,6 +27,7 @@ end
 -- Main healing function to be called from keybinds or automation
 function AutoHeal:PerformHealing()
     if not self.engine then
+        MyrkLogs.Error("AutoHeal engine not initialized")
         return false
     end
     

@@ -180,6 +180,9 @@ function MyrkLogs:DebounceText()
 end
 
 -- Core log function with level
+---@param msg string The name of the setting to set the value of
+---@param level string The log level: DBG, INF, WRN, ERR
+---@param broadcast boolean|nil Whether to broadcast this log to party/raid (if enabled).
 function MyrkLogs:Log(level, msg, broadcast)
   local d = self.debounce
   if d.repeatCount > 0 then
@@ -211,12 +214,7 @@ function MyrkLogs:Log(level, msg, broadcast)
 end
 
 -- Convenience wrappers
-function MyrkLogs:Debug(msg)
-  local text = tostring(msg)
-
-  self:Log("DBG", msg)
-end
-
+---@param msg string
 function MyrkLogs:Debug(msg)
   local text = tostring(msg)
   local now = GetTime()
@@ -234,14 +232,27 @@ function MyrkLogs:Debug(msg)
   self:Log("DBG", text)
 end
 
+---@param msg string
 function MyrkLogs:Info(msg)
   self:Log("INF", msg)
 end
 
+---@param msg string
 function MyrkLogs:Warn(msg)
   self:Log("WRN", msg)
 end
 
+---@param msg string
 function MyrkLogs:Error(msg)
   self:Log("ERR", msg)
 end
+
+MyrkLogsLib = {}
+MyrkLogsLib.Debug = function(msg) MyrkLogs:Debug(msg) end
+MyrkLogsLib.Info = function(msg) MyrkLogs:Info(msg) end
+MyrkLogsLib.Warn = function(msg) MyrkLogs:Warn(msg) end
+MyrkLogsLib.Error = function(msg) MyrkLogs:Error(msg) end
+
+local MAJOR_VERSION = "MyrkLogs-1.0"
+local MINOR_VERSION = "$Revision: 0 $"
+AceLibrary:Register(MyrkLogsLib, MAJOR_VERSION, MINOR_VERSION)
