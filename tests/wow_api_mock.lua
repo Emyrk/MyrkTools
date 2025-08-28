@@ -27,8 +27,38 @@ function WoWAPIMock.setUnitHealth(unitName, currentHealth, maxHealth)
     health = currentHealth,
     maxHealth = maxHealth,
     exists = true,
-    dead = currentHealth <= 0
+    dead = currentHealth <= 0,
+    name = unitName,
+    class = "WARRIOR", -- Default class
+    englishClass = "WARRIOR"
   }
+end
+
+-- Helper function to set unit class
+function WoWAPIMock.setUnitClass(unitName, localizedClass, englishClass)
+  if not mockData.units[unitName] then
+    mockData.units[unitName] = { exists = true, health = 100, maxHealth = 100, name = unitName }
+  end
+  mockData.units[unitName].class = localizedClass or englishClass
+  mockData.units[unitName].englishClass = englishClass
+end
+
+-- Helper function to set unit data completely
+function WoWAPIMock.setUnitData(unitName, data)
+  mockData.units[unitName] = {
+    health = data.health or 100,
+    maxHealth = data.maxHealth or 100,
+    exists = data.exists ~= false,
+    dead = (data.health or 100) <= 0,
+    name = data.name or unitName,
+    class = data.class or "WARRIOR",
+    englishClass = data.englishClass or data.class or "WARRIOR"
+  }
+end
+
+-- Helper function to remove a unit (simulate leaving party)
+function WoWAPIMock.removeUnit(unitName)
+  mockData.units[unitName] = nil
 end
 
 -- Helper function to set incoming damage data
@@ -77,6 +107,22 @@ function UnitName(unit)
     return unit, nil -- Return unit name and realm (nil for same realm)
   end
   return nil, nil
+end
+
+function UnitClass(unit)
+  local unitData = mockData.units[unit]
+  if not unitData or not unitData.exists then
+    return nil, nil
+  end
+  return unitData.class or "Warrior", unitData.englishClass or "WARRIOR"
+end
+
+function UnitClassBase(unit)
+  local unitData = mockData.units[unit]
+  if not unitData or not unitData.exists then
+    return nil
+  end
+  return unitData.englishClass or "WARRIOR"
 end
 
 -- Mock GetTime function
