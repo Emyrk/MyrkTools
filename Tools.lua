@@ -46,3 +46,27 @@ function PrintTable(t, indent)
     end
   end
 end
+
+-- Calculate expected unit health after incoming damage
+-- Returns the unit's current health minus expected incoming damage
+function ExpectedUnitHealth(unitName)
+  if not unitName then
+    return 0
+  end
+  
+  -- Get current health
+  local currentHealth = UnitHealth(unitName)
+  if not currentHealth or currentHealth <= 0 then
+    return 0
+  end
+  
+  -- Get expected incoming damage from DamageComm
+  local incomingDamage = 0
+  if UnitGetIncomingDamage then
+    incomingDamage = UnitGetIncomingDamage(unitName) or 0
+  end
+  
+  -- Calculate expected health (don't go below 0)
+  local expectedHealth = currentHealth - incomingDamage
+  return math.max(0, expectedHealth)
+end
