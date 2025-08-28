@@ -23,6 +23,41 @@ Or manually:
 luarocks install busted
 ```
 
+### NixOS Users
+
+For NixOS users, use the provided `shell.nix` for a complete development environment:
+
+```bash
+# Enter the Nix development shell
+nix-shell
+
+# Or use the Makefile shortcut
+make nix-shell
+```
+
+The `shell.nix` provides:
+- Lua 5.1 with all required packages
+- Busted testing framework
+- LuaCheck linter
+- LuaCov coverage tool
+- Proper environment setup
+
+If you encounter package availability issues, use the minimal version:
+```bash
+nix-shell shell-minimal.nix
+```
+
+Then install dependencies locally:
+```bash
+make test-install
+```
+
+**Alternative: Using flakes (if you prefer)**
+```bash
+# Create a quick flake shell
+nix shell nixpkgs#lua5_1 nixpkgs#luarocks nixpkgs#gnumake
+```
+
 ### Optional Development Tools
 
 ```bash

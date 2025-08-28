@@ -1,23 +1,39 @@
-.PHONY: test test-install test-clean help
+.PHONY: test test-install test-clean help nix-shell
 
 # Default target
 help:
 	@echo "Available commands:"
+	@echo "  make nix-shell     - Enter Nix development shell"
 	@echo "  make test-install  - Install busted testing framework"
 	@echo "  make test          - Run all unit tests"
 	@echo "  make test-clean    - Clean test artifacts"
 	@echo "  make help          - Show this help message"
 
+# Enter Nix shell (for NixOS users)
+nix-shell:
+	@if [ -f shell.nix ]; then \
+		nix-shell; \
+	else \
+		echo "shell.nix not found. Are you in the right directory?"; \
+		exit 1; \
+	fi
+
 # Install busted testing framework
 test-install:
 	@echo "Installing busted testing framework..."
 	@if command -v luarocks >/dev/null 2>&1; then \
+		echo "Installing to local tree..."; \
 		luarocks install busted; \
+		luarocks install luacheck; \
+		luarocks install luacov; \
+		echo "Dependencies installed successfully!"; \
 	else \
-		echo "Error: luarocks not found. Please install luarocks first."; \
-		echo "On Ubuntu/Debian: sudo apt-get install luarocks"; \
-		echo "On macOS: brew install luarocks"; \
-		echo "On Windows: Download from https://luarocks.org/"; \
+		echo "Error: luarocks not found."; \
+		echo "For NixOS users: run 'nix-shell' first"; \
+		echo "For other systems:"; \
+		echo "  Ubuntu/Debian: sudo apt-get install luarocks"; \
+		echo "  macOS: brew install luarocks"; \
+		echo "  Windows: Download from https://luarocks.org/"; \
 		exit 1; \
 	fi
 
@@ -27,7 +43,9 @@ test:
 	@if command -v busted >/dev/null 2>&1; then \
 		busted --verbose; \
 	else \
-		echo "Error: busted not found. Run 'make test-install' first."; \
+		echo "Error: busted not found."; \
+		echo "Run 'make test-install' first."; \
+		echo "For NixOS users: make sure you're in 'nix-shell'"; \
 		exit 1; \
 	fi
 
