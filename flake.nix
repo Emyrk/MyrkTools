@@ -32,6 +32,12 @@
           shellHook = ''
             echo "🎮 MyrkTools Development Environment (Flake)"
             echo "==========================================="
+            
+            # Create lua5.1 symlink for busted compatibility
+            mkdir -p .nix-shell-bin
+            ln -sf $(which lua) .nix-shell-bin/lua5.1
+            export PATH="$PWD/.nix-shell-bin:$PATH"
+            
             echo "Lua: $(lua -v)"
             echo "LuaRocks: $(luarocks --version | head -n1)"
             echo "Busted: $(busted --version 2>/dev/null || echo 'Available')"
@@ -61,6 +67,12 @@
           shellHook = ''
             echo "🎮 MyrkTools Development Environment (Minimal Flake)"
             echo "================================================="
+            
+            # Create lua5.1 symlink for busted compatibility
+            mkdir -p .nix-shell-bin
+            ln -sf $(which lua) .nix-shell-bin/lua5.1
+            export PATH="$PWD/.nix-shell-bin:$PATH"
+            
             echo "Run 'make test-install' to install test dependencies"
             echo ""
             

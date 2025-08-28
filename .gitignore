@@ -1,0 +1,15 @@
+# Nix shell artifacts
+.nix-shell-bin/
+
+# LuaRocks local installations
+lua_modules/
+.luarocks/
+
+# Test artifacts
+luacov.*.out
+luacov.report.out
+
+# Temporary files
+*.tmp
+*.bak
+*~

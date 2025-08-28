@@ -25,6 +25,12 @@ mkShell {
   shellHook = ''
     echo "🎮 MyrkTools Development Environment (Minimal)"
     echo "============================================="
+    
+    # Create lua5.1 symlink for busted compatibility
+    mkdir -p .nix-shell-bin
+    ln -sf $(which lua) .nix-shell-bin/lua5.1
+    export PATH="$PWD/.nix-shell-bin:$PATH"
+    
     echo "Lua version: $(lua -v)"
     echo "LuaRocks version: $(luarocks --version | head -n1)"
     echo ""

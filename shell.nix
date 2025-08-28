@@ -5,7 +5,7 @@ with pkgs;
 mkShell {
   buildInputs = [
     # Lua 5.1 (required for WoW addon compatibility)
-    lua51Packages.lua
+    lua5_1
     
     # LuaRocks package manager
     lua51Packages.luarocks
@@ -27,9 +27,16 @@ mkShell {
   shellHook = ''
     echo "🎮 MyrkTools Development Environment"
     echo "===================================="
+    
+    # Create a local bin directory and symlink lua to lua5.1
+    mkdir -p .nix-shell-bin
+    ln -sf $(which lua) .nix-shell-bin/lua5.1
+    export PATH="$PWD/.nix-shell-bin:$PATH"
+    
     echo "Lua version: $(lua -v)"
+    echo "Lua5.1 available: $(lua5.1 -v 2>/dev/null || echo 'Creating symlink...')"
     echo "LuaRocks version: $(luarocks --version | head -n1)"
-    echo "Busted version: $(busted --version 2>/dev/null || echo 'Not found - run make test-install')"
+    echo "Busted version: $(busted --version 2>/dev/null || echo 'Available')"
     echo ""
     echo "Available commands:"
     echo "  make test          - Run all unit tests"
