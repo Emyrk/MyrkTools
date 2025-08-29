@@ -105,7 +105,7 @@ function ShowAvailableRoles()
     local roles = partyMonitor:GetAvailableRoles()
     DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[Roles]|r Available roles:")
     for _, role in pairs(roles) do
-        if role ~= "None" then -- Don't show "None" as an option
+        if role ~= "" then -- Don't show "" as an option
             DEFAULT_CHAT_FRAME:AddMessage("  " .. role)
         end
     end

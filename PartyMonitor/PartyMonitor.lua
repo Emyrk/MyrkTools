@@ -6,6 +6,10 @@
 PartyMonitor = MyrkAddon:NewModule("MyrkPartyMonitor")
 PartyMonitor.party = Party:New()
 
+-- External deps
+DamageComm = AceLibrary("DamageComm-1.0")
+HealComm = AceLibrary("HealComm-1.0")
+
 -- AceDB defaults for persistent storage
 local defaults = {
     realm = {

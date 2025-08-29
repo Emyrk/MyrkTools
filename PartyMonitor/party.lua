@@ -2,13 +2,17 @@
 -- This version fixes the bugs in the original implementation
 -- Added role annotation system for flexible party management
 
+---@class Party
+---@field players table<string, AllyPlayer> key is unitID like "player", "party1", etc.
+---@field roleAssignments table<string, PartyRoles> key is player name, value is their role like "Tank"
 Party = {}
 Party.__index = Party
 
 -- Available roles for party members
+---@enum PartyRoles
 Party.ROLES = {
     TANK = "Tank",
-    NONE = "None"
+    NONE = ""
 }
 
 function Party:New()
@@ -131,6 +135,14 @@ function Party:ListRoleAssignments()
   return assignments
 end
 
+---@class AllyPlayer
+---@field id string unit ID like "player", "party1", etc.
+---@field name? string Player's name
+---@field hp number Current health
+---@field hpmax number Maximum health
+---@field recentDmg number Recent damage taken
+---@field class? string Player's class in English
+---@field role string Player's role, e.g. "Tank"
 AllyPlayer = {} -- Fixed: was PartyPlayer, should be AllyPlayer
 AllyPlayer.__index = AllyPlayer
 
@@ -140,6 +152,8 @@ function AllyPlayer:New(id)
       name = "",
       hp = -1,
       hpmax = -1,
+      recentDmg = 0,
+      incHeal = 0,
       class = "",
       role = Party.ROLES.NONE, -- Default role
     }
@@ -153,6 +167,8 @@ function AllyPlayer:Refresh()
   self.hp = UnitHealth(self.id)
   self.hpmax = UnitHealthMax(self.id)
   self.class = englishClass
+  self.recentDmg = DamageComm.UnitGetIncomingDamage(self.name) or 0;
+  self.incHeal = HealComm:getHeal(self.name) or 0;
   -- Note: role is managed by Party:SetRole(), not refreshed here
 end
 
