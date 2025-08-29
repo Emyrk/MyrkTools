@@ -22,9 +22,32 @@ function CastMonitor:OnEnable()
             onSuccess = nil,
             onFailed = nil,
             onInterrupted = nil,
-            onStopped = nil
         }
     }
+end
+
+function CastMonitor:CastSpellByNameAndLog(spell)
+    local name = UnitName("target")
+
+    local callbacks = {
+        onSuccess = function(spell, target, reason)
+            DEFAULT_CHAT_FRAME:AddMessage(string.format("|cff00ff00[Auto]|r Cast successful: %s -> %s (%s)", 
+                spell, target, reason))
+        end,
+        onFailed = function(spell, target, reason, error)
+            DEFAULT_CHAT_FRAME:AddMessage(string.format("|cffff0000[Auto]|r Cast failed: %s -> %s (%s) - %s", 
+                spell, target, reason, error or "Unknown"))
+        end,
+        onInterrupted = function(spell, target, reason, error)
+            DEFAULT_CHAT_FRAME:AddMessage(string.format("|cffffff00[Auto]|r Cast interrupted: %s -> %s (%s) - %s", 
+                spell, target, reason, error or "Unknown"))
+        end
+    }
+
+    self:StartMonitor(spell, name, "manual", callbacks)
+    
+    -- Cast the spell
+    CastSpellByName(spell)
 end
 
 -- Start monitoring a spell cast
@@ -46,7 +69,6 @@ function CastMonitor:StartMonitor(spell, target, reason, callbacks)
             onSuccess = callbacks.onSuccess or nil,
             onFailed = callbacks.onFailed or nil,
             onInterrupted = callbacks.onInterrupted or nil,
-            onStopped = callbacks.onStopped or nil,
         }
     }
     
