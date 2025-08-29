@@ -1,0 +1,1 @@
+Move damage comm hook to party monitor
