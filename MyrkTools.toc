@@ -3,7 +3,7 @@
 ## Title-deDE: MyrkTools |cFFFF8080-Emyrk-|r
 ## Notes: Collection of tools by yours truly
 ## Version: 0.1
-## SavedVariablesPerCharacter: MyrkLogsDB
+## SavedVariablesPerCharacter: MyrkLogsDB, PartyMonitorDB
 
 
 libs\LibStub\LibStub.lua
@@ -35,6 +35,7 @@ DamageComm.lua
 # PartyMonitor
 PartyMonitor/party.lua
 PartyMonitor/PartyMonitor.lua
+PartyMonitor/RoleCommands.lua
 
 # AutoHeal System
 autoheal/DecisionEngine.lua

@@ -57,8 +57,13 @@ function EmergencyShield(targetType)
         if targetType == "player" then
             targets = {"player"}
         elseif targetType == "tank" then
-            local tank = engine:resolveTank()
-            targets = tank and {tank} or {}
+            targets = engine:resolveTanks() -- Now returns all tanks
+        elseif targetType == "tanks" then
+            targets = engine:resolveTanks()
+        elseif targetType == "healers" then
+            targets = engine:resolveHealers()
+        elseif targetType == "dps" then
+            targets = engine:resolveDPS()
         elseif targetType == "party" then
             targets = engine:resolveParty()
         end
@@ -105,8 +110,13 @@ function EmergencyFlash(timeThreshold, targetType)
         local targets = {}
         
         if targetType == "tank" then
-            local tank = engine:resolveTank()
-            targets = tank and {tank} or {}
+            targets = engine:resolveTanks() -- Now returns all tanks
+        elseif targetType == "tanks" then
+            targets = engine:resolveTanks()
+        elseif targetType == "healers" then
+            targets = engine:resolveHealers()
+        elseif targetType == "dps" then
+            targets = engine:resolveDPS()
         elseif targetType == "party" then
             targets = engine:resolveParty()
         end
@@ -132,8 +142,13 @@ function EmergencyHeal(timeThreshold, targetType)
         local targets = {}
         
         if targetType == "tank" then
-            local tank = engine:resolveTank()
-            targets = tank and {tank} or {}
+            targets = engine:resolveTanks() -- Now returns all tanks
+        elseif targetType == "tanks" then
+            targets = engine:resolveTanks()
+        elseif targetType == "healers" then
+            targets = engine:resolveHealers()
+        elseif targetType == "dps" then
+            targets = engine:resolveDPS()
         elseif targetType == "party" then
             targets = engine:resolveParty()
         end
@@ -159,8 +174,13 @@ function Heal(threshold, targetType)
         local targets = {}
         
         if targetType == "tank" then
-            local tank = engine:resolveTank()
-            targets = tank and {tank} or {}
+            targets = engine:resolveTanks() -- Now returns all tanks
+        elseif targetType == "tanks" then
+            targets = engine:resolveTanks()
+        elseif targetType == "healers" then
+            targets = engine:resolveHealers()
+        elseif targetType == "dps" then
+            targets = engine:resolveDPS()
         elseif targetType == "party" then
             targets = engine:resolveParty()
         end
@@ -187,8 +207,13 @@ function PriorityHeal(threshold, targetType)
         local targets = {}
         
         if targetType == "tank" then
-            local tank = engine:resolveTank()
-            targets = tank and {tank} or {}
+            targets = engine:resolveTanks() -- Now returns all tanks
+        elseif targetType == "tanks" then
+            targets = engine:resolveTanks()
+        elseif targetType == "healers" then
+            targets = engine:resolveHealers()
+        elseif targetType == "dps" then
+            targets = engine:resolveDPS()
         elseif targetType == "party" then
             targets = engine:resolveParty()
         end

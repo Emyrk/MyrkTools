@@ -11,10 +11,7 @@ function Auto:OnEnable()
     -- Initialize the decision engine
     self.engine = DecisionEngine:New()
     
-    -- Configure tank list (manually set for now)
-    self.engine.tankList = {} -- Add tank names here: {"TankName1", "TankName2"}
-    
-    -- Register for party/raid updates to refresh tank list
+    -- Register for party/raid updates
     self:RegisterEvent("PARTY_MEMBERS_CHANGED", "OnPartyChanged")
     self:RegisterEvent("RAID_ROSTER_UPDATE", "OnPartyChanged")
     
@@ -22,8 +19,7 @@ function Auto:OnEnable()
 end
 
 function Auto:OnPartyChanged()
-    -- Could auto-detect tanks here or refresh manual list
-    -- TODO: PartyMonitor can maybe allow annotations?
+    -- PartyMonitor handles role management now
 end
 
 -- Main healing function to be called from keybinds or automation
@@ -64,43 +60,4 @@ function Auto:ExecuteHealingAction(decision)
     
     -- Cast the spell
     CastSpellByName(decision.spell)
-end
-
--- Configuration functions
-function Auto:AddTank(tankName)
-    if not self.engine then return end
-    
-    for _, name in ipairs(self.engine.tankList) do
-        if name == tankName then
-            return -- Already in list
-        end
-    end
-    
-    table.insert(self.engine.tankList, tankName)
-    DEFAULT_CHAT_FRAME:AddMessage(string.format("|cff00ff00[Auto]|r Added tank: %s", tankName))
-end
-
-function Auto:RemoveTank(tankName)
-    if not self.engine then return end
-    
-    for i, name in ipairs(self.engine.tankList) do
-        if name == tankName then
-            table.remove(self.engine.tankList, i)
-            DEFAULT_CHAT_FRAME:AddMessage(string.format("|cff00ff00[Auto]|r Removed tank: %s", tankName))
-            return
-        end
-    end
-end
-
-function Auto:ListTanks()
-    if not self.engine then return end
-    
-    if #self.engine.tankList == 0 then
-        DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[Auto]|r No tanks configured")
-    else
-        DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[Auto]|r Tanks:")
-        for _, name in ipairs(self.engine.tankList) do
-            DEFAULT_CHAT_FRAME:AddMessage("  - " .. name)
-        end
-    end
 end

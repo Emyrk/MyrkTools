@@ -7,7 +7,6 @@ DecisionEngine.__index = DecisionEngine
 function DecisionEngine:New()
     local instance = {
         partyMonitor = nil, -- Set by module
-        tankList = {}, -- Manually configured tank list
         config = {
             emergencyThreshold = 0.15, -- 15% health for emergency
             selfPreservationThreshold = 0.20, -- 20% for self preservation
@@ -41,33 +40,67 @@ function DecisionEngine:evaluateDecision(decision)
     return nil
 end
 
--- Target resolution helpers
--- TODO: @Emyrk, this should instead return a set of ids.
+-- Target resolution helpers using PartyMonitor roles
 function DecisionEngine:resolveTank()
-    -- Return first available tank from tank list
-    for _, tankName in ipairs(self.tankList) do
-        local unitId = self:getUnitIdByName(tankName)
-        if unitId and UnitExists(unitId) then
+    if not self.partyMonitor then
+        return nil
+    end
+    
+    -- Get tank unit IDs from PartyMonitor
+    local tankUnitIds = self.partyMonitor:GetTankUnitIds()
+    
+    -- Return first available tank
+    for _, unitId in ipairs(tankUnitIds) do
+        if UnitExists(unitId) then
             return unitId
         end
     end
+    
     return nil
 end
 
--- TODO: Shouldn't we use the party monitor?
----@return table containing a list of party member ids
-function DecisionEngine:resolveParty()
-    -- Return all party members including player
-    local members = {}
-    
-    -- Add player
-    if UnitExists("player") then
-        table.insert(members, "player")
+function DecisionEngine:resolveTanks()
+    if not self.partyMonitor then
+        return {}
     end
     
-    -- Add party members
-    for i = 1, 4 do
-        local unitId = "party" .. i
+    -- Get all tank unit IDs from PartyMonitor
+    local tankUnitIds = self.partyMonitor:GetTankUnitIds()
+    local validTanks = {}
+    
+    for _, unitId in ipairs(tankUnitIds) do
+        if UnitExists(unitId) then
+            table.insert(validTanks, unitId)
+        end
+    end
+    
+    return validTanks
+end
+
+function DecisionEngine:resolveParty()
+    if not self.partyMonitor then
+        -- Fallback to manual party resolution
+        local members = {}
+        
+        -- Add player
+        if UnitExists("player") then
+            table.insert(members, "player")
+        end
+        
+        -- Add party members
+        for i = 1, 4 do
+            local unitId = "party" .. i
+            if UnitExists(unitId) then
+                table.insert(members, unitId)
+            end
+        end
+        
+        return members
+    end
+    
+    -- Use PartyMonitor for party resolution
+    local members = {}
+    for unitId, player in pairs(self.partyMonitor.party.players) do
         if UnitExists(unitId) then
             table.insert(members, unitId)
         end
@@ -76,19 +109,40 @@ function DecisionEngine:resolveParty()
     return members
 end
 
-function DecisionEngine:getUnitIdByName(name)
-    if UnitName("player") == name then
-        return "player"
+function DecisionEngine:resolveHealers()
+    if not self.partyMonitor then
+        return {}
     end
     
-    for i = 1, 4 do
-        local unitId = "party" .. i
-        if UnitExists(unitId) and UnitName(unitId) == name then
-            return unitId
+    -- Get all healer unit IDs from PartyMonitor
+    local healerUnitIds = self.partyMonitor:GetHealerUnitIds()
+    local validHealers = {}
+    
+    for _, unitId in ipairs(healerUnitIds) do
+        if UnitExists(unitId) then
+            table.insert(validHealers, unitId)
         end
     end
     
-    return nil
+    return validHealers
+end
+
+function DecisionEngine:resolveDPS()
+    if not self.partyMonitor then
+        return {}
+    end
+    
+    -- Get all DPS unit IDs from PartyMonitor
+    local dpsUnitIds = self.partyMonitor:GetDPSUnitIds()
+    local validDPS = {}
+    
+    for _, unitId in ipairs(dpsUnitIds) do
+        if UnitExists(unitId) then
+            table.insert(validDPS, unitId)
+        end
+    end
+    
+    return validDPS
 end
 
 -- Helper function to get health percentage
