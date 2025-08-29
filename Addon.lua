@@ -86,7 +86,7 @@ function MyrkAddon:HandleTankCommand(input)
     
   elseif command == "list" then
     local tanks = partyMonitor:GetTanks()
-    if #tanks == 0 then
+    if table.getn(tanks) == 0 then
       self:Print("No tanks configured")
     else
       self:Print("Current tanks:")

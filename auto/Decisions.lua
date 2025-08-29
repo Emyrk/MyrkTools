@@ -1,3 +1,12 @@
+---@enum actions
+local ACTIONS = {
+	busy = "busy",
+}
+
+
+---@class Action
+---@field action actions What action to execute.
+---@field reason string Explain why no action should be taken. For debugging purposes.
 Action = {}
 Action.__index = Action
 
@@ -6,7 +15,7 @@ Action.__index = Action
 ---@return table
 function Action:Busy(reason)
     local instance = {
-      action = "busy",
+      action = ACTIONS.busy,
       reason = reason,
     }
     setmetatable(instance, Action)
