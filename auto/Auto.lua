@@ -43,21 +43,9 @@ function Auto:PerformHealing()
     local decision = self.engine:doFirst(HealingStrategy)
     
     if decision and decision.action == "cast" then
-        -- Execute the healing action
-        self:ExecuteHealingAction(decision)
-        return true
+        -- Execute the healing action with monitoring
+        return self.engine:ExecuteAction(decision)
     end
     
     return false -- No action taken
-end
-
-function Auto:ExecuteHealingAction(decision)
-    DEFAULT_CHAT_FRAME:AddMessage(string.format("|cff00ff00[Auto]|r %s -> %s (%s)", 
-        decision.spell, decision.target, decision.reason))
-    
-    -- Target the unit first
-    TargetUnit(decision.target)
-    
-    -- Cast the spell
-    CastSpellByName(decision.spell)
 end

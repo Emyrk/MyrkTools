@@ -43,3 +43,11 @@ autoheal/DecisionNodes.lua
 autoheal/HealingStrategy.lua
 autoheal/AutoHeal.lua
 autoheal/init.lua
+
+# Auto System
+auto/CastMonitor.lua
+auto/DecisionEngine.lua
+auto/DecisionNodes.lua
+auto/HealingStrategy.lua
+auto/Auto.lua
+auto/init.lua

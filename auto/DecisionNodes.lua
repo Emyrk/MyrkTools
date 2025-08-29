@@ -30,7 +30,16 @@ end
 function AlreadyCasting()
     return function(engine)
         if engine:isAlreadyCasting() then
-            return { action = "skip", reason = "already_casting" }
+            local currentCast = engine:GetCurrentCast()
+            local reason = "already_casting"
+            
+            if currentCast then
+                reason = string.format("already_casting_%s_to_%s", 
+                    currentCast.spell or "unknown", 
+                    currentCast.target or "unknown")
+            end
+            
+            return { action = "skip", reason = reason }
         end
         return nil
     end

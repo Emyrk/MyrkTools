@@ -7,6 +7,7 @@ DecisionEngine.__index = DecisionEngine
 function DecisionEngine:New()
     local instance = {
         partyMonitor = nil, -- Set by module
+        castMonitor = GlobalCastMonitor, -- Use global cast monitor instance
         config = {
             emergencyThreshold = 0.15, -- 15% health for emergency
             selfPreservationThreshold = 0.20, -- 20% for self preservation
@@ -185,8 +186,45 @@ end
 
 -- Helper function to check if we're already casting
 function DecisionEngine:isAlreadyCasting()
-    local spell, _, _, _, _, endTime = UnitCastingInfo("player")
-    return spell ~= nil
+    return self.castMonitor:IsCasting()
+end
+
+-- Execute a healing action with monitoring
+function DecisionEngine:ExecuteAction(decision)
+    if not decision or decision.action ~= "cast" then
+        return false
+    end
+    
+    -- Start monitoring the cast
+    local callbacks = {
+        onSuccess = function(spell, target, reason)
+            DEFAULT_CHAT_FRAME:AddMessage(string.format("|cff00ff00[Auto]|r Cast successful: %s -> %s (%s)", 
+                spell, target, reason))
+        end,
+        onFailed = function(spell, target, reason, error)
+            DEFAULT_CHAT_FRAME:AddMessage(string.format("|cffff0000[Auto]|r Cast failed: %s -> %s (%s) - %s", 
+                spell, target, reason, error or "Unknown"))
+        end,
+        onInterrupted = function(spell, target, reason, error)
+            DEFAULT_CHAT_FRAME:AddMessage(string.format("|cffffff00[Auto]|r Cast interrupted: %s -> %s (%s) - %s", 
+                spell, target, reason, error or "Unknown"))
+        end
+    }
+    
+    self.castMonitor:StartMonitor(decision.spell, decision.target, decision.reason, callbacks)
+    
+    -- Target the unit first
+    TargetUnit(decision.target)
+    
+    -- Cast the spell
+    CastSpellByName(decision.spell)
+    
+    return true
+end
+
+-- Get current cast information
+function DecisionEngine:GetCurrentCast()
+    return self.castMonitor:GetCurrentCast()
 end
 
 -- Helper function to check if target has a specific buff
