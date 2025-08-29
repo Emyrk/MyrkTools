@@ -1,13 +1,14 @@
 -- DecisionEngine.lua
 -- Core decision tree executor for the Auto system
 
+---@class DecisionEngine
 DecisionEngine = {}
 DecisionEngine.__index = DecisionEngine
 
 function DecisionEngine:New()
     local instance = {
         partyMonitor = nil, -- Set by module
-        castMonitor = GlobalCastMonitor, -- Use global cast monitor instance
+        castMonitor = nil, 
         config = {
             emergencyThreshold = 0.15, -- 15% health for emergency
             selfPreservationThreshold = 0.20, -- 20% for self preservation
@@ -19,6 +20,27 @@ function DecisionEngine:New()
     }
     setmetatable(instance, DecisionEngine)
     return instance
+end
+
+function DecisionEngine:LoadModules()
+    if not self.partyMonitor then
+        self.partyMonitor = MyrkAddon:GetModule("MyrkPartyMonitor")
+        if not self.partyMonitor then
+            DEFAULT_CHAT_FRAME:AddMessage("|cffff0000[MyrkAuto]|r PartyMonitor not found")
+        end
+    end
+
+    if not self.castMonitor then
+        self.castMonitor = MyrkAddon:GetModule("MyrkCastMonitor")
+        if not self.castMonitor then
+            DEFAULT_CHAT_FRAME:AddMessage("|cffff0000[MyrkAuto]|r MyrkCastMonitor not found")
+        end
+    end
+end
+
+function DecisionEngine:Ready()
+    self:LoadModules()
+    return self.partyMonitor and self.castMonitor
 end
 
 -- Core decision tree executor

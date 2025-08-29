@@ -2,16 +2,17 @@
 -- Monitors spell casting state and provides feedback on cast success/failure
 -- Based on QuickHeal's StartMonitor/StopMonitor system
 
-CastMonitor = {}
-CastMonitor.__index = CastMonitor
+---@class CastMonitor
+---@field instance ClassMonitorInstance
+CastMonitor = MyrkAddon:NewModule("MyrkCastMonitor")
 
 -- Monitoring state
-local isMonitoring = false
-local currentCast = nil
 local monitorFrame = nil
 
-function CastMonitor:New()
-    local instance = {
+function CastMonitor:OnEnable()
+    ---@class ClassMonitorInstance
+    ---@field isActive boolean
+    self.instance = {
         isActive = false,
         currentTarget = nil,
         currentSpell = nil,
@@ -24,29 +25,30 @@ function CastMonitor:New()
             onStopped = nil
         }
     }
-    setmetatable(instance, CastMonitor)
-    return instance
 end
 
 -- Start monitoring a spell cast
 function CastMonitor:StartMonitor(spell, target, reason, callbacks)
     -- Stop any existing monitor
     self:StopMonitor("Starting new cast")
+    if not callbacks then
+        callbacks = {}
+    end
     
     -- Set up monitoring state
-    self.isActive = true
-    self.currentTarget = target
-    self.currentSpell = spell
-    self.currentReason = reason or "unknown"
-    self.startTime = GetTime()
-    
-    -- Store callbacks
-    if callbacks then
-        self.callbacks.onSuccess = callbacks.onSuccess
-        self.callbacks.onFailed = callbacks.onFailed
-        self.callbacks.onInterrupted = callbacks.onInterrupted
-        self.callbacks.onStopped = callbacks.onStopped
-    end
+    self.instance = {
+        isActive = true,
+        currentTarget = target,
+        currentSpell = spell,
+        currentReason = reason or "unknown",
+        startTime = GetTime(),
+        callbacks = {
+            onSuccess = callbacks.onSuccess or nil,
+            onFailed = callbacks.onFailed or nil,
+            onInterrupted = callbacks.onInterrupted or nil,
+            onStopped = callbacks.onStopped or nil,
+        }
+    }
     
     -- Create frame if it doesn't exist
     if not monitorFrame then
@@ -68,7 +70,7 @@ end
 
 -- Stop monitoring
 function CastMonitor:StopMonitor(trigger)
-    if not self.isActive then
+    if not self.instance.isActive then
         return
     end
     
@@ -84,17 +86,16 @@ function CastMonitor:StopMonitor(trigger)
         trigger or "Unknown trigger"))
     
     -- Clear state
-    self.isActive = false
-    self.currentTarget = nil
-    self.currentSpell = nil
-    self.currentReason = nil
-    self.startTime = nil
+    self.instance = {
+        isActive = false,
+        currentTarget = nil,
+        currentSpell = nil,
+        currentReason = nil,
+        startTime = nil
+    }
     
     -- Clear callbacks
-    self.callbacks.onSuccess = nil
-    self.callbacks.onFailed = nil
-    self.callbacks.onInterrupted = nil
-    self.callbacks.onStopped = nil
+    self.callbacks = nil
 end
 
 -- Event handler
@@ -176,6 +177,3 @@ function CastMonitor:IsCasting()
     local spell, _, _, _, _, endTime = UnitCastingInfo("player")
     return spell ~= nil
 end
-
--- Global instance
-GlobalCastMonitor = CastMonitor:New()

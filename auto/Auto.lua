@@ -29,14 +29,10 @@ function Auto:PerformHealing()
         return false
     end
 
-    if not self.engine.partyMonitor then
-        -- Get the current party state from PartyMonitor
-        local partyMonitor = MyrkAddon:GetModule("MyrkPartyMonitor")
-        if not partyMonitor then
-            DEFAULT_CHAT_FRAME:AddMessage("|cffff0000[MyrkAuto]|r PartyMonitor not found")
-            return false
-        end
-        self.engine.partyMonitor = partyMonitor
+    if not self.engine:Ready() then
+        Logs.Error("Auto engine is not ready")
+        return false
+
     end
         
     -- Execute the healing strategy
