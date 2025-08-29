@@ -336,11 +336,7 @@ end
 -- Convenience function for autoSelfCast management
 function WithAutoSelfCastOff(...)
     local nodes = {...}
-    return WithSetup(
-        CVarSetup("autoSelfCast", "0"),
-        CVarTeardown(),
-        unpack(nodes)
-    )
+    return WithCVar("autoSelfCast", "0", unpack(nodes))
 end
 
 -- Generic CVar wrapper

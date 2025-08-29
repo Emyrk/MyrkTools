@@ -1,0 +1,2 @@
+- Track spell casting start/stop
+- Blacklist players who heals fail
