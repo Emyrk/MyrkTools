@@ -284,3 +284,71 @@ function Wand()
         return nil
     end
 end
+
+-- Setup/Teardown wrapper for decision nodes
+-- Executes setup before evaluating nodes, teardown after (regardless of success/failure)
+function WithSetup(setupFunc, teardownFunc, ...)
+    local nodes = {...}
+    
+    return function(engine)
+        local setupResult = nil
+        
+        -- Execute setup function
+        if setupFunc then
+            setupResult = setupFunc(engine)
+        end
+        
+        -- Evaluate the wrapped decision nodes
+        local result = nil
+        for _, node in ipairs(nodes) do
+            result = engine:evaluateDecision(node)
+            if result then
+                break -- First successful decision wins
+            end
+        end
+        
+        -- Always execute teardown, passing setup result for context
+        if teardownFunc then
+            teardownFunc(engine, setupResult)
+        end
+        
+        return result
+    end
+end
+
+-- Helper function to create CVar setup/teardown functions
+function CVarSetup(cvarName, newValue)
+    return function(engine)
+        local oldValue = GetCVar(cvarName)
+        SetCVar(cvarName, newValue)
+        return {cvar = cvarName, oldValue = oldValue}
+    end
+end
+
+function CVarTeardown()
+    return function(engine, setupResult)
+        if setupResult and setupResult.cvar and setupResult.oldValue then
+            SetCVar(setupResult.cvar, setupResult.oldValue)
+        end
+    end
+end
+
+-- Convenience function for autoSelfCast management
+function WithAutoSelfCastOff(...)
+    local nodes = {...}
+    return WithSetup(
+        CVarSetup("autoSelfCast", "0"),
+        CVarTeardown(),
+        unpack(nodes)
+    )
+end
+
+-- Generic CVar wrapper
+function WithCVar(cvarName, value, ...)
+    local nodes = {...}
+    return WithSetup(
+        CVarSetup(cvarName, value),
+        CVarTeardown(),
+        unpack(nodes)
+    )
+end
