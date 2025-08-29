@@ -8,13 +8,6 @@ Party.__index = Party
 -- Available roles for party members
 Party.ROLES = {
     TANK = "Tank",
-    OFF_TANK = "Off-Tank", 
-    HEALER = "Healer",
-    OFF_HEALER = "Off-Healer",
-    DPS_MELEE = "Melee DPS",
-    DPS_RANGED = "Ranged DPS",
-    DPS_CASTER = "Caster DPS",
-    SUPPORT = "Support",
     NONE = "None"
 }
 
@@ -38,13 +31,13 @@ end
 -- "player" is also accepted
 function Party:RefreshID(id) 
   if UnitExists(id) then
-    local name = UnitName(id) -- Fixed: was 'unitstr', now 'id'
+    local name = UnitName(id)
     if name and name ~= "" then
       if not self.players[id] then
         self.players[id] = AllyPlayer:New(id)
       end
 
-      self.players[id]:Refresh() -- Fixed: added colon for method call
+      self.players[id]:Refresh() 
       
       -- Apply stored role if available
       if self.roleAssignments[name] then
@@ -55,7 +48,7 @@ function Party:RefreshID(id)
     end
   end
 
-  self:RemoveID(id) -- Fixed: added colon for method call
+  self:RemoveID(id)
 end
 
 function Party:RemoveID(id) 
@@ -85,6 +78,10 @@ function Party:SetRole(playerName, role)
   if unitId and self.players[unitId] then
     self.players[unitId].role = role
   end
+
+  if role == self.ROLES.NONE then
+    self.roleAssignments[playerName] = nil
+  end
   
   return true
 end
@@ -94,13 +91,7 @@ function Party:GetRole(playerName)
 end
 
 function Party:ClearRole(playerName)
-  self.roleAssignments[playerName] = nil
-  
-  -- Clear from current player if they're in party
-  local unitId = self:GetUnitIdByName(playerName)
-  if unitId and self.players[unitId] then
-    self.players[unitId].role = self.ROLES.NONE
-  end
+  self:SetRole(playerName, self.ROLES.NONE)
 end
 
 -- Query functions for roles
@@ -114,43 +105,9 @@ function Party:GetPlayersByRole(role)
   return result
 end
 
-function Party:GetTanks()
-  local tanks = self:GetPlayersByRole(self.ROLES.TANK)
-  local offTanks = self:GetPlayersByRole(self.ROLES.OFF_TANK)
-  
-  -- Combine and return tanks first, then off-tanks
-  for _, offTank in ipairs(offTanks) do
-    table.insert(tanks, offTank)
-  end
-  
-  return tanks
-end
-
-function Party:GetHealers()
-  local healers = self:GetPlayersByRole(self.ROLES.HEALER)
-  local offHealers = self:GetPlayersByRole(self.ROLES.OFF_HEALER)
-  
-  -- Combine and return healers first, then off-healers
-  for _, offHealer in ipairs(offHealers) do
-    table.insert(healers, offHealer)
-  end
-  
-  return healers
-end
-
-function Party:GetDPS()
-  local dps = {}
-  local meleeList = self:GetPlayersByRole(self.ROLES.DPS_MELEE)
-  local rangedList = self:GetPlayersByRole(self.ROLES.DPS_RANGED)
-  local casterList = self:GetPlayersByRole(self.ROLES.DPS_CASTER)
-  
-  for _, player in ipairs(meleeList) do table.insert(dps, player) end
-  for _, player in ipairs(rangedList) do table.insert(dps, player) end
-  for _, player in ipairs(casterList) do table.insert(dps, player) end
-  
-  return dps
-end
-
+---Return the player id for a given name if they are in the party. Otherwise returns nil
+---@param playerName string
+---@return string|nil playerID will be 'player', 'party1', etc. or nil if not found
 function Party:GetUnitIdByName(playerName)
   if UnitName("player") == playerName then
     return "player"
@@ -207,15 +164,5 @@ function AllyPlayer:GetHealthPercent()
 end
 
 function AllyPlayer:IsTank()
-  return self.role == Party.ROLES.TANK or self.role == Party.ROLES.OFF_TANK
-end
-
-function AllyPlayer:IsHealer()
-  return self.role == Party.ROLES.HEALER or self.role == Party.ROLES.OFF_HEALER
-end
-
-function AllyPlayer:IsDPS()
-  return self.role == Party.ROLES.DPS_MELEE or 
-         self.role == Party.ROLES.DPS_RANGED or 
-         self.role == Party.ROLES.DPS_CASTER
+  return self.role == Party.ROLES.TANK
 end
