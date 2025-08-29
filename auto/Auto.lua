@@ -1,13 +1,13 @@
--- AutoHeal - Decision tree based healing system
+-- Auto - Decision tree based healing system
 -- Uses a modular decision tree approach for flexible healing strategies
 
-AutoHeal = MyrkAddon:NewModule("MyrkAutoHeal")
+Auto = MyrkAddon:NewModule("MyrkAuto")
 HealComm = AceLibrary("HealComm-1.0")
 DamageComm = AceLibrary("DamageComm-1.0")
 Logs = AceLibrary("MyrkLogs-1.0")
 -- Party = AceLibrary("PartyMonitor-1.0")
 
-function AutoHeal:OnEnable()
+function Auto:OnEnable()
     -- Initialize the decision engine
     self.engine = DecisionEngine:New()
     
@@ -18,18 +18,18 @@ function AutoHeal:OnEnable()
     self:RegisterEvent("PARTY_MEMBERS_CHANGED", "OnPartyChanged")
     self:RegisterEvent("RAID_ROSTER_UPDATE", "OnPartyChanged")
     
-    DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[MyrkAutoHeal]|r Loaded")
+    DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[MyrkAuto]|r Loaded")
 end
 
-function AutoHeal:OnPartyChanged()
+function Auto:OnPartyChanged()
     -- Could auto-detect tanks here or refresh manual list
     -- TODO: PartyMonitor can maybe allow annotations?
 end
 
 -- Main healing function to be called from keybinds or automation
-function AutoHeal:PerformHealing()
+function Auto:PerformHealing()
     if not self.engine then
-        Logs.Error("AutoHeal engine not initialized")
+        Logs.Error("Auto engine not initialized")
         return false
     end
 
@@ -37,7 +37,7 @@ function AutoHeal:PerformHealing()
         -- Get the current party state from PartyMonitor
         local partyMonitor = MyrkAddon:GetModule("MyrkPartyMonitor")
         if not partyMonitor then
-            DEFAULT_CHAT_FRAME:AddMessage("|cffff0000[MyrkAutoHeal]|r PartyMonitor not found")
+            DEFAULT_CHAT_FRAME:AddMessage("|cffff0000[MyrkAuto]|r PartyMonitor not found")
             return false
         end
         self.engine.partyMonitor = partyMonitor
@@ -55,8 +55,8 @@ function AutoHeal:PerformHealing()
     return false -- No action taken
 end
 
-function AutoHeal:ExecuteHealingAction(decision)
-    DEFAULT_CHAT_FRAME:AddMessage(string.format("|cff00ff00[AutoHeal]|r %s -> %s (%s)", 
+function Auto:ExecuteHealingAction(decision)
+    DEFAULT_CHAT_FRAME:AddMessage(string.format("|cff00ff00[Auto]|r %s -> %s (%s)", 
         decision.spell, decision.target, decision.reason))
     
     -- Target the unit first
@@ -67,7 +67,7 @@ function AutoHeal:ExecuteHealingAction(decision)
 end
 
 -- Configuration functions
-function AutoHeal:AddTank(tankName)
+function Auto:AddTank(tankName)
     if not self.engine then return end
     
     for _, name in ipairs(self.engine.tankList) do
@@ -77,28 +77,28 @@ function AutoHeal:AddTank(tankName)
     end
     
     table.insert(self.engine.tankList, tankName)
-    DEFAULT_CHAT_FRAME:AddMessage(string.format("|cff00ff00[AutoHeal]|r Added tank: %s", tankName))
+    DEFAULT_CHAT_FRAME:AddMessage(string.format("|cff00ff00[Auto]|r Added tank: %s", tankName))
 end
 
-function AutoHeal:RemoveTank(tankName)
+function Auto:RemoveTank(tankName)
     if not self.engine then return end
     
     for i, name in ipairs(self.engine.tankList) do
         if name == tankName then
             table.remove(self.engine.tankList, i)
-            DEFAULT_CHAT_FRAME:AddMessage(string.format("|cff00ff00[AutoHeal]|r Removed tank: %s", tankName))
+            DEFAULT_CHAT_FRAME:AddMessage(string.format("|cff00ff00[Auto]|r Removed tank: %s", tankName))
             return
         end
     end
 end
 
-function AutoHeal:ListTanks()
+function Auto:ListTanks()
     if not self.engine then return end
     
     if #self.engine.tankList == 0 then
-        DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[AutoHeal]|r No tanks configured")
+        DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[Auto]|r No tanks configured")
     else
-        DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[AutoHeal]|r Tanks:")
+        DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[Auto]|r Tanks:")
         for _, name in ipairs(self.engine.tankList) do
             DEFAULT_CHAT_FRAME:AddMessage("  - " .. name)
         end

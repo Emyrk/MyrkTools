@@ -23,9 +23,9 @@ function SlashCmdList.AUTOHEAL(msg)
     if not command then command = msg end
     command = string.lower(command)
     
-    local autoHeal = MyrkAddon:GetModule("MyrkAutoHeal")
+    local autoHeal = MyrkAddon:GetModule("MyrkAuto")
     if not autoHeal then
-        DEFAULT_CHAT_FRAME:AddMessage("|cffff0000[AutoHeal]|r Module not loaded")
+        DEFAULT_CHAT_FRAME:AddMessage("|cffff0000[Auto]|r Module not loaded")
         return
     end
     

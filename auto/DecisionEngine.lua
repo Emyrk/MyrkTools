@@ -1,5 +1,5 @@
 -- DecisionEngine.lua
--- Core decision tree executor for the AutoHeal system
+-- Core decision tree executor for the Auto system
 
 DecisionEngine = {}
 DecisionEngine.__index = DecisionEngine

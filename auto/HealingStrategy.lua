@@ -82,10 +82,10 @@ AggressiveStrategy = {
 function SetHealingStrategy(strategyName)
     if strategyName == "conservative" then
         HealingStrategy = ConservativeStrategy
-        DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[AutoHeal]|r Strategy set to Conservative")
+        DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[Auto]|r Strategy set to Conservative")
     elseif strategyName == "aggressive" then
         HealingStrategy = AggressiveStrategy
-        DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[AutoHeal]|r Strategy set to Aggressive")
+        DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[Auto]|r Strategy set to Aggressive")
     else
         -- Reset to default
         HealingStrategy = {
@@ -104,6 +104,6 @@ function SetHealingStrategy(strategyName)
             NotInstance(Smite()),
             Wand(),
         }
-        DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[AutoHeal]|r Strategy set to Default")
+        DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[Auto]|r Strategy set to Default")
     end
 end
