@@ -6,57 +6,61 @@
 PartyMonitor = MyrkAddon:NewModule("MyrkPartyMonitor")
 PartyMonitor.party = Party:New()
 
--- Saved variables for persistent role storage
-PartyMonitorDB = PartyMonitorDB or {}
+-- AceDB defaults for persistent storage
+local defaults = {
+    realm = {
+        roleAssignments = {}, -- Store role assignments per realm
+    },
+}
 
 function PartyMonitor:OnEnable()
-  -- Initialize saved variables
-  if not PartyMonitorDB.roleAssignments then
-    PartyMonitorDB.roleAssignments = {}
-  end
-  
-  -- Load saved role assignments into party
-  self.party.roleAssignments = PartyMonitorDB.roleAssignments
-  
-  self:RegisterEvent("PARTY_MEMBERS_CHANGED", "UpdatePartyMembers")
-  self:RegisterEvent("RAID_ROSTER_UPDATE", "UpdatePartyMembers")
+    -- Initialize AceDB
+    self.db = LibStub("AceDB-3.0"):New("PartyMonitorDB", defaults, true)
+    
+    -- Load saved role assignments from realm storage into party
+    self.party.roleAssignments = self.db.realm.roleAssignments
+    
+    self:RegisterEvent("PARTY_MEMBERS_CHANGED", "UpdatePartyMembers")
+    self:RegisterEvent("RAID_ROSTER_UPDATE", "UpdatePartyMembers")
 
-  self:UpdatePartyMembers()
-  DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[MyrkPartyMonitor]|r Loaded")
+    self:UpdatePartyMembers()
+    DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[MyrkPartyMonitor]|r Loaded")
 end
 
 function PartyMonitor:OnDisable()
-  -- Save role assignments to persistent storage
-  PartyMonitorDB.roleAssignments = self.party.roleAssignments
+    -- Save role assignments to AceDB realm storage
+    if self.db then
+        self.db.realm.roleAssignments = self.party.roleAssignments
+    end
 end
 
 function PartyMonitor:UpdatePartyMembers()
-  -- Reload the party members
-  self.party:Refresh()
+    -- Reload the party members
+    self.party:Refresh()
 end
 
 -- Role management functions
 function PartyMonitor:SetRole(playerName, role)
-  local success, error = self.party:SetRole(playerName, role)
-  if success then
-    -- Save to persistent storage immediately
-    PartyMonitorDB.roleAssignments = self.party.roleAssignments
-    DEFAULT_CHAT_FRAME:AddMessage(string.format("|cff00ff00[PartyMonitor]|r %s is now %s", playerName, role))
-  else
-    DEFAULT_CHAT_FRAME:AddMessage(string.format("|cffff0000[PartyMonitor]|r %s", error))
-  end
-  return success
+    local success, error = self.party:SetRole(playerName, role)
+    if success then
+        -- Save to AceDB realm storage immediately
+        self.db.realm.roleAssignments = self.party.roleAssignments
+        DEFAULT_CHAT_FRAME:AddMessage(string.format("|cff00ff00[PartyMonitor]|r %s is now %s", playerName, role))
+    else
+        DEFAULT_CHAT_FRAME:AddMessage(string.format("|cffff0000[PartyMonitor]|r %s", error))
+    end
+    return success
 end
 
 function PartyMonitor:GetRole(playerName)
-  return self.party:GetRole(playerName)
+    return self.party:GetRole(playerName)
 end
 
 function PartyMonitor:ClearRole(playerName)
-  self.party:ClearRole(playerName)
-  -- Save to persistent storage immediately
-  PartyMonitorDB.roleAssignments = self.party.roleAssignments
-  DEFAULT_CHAT_FRAME:AddMessage(string.format("|cff00ff00[PartyMonitor]|r Cleared role for %s", playerName))
+    self.party:ClearRole(playerName)
+    -- Save to AceDB realm storage immediately
+    self.db.realm.roleAssignments = self.party.roleAssignments
+    DEFAULT_CHAT_FRAME:AddMessage(string.format("|cff00ff00[PartyMonitor]|r Cleared role for %s", playerName))
 end
 
 -- Query functions for other modules to use
