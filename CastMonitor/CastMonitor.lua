@@ -30,6 +30,10 @@ function CastMonitor:OnEnable()
             onInterrupted = nil,
         }
     }
+
+    if pfUI then
+        CastMonitor:CastMonitorHookPfUI()
+    end
     DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[MyrkCastMonitor]|r Loaded")
 end
 
@@ -61,6 +65,7 @@ function CastMonitor:CastSpellByNameAndLog(spell)
     
     -- Cast the spell
     CastSpellByName(spell)
+    self:UpdatePfUIIndicator()
 end
 
 -- Start monitoring a spell cast
@@ -99,7 +104,7 @@ function CastMonitor:StartMonitor(spell, target, reason, callbacks)
     monitorFrame:RegisterEvent("SPELLCAST_INTERRUPTED")
     monitorFrame:RegisterEvent("UI_ERROR_MESSAGE")
     
-    local msg = string.format("|cff00ff00[CastMonitor]|r Started monitoring %s -> %s (%s)", 
+    local msg = string.format("[CastMonitor]Started monitoring %s -> %s (%s)", 
         spell, target, reason)
     Logs.Debug(msg)
     -- DEFAULT_CHAT_FRAME:AddMessage(msg)
@@ -119,7 +124,7 @@ function CastMonitor:StopMonitor(trigger)
         monitorFrame:UnregisterEvent("UI_ERROR_MESSAGE")
     end
     
-    local msg = string.format("|cff00ff00[CastMonitor]|r Stopped monitoring: %s", 
+    local msg = string.format("[CastMonitor] Stopped monitoring: %s", 
         trigger or "Unknown trigger")
     Logs.Debug(msg)
     -- DEFAULT_CHAT_FRAME:AddMessage(msg)
@@ -135,6 +140,7 @@ function CastMonitor:StopMonitor(trigger)
     
     -- Clear callbacks
     self.callbacks = nil
+    self:UpdatePfUIIndicator()
 end
 
 -- Event handler
@@ -213,7 +219,82 @@ function CastMonitor:IsCasting()
         return true
     end
     
+    return false;
     -- Check WoW's casting info as fallback
-    local spell, _, _, _, _, endTime = UnitCastingInfo("player")
-    return spell ~= nil
+    -- local spell, _, _, _, _, endTime = UnitCastingInfo("player")
+    -- return spell ~= nil
+end
+
+-- pfUI integration for visual indicator
+function CastMonitor:CastMonitorHookPfUI()
+    if not pfUI then
+        return -- pfUI not available
+    end
+    
+    pfUI:RegisterModule("CastMonitorIndicator", "vanilla:tbc", function()
+        local HookRefreshUnit = pfUI.uf.RefreshUnit
+        function pfUI.uf:RefreshUnit(unit, component)
+            -- Always run pfUI's original logic first
+            HookRefreshUnit(this, unit, component)
+            
+            -- Only show indicator on player frame
+            if not unit or unit.label ~= "player" then
+                if unit and unit.castMonitor then 
+                    unit.castMonitor:Hide() 
+                end
+                return
+            end
+            
+            local unitstr = "player"
+            if not UnitExists(unitstr) then
+                if unit.castMonitor then 
+                    unit.castMonitor:Hide() 
+                end
+                return
+            end
+            
+            -- Create the indicator frame once
+            if not unit.castMonitor then
+                unit.castMonitor = CreateFrame("Frame", nil, unit.hp)
+                unit.castMonitor.tex = unit.castMonitor:CreateTexture(nil, "OVERLAY")
+                unit.castMonitor.tex:SetTexture("Interface\\Buttons\\WHITE8X8")
+                unit.castMonitor.tex:SetAllPoints()
+                unit.castMonitor:SetFrameStrata("HIGH")
+                unit.castMonitor:SetFrameLevel((unit.hp:GetFrameLevel() or 1) + 10)
+                unit.castMonitor:Hide()
+            end
+            
+            -- Show/hide based on monitoring state
+            if CastMonitor:IsCasting() then
+                -- Create a small green dot in the center of the health bar
+                local width = unit.config.width or 100
+                local height = unit.config.height or 20
+                local dotSize = math.min(8, math.min(width, height) / 3)
+                
+                unit.castMonitor:SetWidth(dotSize)
+                unit.castMonitor:SetHeight(dotSize)
+                unit.castMonitor:ClearAllPoints()
+                unit.castMonitor:SetPoint("CENTER", unit.hp, "CENTER", 0, 0)
+                
+                -- Set green color with some transparency
+                unit.castMonitor.tex:SetVertexColor(0.2, 1.0, 0.2, 0.8)
+                unit.castMonitor:Show()
+            else
+                unit.castMonitor:Hide()
+            end
+        end
+    end)
+end
+
+-- Update pfUI indicator
+function CastMonitor:UpdatePfUIIndicator()
+    -- if pfUI and pfUI.uf and pfUI.uf.RefreshUnit then
+    --     -- Refresh the player unit frame to update the indicator
+    --     for _, frame in pairs(pfUI.uf.units) do
+    --         if frame.label == "player" then
+    --             pfUI.uf:RefreshUnit(frame)
+    --             break
+    --         end
+    --     end
+    -- end
 end
