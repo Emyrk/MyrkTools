@@ -3,7 +3,7 @@
 -- the damage against them, and predict how much damage they will take in the future.
 -- This will all be used to predict healing.
 -- Added role annotation system for flexible party management
-PartyMonitor = MyrkAddon:NewModule("MyrkPartyMonitor")
+PartyMonitor = MyrkAddon:NewModule("MyrkPartyMonitor", "AceEvent-3.0")
 PartyMonitor.party = Party:New()
 
 -- External deps

@@ -1,7 +1,7 @@
 -- Auto - Decision tree based healing system
 -- Uses a modular decision tree approach for flexible healing strategies
 
-Auto = MyrkAddon:NewModule("MyrkAuto")
+Auto = MyrkAddon:NewModule("MyrkAuto", "AceEvent-3.0")
 HealComm = AceLibrary("HealComm-1.0")
 DamageComm = AceLibrary("DamageComm-1.0")
 Logs = AceLibrary("MyrkLogs-1.0")
