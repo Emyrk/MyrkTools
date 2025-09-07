@@ -4,11 +4,10 @@
 -- This will all be used to predict healing.
 -- Added role annotation system for flexible party management
 PartyMonitor = MyrkAddon:NewModule("MyrkPartyMonitor", "AceEvent-3.0")
-PartyMonitor.party = Party:New()
 
 -- External deps
-DamageComm = AceLibrary("DamageComm-1.0")
-HealComm = AceLibrary("HealComm-1.0")
+-- local DamageComm = AceLibrary("DamageComm-1.0")
+-- local HealComm = AceLibrary("HealComm-1.0")
 
 -- AceDB defaults for persistent storage
 local defaults = {
@@ -18,17 +17,18 @@ local defaults = {
 }
 
 function PartyMonitor:OnEnable()
-    -- Initialize AceDB
-    self.db = LibStub("AceDB-3.0"):New("PartyMonitorDB", defaults, true)
-    
-    -- Load saved role assignments from realm storage into party
-    self.party.roleAssignments = self.db.realm.roleAssignments
-    
-    self:RegisterEvent("PARTY_MEMBERS_CHANGED", "UpdatePartyMembers")
-    self:RegisterEvent("RAID_ROSTER_UPDATE", "UpdatePartyMembers")
+  PartyMonitor.party = Party:New()
+  -- Initialize AceDB
+  self.db = LibStub("AceDB-3.0"):New("PartyMonitorDB", defaults, true)
 
-    self:UpdatePartyMembers()
-    DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[MyrkPartyMonitor]|r Loaded")
+  -- Load saved role assignments from realm storage into party
+  self.party.roleAssignments = self.db.realm.roleAssignments
+  
+  self:RegisterEvent("PARTY_MEMBERS_CHANGED", "UpdatePartyMembers")
+  self:RegisterEvent("RAID_ROSTER_UPDATE", "UpdatePartyMembers")
+
+  self:UpdatePartyMembers()
+  DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[MyrkPartyMonitor]|r Loaded")
 end
 
 function PartyMonitor:OnDisable()
@@ -39,6 +39,9 @@ function PartyMonitor:OnDisable()
 end
 
 function PartyMonitor:UpdatePartyMembers()
+    if not self.party then
+        return
+    end
     -- Reload the party members
     self.party:Refresh()
 end
@@ -72,21 +75,13 @@ function PartyMonitor:GetTanks()
   return self.party:GetTanks()
 end
 
-function PartyMonitor:GetHealers()
-  return self.party:GetHealers()
-end
-
-function PartyMonitor:GetDPS()
-  return self.party:GetDPS()
-end
-
 function PartyMonitor:GetPlayersByRole(role)
   return self.party:GetPlayersByRole(role)
 end
 
 function PartyMonitor:ListRoles()
   local assignments = self.party:ListRoleAssignments()
-  if #assignments == 0 then
+  if table.getn(assignments) == 0 then
     DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[PartyMonitor]|r No role assignments")
   else
     DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[PartyMonitor]|r Role assignments:")
@@ -110,24 +105,14 @@ function PartyMonitor:GetTankUnitIds()
   return unitIds
 end
 
-function PartyMonitor:GetHealerUnitIds()
-  local healers = self:GetHealers()
-  local unitIds = {}
-  for _, healer in ipairs(healers) do
-    table.insert(unitIds, healer.id)
-  end
-  return unitIds
-end
+function PartyMonitor:Debug()
+    if not self.party then
+        return
+    end
 
-function PartyMonitor:GetDPSUnitIds()
-  local dps = self:GetDPS()
-  local unitIds = {}
-  for _, dpsPlayer in ipairs(dps) do
-    table.insert(unitIds, dpsPlayer.id)
-  end
-  return unitIds
+    DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[PartyMonitor]|r Debug Info:")
+    for unitId, player in pairs(self.party.players) do
+        DEFAULT_CHAT_FRAME:AddMessage(string.format("  %s: %s (HP: %d/%d, Role: %s)", 
+            unitId, player.name, player.hp, player.hpmax, player.role))
+    end
 end
-
-local MAJOR_VERSION = "PartyMonitor-1.0"
-local MINOR_VERSION = "$Revision: 0 $"
-AceLibrary:Register(PartyMonitor.party, MAJOR_VERSION, MINOR_VERSION)

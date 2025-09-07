@@ -20,7 +20,7 @@ libs\AceConfig-3.0\AceConfig-3.0.xml
 libs\AceComm-3.0\AceComm-3.0.xml
 
 # Utility functions
-utility\utility.xml
+utility\utility.lua
 
 # Core
 Addon.lua
@@ -41,7 +41,7 @@ PartyMonitor\RoleCommands.lua
 autoheal\DecisionEngine.lua
 autoheal\DecisionNodes.lua
 autoheal\HealingStrategy.lua
-autoheal\AutoHeal.lua
+autoheal\Auto.lua
 autoheal\init.lua
 
 # Auto System

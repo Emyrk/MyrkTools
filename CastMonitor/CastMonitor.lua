@@ -9,6 +9,7 @@ Logs = AceLibrary("MyrkLogs-1.0")
 
 -- Monitoring state
 local monitorFrame = nil
+local playerUnitUI = nil
 
 Reasons = {
     OUT_OF_RANGE = "OUT_OF_RANGE",
@@ -214,6 +215,16 @@ end
 
 -- Check if we're currently casting (either monitored or via WoW API)
 function CastMonitor:IsCasting()
+    if not self.instance then
+        return false
+    end
+
+    if self.instance.startTime and (GetTime() - self.instance.startTime) > 5 then
+        -- Timeout after 5 seconds
+        self:StopMonitor("Timeout")
+        return false
+    end
+
     -- Check if we're monitoring a cast
     if self.instance.isActive then
         return true
@@ -262,10 +273,7 @@ function CastMonitor:CastMonitorHookPfUI()
                 unit.castMonitor:SetFrameStrata("HIGH")
                 unit.castMonitor:SetFrameLevel((unit.hp:GetFrameLevel() or 1) + 10)
                 unit.castMonitor:Hide()
-            end
-            
-            -- Show/hide based on monitoring state
-            if CastMonitor:IsCasting() then
+
                 -- Create a small green dot in the center of the health bar
                 local width = unit.config.width or 100
                 local height = unit.config.height or 20
@@ -278,23 +286,28 @@ function CastMonitor:CastMonitorHookPfUI()
                 
                 -- Set green color with some transparency
                 unit.castMonitor.tex:SetVertexColor(0.2, 1.0, 0.2, 0.8)
+            end
+            
+            -- Show/hide based on monitoring state
+            if CastMonitor:IsCasting() then
                 unit.castMonitor:Show()
             else
                 unit.castMonitor:Hide()
             end
+
+            playerUnitUI = unit.castMonitor
         end
     end)
 end
 
 -- Update pfUI indicator
+-- TODO: Probably better to just call the PFUI refresh function directly
 function CastMonitor:UpdatePfUIIndicator()
-    -- if pfUI and pfUI.uf and pfUI.uf.RefreshUnit then
-    --     -- Refresh the player unit frame to update the indicator
-    --     for _, frame in pairs(pfUI.uf.units) do
-    --         if frame.label == "player" then
-    --             pfUI.uf:RefreshUnit(frame)
-    --             break
-    --         end
-    --     end
-    -- end
+    if playerUnitUI then
+        if CastMonitor:IsCasting() then
+            playerUnitUI:Show()
+        else
+            playerUnitUI:Hide()
+        end
+    end
 end

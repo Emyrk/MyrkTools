@@ -36,7 +36,7 @@ function MyrkAddon:Console(input)
     return
   end
 
-  -- Tank management commands
+  -- Party management commands
   if string.match(input, "^tank") then
     self:HandleTankCommand(input)
     return
@@ -63,6 +63,7 @@ function MyrkAddon:HandleTankCommand(input)
   end
   
   command = string.lower(command)
+  print(command, playerName)
   
   if command == "add" then
     if not playerName or playerName == "" then
@@ -85,7 +86,7 @@ function MyrkAddon:HandleTankCommand(input)
     self:Print(string.format("Removed tank role from %s", playerName))
     
   elseif command == "list" then
-    local tanks = partyMonitor:GetTanks()
+    local tanks = partyMonitor:GetPlayersByRole("Tank")
     if table.getn(tanks) == 0 then
       self:Print("No tanks configured")
     else

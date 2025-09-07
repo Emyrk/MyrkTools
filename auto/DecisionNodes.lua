@@ -48,7 +48,7 @@ end
 -- Annotate party members with spell reachability
 -- This is a state modifier, not an action
 function Castable(...)
-    local spells = {...}
+    -- local spells = {...}
     return function(engine)
         -- TODO: Check spell range, mana cost, etc. for each party member
         -- For now, this is a placeholder that always succeeds
@@ -297,7 +297,7 @@ end
 -- Setup/Teardown wrapper for decision nodes
 -- Executes setup before evaluating nodes, teardown after (regardless of success/failure)
 function WithSetup(setupFunc, teardownFunc, ...)
-    local nodes = {...}
+    local nodes = arg
     
     return function(engine)
         local setupResult = nil
@@ -344,13 +344,13 @@ end
 
 -- Convenience function for autoSelfCast management
 function WithAutoSelfCastOff(...)
-    local nodes = {...}
+    local nodes = arg
     return WithCVar("autoSelfCast", "0", unpack(nodes))
 end
 
 -- Generic CVar wrapper
 function WithCVar(cvarName, value, ...)
-    local nodes = {...}
+    local nodes = arg
     return WithSetup(
         CVarSetup(cvarName, value),
         CVarTeardown(),
