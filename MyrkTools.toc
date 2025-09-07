@@ -20,7 +20,7 @@ libs\AceConfig-3.0\AceConfig-3.0.xml
 libs\AceComm-3.0\AceComm-3.0.xml
 
 # Utility functions
-utility/utility.xml
+utility\utility.xml
 
 # Core
 Addon.lua
@@ -30,24 +30,24 @@ Tools.lua
 Logs.lua
 Priest.lua
 Loader.lua
-DamageComm.lua
+DamageComm\DamageComm.lua
 
 # PartyMonitor
-PartyMonitor/party.lua
-PartyMonitor/PartyMonitor.lua
-PartyMonitor/RoleCommands.lua
+PartyMonitor\party.lua
+PartyMonitor\PartyMonitor.lua
+PartyMonitor\RoleCommands.lua
 
 # AutoHeal System
-autoheal/DecisionEngine.lua
-autoheal/DecisionNodes.lua
-autoheal/HealingStrategy.lua
-autoheal/AutoHeal.lua
-autoheal/init.lua
+autoheal\DecisionEngine.lua
+autoheal\DecisionNodes.lua
+autoheal\HealingStrategy.lua
+autoheal\AutoHeal.lua
+autoheal\init.lua
 
 # Auto System
-auto/CastMonitor.lua
-auto/DecisionEngine.lua
-auto/DecisionNodes.lua
-auto/HealingStrategy.lua
-auto/Auto.lua
-auto/init.lua
+CastMonitor\CastMonitor.lua
+auto\DecisionEngine.lua
+auto\DecisionNodes.lua
+auto\HealingStrategy.lua
+auto\Auto.lua
+auto\init.lua

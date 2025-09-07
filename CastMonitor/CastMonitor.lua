@@ -24,6 +24,7 @@ function CastMonitor:OnEnable()
             onInterrupted = nil,
         }
     }
+    DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[MyrkCastMonitor]|r Loaded")
 end
 
 function CastMonitor:CastSpellByNameAndLog(spell)
