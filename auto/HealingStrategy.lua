@@ -1,6 +1,10 @@
 -- HealingStrategy.lua
 -- The complete healing decision tree strategy
 
+Rogue = {
+    RefreshPartyState,
+}
+
 -- This is the main healing strategy decision tree
 -- Decisions are evaluated in order, first match wins
 DefaultHealingStrategy = {

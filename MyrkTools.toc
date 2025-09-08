@@ -35,7 +35,6 @@ DamageComm\DamageComm.lua
 # PartyMonitor
 PartyMonitor\party.lua
 PartyMonitor\PartyMonitor.lua
-PartyMonitor\RoleCommands.lua
 
 # AutoHeal System
 autoheal\DecisionEngine.lua

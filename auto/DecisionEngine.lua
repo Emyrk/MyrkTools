@@ -9,9 +9,21 @@ function DecisionEngine:New()
     local instance = {
         partyMonitor = nil, -- Set by module
         castMonitor = nil, 
+        strategy = nil, -- Current strategy (list of decision nodes)
         config = {
         }
     }
+
+    local localizedClass, englishClass = UnitClass("player")
+    if englishClass == "ROGUE" then
+        instance.strategy = Rogue
+    elseif englishClass == "PRIEST" then
+        instance.strategy = HealingStrategy
+    else
+        DEFAULT_CHAT_FRAME:AddMessage("|cffff0000[MyrkAuto]|r Unsupported class: " .. tostring(englishClass))
+        return nil
+    end
+    
     setmetatable(instance, DecisionEngine)
     return instance
 end
@@ -38,9 +50,11 @@ function DecisionEngine:Ready()
 end
 
 -- Core decision tree executor
-function DecisionEngine:doFirst(decisions)
-    for _, decision in ipairs(decisions) do
-        local result = self:evaluateDecision(decision)
+function DecisionEngine:Execute()
+    for _, step in ipairs(self.strategy) do
+        print("Evaluating step:", step)
+        local result = self:evaluateStep(step)
+        print("Step result:", type(result))
         if result then
             return result -- First successful decision wins
         end
@@ -48,52 +62,16 @@ function DecisionEngine:doFirst(decisions)
     return nil -- No decision matched
 end
 
-function DecisionEngine:evaluateDecision(decision)
-    if type(decision) == "function" then
-        return decision(self)
-    elseif type(decision) == "table" and decision.evaluate then
-        return decision:evaluate(self)
+function DecisionEngine:evaluateStep(step)
+    if type(step) == "function" then
+        return step(self)
+    elseif type(step) == "table" and step.evaluate then
+        return step:evaluate(self)
     end
     return nil
 end
 
 -- Target resolution helpers using PartyMonitor roles
-function DecisionEngine:resolveTank()
-    if not self.partyMonitor then
-        return nil
-    end
-    
-    -- Get tank unit IDs from PartyMonitor
-    local tankUnitIds = self.partyMonitor:GetTankUnitIds()
-    
-    -- Return first available tank
-    for _, unitId in ipairs(tankUnitIds) do
-        if UnitExists(unitId) then
-            return unitId
-        end
-    end
-    
-    return nil
-end
-
-function DecisionEngine:resolveTanks()
-    if not self.partyMonitor then
-        return {}
-    end
-    
-    -- Get all tank unit IDs from PartyMonitor
-    local tankUnitIds = self.partyMonitor:GetTankUnitIds()
-    local validTanks = {}
-    
-    for _, unitId in ipairs(tankUnitIds) do
-        if UnitExists(unitId) then
-            table.insert(validTanks, unitId)
-        end
-    end
-    
-    return validTanks
-end
-
 function DecisionEngine:resolveParty()
     if not self.partyMonitor then
         -- Fallback to manual party resolution
@@ -124,42 +102,6 @@ function DecisionEngine:resolveParty()
     end
     
     return members
-end
-
-function DecisionEngine:resolveHealers()
-    if not self.partyMonitor then
-        return {}
-    end
-    
-    -- Get all healer unit IDs from PartyMonitor
-    local healerUnitIds = self.partyMonitor:GetHealerUnitIds()
-    local validHealers = {}
-    
-    for _, unitId in ipairs(healerUnitIds) do
-        if UnitExists(unitId) then
-            table.insert(validHealers, unitId)
-        end
-    end
-    
-    return validHealers
-end
-
-function DecisionEngine:resolveDPS()
-    if not self.partyMonitor then
-        return {}
-    end
-    
-    -- Get all DPS unit IDs from PartyMonitor
-    local dpsUnitIds = self.partyMonitor:GetDPSUnitIds()
-    local validDPS = {}
-    
-    for _, unitId in ipairs(dpsUnitIds) do
-        if UnitExists(unitId) then
-            table.insert(validDPS, unitId)
-        end
-    end
-    
-    return validDPS
 end
 
 -- Helper function to get health percentage

@@ -45,6 +45,15 @@ function AlreadyCasting()
     end
 end
 
+function RefreshPartyState(engine)
+    if not engine.partyMonitor then
+        return nil
+    end
+    
+    engine.partyMonitor:UpdatePartyMembers()
+    return nil -- This is a state modifier, not an action
+end
+
 -- Annotate party members with spell reachability
 -- This is a state modifier, not an action
 function Castable(...)

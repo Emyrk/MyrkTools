@@ -22,8 +22,7 @@ function Auto:OnPartyChanged()
     -- PartyMonitor handles role management now
 end
 
--- Main healing function to be called from keybinds or automation
-function Auto:PerformHealing()
+function Auto:Perform()
     if not self.engine then
         Logs.Error("Auto engine not initialized")
         return false
@@ -36,7 +35,8 @@ function Auto:PerformHealing()
     end
         
     -- Execute the healing strategy
-    local decision = self.engine:doFirst(HealingStrategy)
+    local decision = self.engine:Execute()
+    print("Decision:", decision and decision.action or "none")
     
     if decision and decision.action == "cast" then
         -- Execute the healing action with monitoring
