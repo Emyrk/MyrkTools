@@ -14,6 +14,8 @@ function DecisionEngine:New()
         strategy = RogueStrategy
     elseif englishClass == "PRIEST" then
         strategy = PriestStrategy
+    elseif englishClass == "WARRIOR" then
+        strategy = WarriorAFK
     else
         DEFAULT_CHAT_FRAME:AddMessage("|cffff0000[MyrkAuto]|r Unsupported class: " .. tostring(englishClass))
         return nil
@@ -156,7 +158,7 @@ function DecisionEngine:ExecuteHeal(decision)
    
     if result and result.action == ACTIONS.error then
         DEFAULT_CHAT_FRAME:AddMessage(string.format("|cffff0000[Auto]|r Cast error: %s -> %s (%s)", 
-            decision.spell, decision.target_id or "??", result.reason))
+            decision.spellID, decision.target_id or "??", result.reason))
         return false
     end
 

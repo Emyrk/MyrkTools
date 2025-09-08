@@ -18,9 +18,9 @@ PriestStrategy = {
     CastableHeal("Lesser Heal(Rank 1)", "Renew(Rank 1)"),
 
     -- Save yourself first - emergency situations
-    EmergencyShield("player", 0.15),
-    EmergencyShield("tank", 0.15),
-    EmergencyShield("party", 0.15),
+    EmergencyShield("player", 0.25),
+    EmergencyShield("tank", 0.3),
+    EmergencyShield("party", 0.25),
 
     -- Using time to death (ttd) and pct to determine if we should cast
     EmergencyShield("player", 0.50, 2),
@@ -32,9 +32,6 @@ PriestStrategy = {
     EmergencyFlashHeal("party", 0.75, 3.5),
 
     -- Regular healing priorities
-    -- Any top ups
-    LesserHeal("tank", 0.85),
-
     -- Always heal the tank first
     Priest_Heal("tank", 0.85),
     Priest_Heal("party", 0.85),
@@ -51,6 +48,20 @@ PriestStrategy = {
 
     -- Renew("party", 0.1),
     Wanding:New(),
+}
+
+WarriorAFK = {
+    Debounce:New(0.5),
+    IsDead,
+    -- https://github.com/Emyrk/MyrkTools/blob/5ca6ee25a82cde582c0985e06f0b40c7fce972bd/MyrkTools.lua
+    InCombat(
+        TargetIsAttackable(
+            HeroicStrike()
+        )
+    ),
+    NotCombat(
+        TargetAndThrow()
+    )
 }
 
 -- This is the main healing strategy decision tree

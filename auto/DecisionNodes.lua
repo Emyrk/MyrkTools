@@ -232,9 +232,19 @@ function NotInstance(actionFunc)
     end
 end
 
+function InCombat(actionFunc)
+    return function(engine)
+        if not InCombat() then
+            return nil -- Skip if in combat
+        end
+        
+        return actionFunc(engine)
+    end
+end
+
 function NotCombat(actionFunc)
     return function(engine)
-        if IsInCombat() then
+        if not InCombat() then
             return nil -- Skip if in combat
         end
         
@@ -252,6 +262,30 @@ function Smite()
             return Action:Cast("Smite", "target", "smite")
         end
         return nil
+    end
+end
+
+function HeroicStrike()
+    return function(engine)
+         if UnitExists("target") and UnitCanAttack("player", "target") and UnitName("targettarget") ~= UnitName("player") then
+            ClearTarget()
+            TargetNearestEnemy()
+        end
+
+        AttackTarget()
+        return Action:Cast("Heroic Strike", "target", "heroic_strike")
+    end
+end
+
+function TargetAndThrow()
+    return function(engine)
+        local pct = UnitHealth("player")/UnitHealthMax("player")
+        if pct < 0.9 then
+            return nil
+        end
+        Logs.Info("Attempting to target and throw")
+        TargetNearestEnemy()
+        CastSpellByName("Throw")
     end
 end
 

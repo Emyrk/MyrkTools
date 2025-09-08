@@ -3,6 +3,16 @@ MyrkLogs = MyrkAddon:NewModule("MyrkLogs")
 
 local AceGUI = LibStub("AceGUI-3.0")
 
+local defaults = {
+    profile = {
+        framePosition = {
+            shown = true
+        },
+        syncEnabled = true, -- whether to sync logs with other players
+    },
+
+}
+
 function MyrkLogs:OnEnable()
   self.db = LibStub("AceDB-3.0"):New("MyrkLogsDB", defaults, true)
   self.syncEnabled = self.db.profile.syncEnabled
