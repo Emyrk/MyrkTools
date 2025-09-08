@@ -1,1 +1,2 @@
-Move damage comm hook to party monitor
+Need:
+- Spell monitor
