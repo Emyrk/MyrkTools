@@ -185,3 +185,27 @@ end
 function AllyPlayer:IsTank()
   return self.role == Party.ROLES.TANK
 end
+
+function AllyPlayer:CalculateTimeToDeath()
+    if not self or self.hp <= 0 then
+        return 1000 -- Already dead or invalid
+    end
+
+    if self.hpmax <= 0 then
+        return 1000 -- Invalid max health, assume safe
+    end
+    
+    -- Calculate net damage per second (damage - healing)
+    local netDamagePer5Second = self.recent0000Dmg or 0
+    local netDamagePerSecond = netDamagePer5Second / 5.0
+    local incHeal = self.incHeal or 0
+    
+    if netDamagePerSecond <= 0 then
+        return 1000 -- Taking no net damage or being healed, won't die
+    end
+    
+    -- Calculate time until death
+    local timeToDeath = (self.hp + incHeal) / netDamagePerSecond
+    
+    return math.max(0, timeToDeath)
+end

@@ -17,7 +17,7 @@ PriestStrategy = {
     EmergencyShield("player", 0.15),
     EmergencyShield("tank", 0.15),
     EmergencyShield("party", 0.15),
-    Renew("party", 1.1),
+    Renew("party", 0.1),
 }
 
 -- This is the main healing strategy decision tree

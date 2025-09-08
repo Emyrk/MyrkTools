@@ -61,8 +61,8 @@ function PartyMonitor:ForEach(callback, sortBy)
     if sortBy then
         if sortBy == "time_to_death" then
             table.sort(players, function(a, b)
-                local timeA = self:CalculateTimeToDeath(a)
-                local timeB = self:CalculateTimeToDeath(b)
+                local timeA = a:CalculateTimeToDeath()
+                local timeB = b:CalculateTimeToDeath()
                 return timeA < timeB -- Shortest time to death first
             end)
         elseif sortBy == "health_percent" then
@@ -79,15 +79,13 @@ function PartyMonitor:ForEach(callback, sortBy)
             table.sort(players, function(a, b)
                 return a.recentDmg > b.recentDmg -- Highest incoming damage first
             end)
-        elseif sortBy == "role_priority" then
-            table.sort(players, function(a, b)
-                return self:GetRolePriority(a.role) < self:GetRolePriority(b.role)
-            end)
         end
     end
     
+    print("---")
     -- Iterate through sorted players
     for _, player in ipairs(players) do
+        print(player.name .. " " .. player:CalculateTimeToDeath())
         local stop = callback(player)
         if stop then
             break
@@ -277,29 +275,6 @@ function PartyMonitor:UpdatePfUIIndicators()
     --         end
     --     end
     -- end
-end
-
--- Calculate estimated time to death based on current HP, incoming damage, and incoming heals
-function PartyMonitor:CalculateTimeToDeath(player)
-    if not player or player.hp <= 0 then
-        return 0 -- Already dead or invalid
-    end
-    
-    if player.hpmax <= 0 then
-        return math.huge -- Invalid max health, assume safe
-    end
-    
-    -- Calculate net damage per second (damage - healing)
-    local netDamagePerSecond = player.recentDmg - player.incHeal
-    
-    if netDamagePerSecond <= 0 then
-        return math.huge -- Taking no net damage or being healed, won't die
-    end
-    
-    -- Calculate time until death
-    local timeToDeath = player.hp / netDamagePerSecond
-    
-    return math.max(0, timeToDeath)
 end
 
 -- Get role priority for sorting (lower number = higher priority)
