@@ -27,22 +27,20 @@ function CancelOverHeal()
 end
 
 -- Quick exit if already casting
-function AlreadyCasting()
-    return function(engine)
-        if engine:isAlreadyCasting() then
-            local currentCast = engine:GetCurrentCast()
-            local reason = "already_casting"
-            
-            if currentCast then
-                reason = string.format("already_casting_%s_to_%s", 
-                    currentCast.spell or "unknown", 
-                    currentCast.target or "unknown")
-            end
-            
-            return { action = "skip", reason = reason }
+function AlreadyCasting(engine)
+    if engine:isAlreadyCasting() then
+        local currentCast = engine:GetCurrentCast()
+        local reason = "already_casting"
+        
+        if currentCast then
+            reason = string.format("already_casting_%s_to_%s", 
+                currentCast.spell or "unknown", 
+                currentCast.target or "unknown")
         end
-        return nil
+        
+        return Action:Busy(reason)
     end
+    return nil
 end
 
 function RefreshPartyState(engine)

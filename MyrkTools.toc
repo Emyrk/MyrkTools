@@ -36,17 +36,12 @@ DamageComm\DamageComm.lua
 PartyMonitor\party.lua
 PartyMonitor\PartyMonitor.lua
 
-# AutoHeal System
-autoheal\DecisionEngine.lua
-autoheal\DecisionNodes.lua
-autoheal\HealingStrategy.lua
-autoheal\Auto.lua
-autoheal\init.lua
+# Cast Monitor
+CastMonitor\CastMonitor.lua
 
 # Auto System
-CastMonitor\CastMonitor.lua
+auto\Decisions.lua
 auto\DecisionEngine.lua
 auto\DecisionNodes.lua
-auto\HealingStrategy.lua
+auto\Strategy.lua
 auto\Auto.lua
-auto\init.lua

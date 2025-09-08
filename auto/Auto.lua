@@ -36,12 +36,23 @@ function Auto:Perform()
         
     -- Execute the healing strategy
     local decision = self.engine:Execute()
-    print("Decision:", decision and decision.action or "none")
+    if decision then
+        if decision.action == ACTIONS.busy then
+            Logs.Debug("Busy: " .. (decision.reason or "no reason"))
+            return true -- Still busy, do not interrupt 
+        end
+
+        if decision.action == ACTIONS.cast then
+            Logs.Info(string.format("Casting %s on %s (%s)", 
+                decision.spell, decision.target, decision.reason or "no reason"))
+        end
+    end
     
-    if decision and decision.action == "cast" then
+    if decision and decision.action == ACTIONS.busy then
         -- Execute the healing action with monitoring
         return self.engine:ExecuteAction(decision)
     end
     
+    Logs.Info("No action taken")
     return false -- No action taken
 end

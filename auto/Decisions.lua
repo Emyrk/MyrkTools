@@ -1,6 +1,7 @@
 ---@enum actions
-local ACTIONS = {
+ACTIONS = {
 	busy = "busy",
+  cast = "cast",
 }
 
 
