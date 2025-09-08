@@ -161,7 +161,7 @@ function PartyMonitor:PartyMonitorHookPfUI()
                 unit.tankIcon.tex = unit.tankIcon:CreateTexture(nil, "OVERLAY")
                 
                 -- Try custom texture first, fallback to default if it fails
-                local customTexture = "Interface\\AddOns\\MyrkTools\\img\\tank_icon.tga"
+                local customTexture = "Interface\\AddOns\\MyrkTools\\img\\tank_icon"
                 local fallbackTexture = "Interface\\Icons\\Ability_Defend"
                 
                 unit.tankIcon.tex:SetTexture(customTexture)
@@ -189,14 +189,12 @@ function PartyMonitor:PartyMonitorHookPfUI()
             
             if hasRole then
                 -- Show tank icon in top-right corner of health bar
-                local width = unit.config.width or 100
-                local height = unit.config.height or 20
-                local iconSize = math.min(16, math.min(width, height) * 0.6)
+                local iconSize = math.min(8)
                 
                 unit.tankIcon:SetWidth(iconSize)
                 unit.tankIcon:SetHeight(iconSize)
                 unit.tankIcon:ClearAllPoints()
-                unit.tankIcon:SetPoint("TOPRIGHT", unit.hp, "TOPRIGHT", -2, -2)
+                unit.tankIcon:SetPoint("TOPRIGHT", unit.hp, "TOPRIGHT", 0, 0)
                 
                 -- Set icon color (slightly blue-tinted for visibility)
                 unit.tankIcon.tex:SetVertexColor(0.8, 0.9, 1.0, 0.9)
