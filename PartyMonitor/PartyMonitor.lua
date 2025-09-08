@@ -216,12 +216,12 @@ end
 
 -- Update pfUI indicators when roles change
 function PartyMonitor:UpdatePfUIIndicators()
-    if pfUI and pfUI.uf and pfUI.uf.RefreshUnit then
-        -- Refresh all unit frames to update tank indicators
-        for _, frame in pairs(pfUI.uf.units) do
-            if frame.label == "party" or frame.label == "player" then
-                pfUI.uf:RefreshUnit(frame)
-            end
-        end
-    end
+    -- if pfUI and pfUI.uf and pfUI.uf.RefreshUnit then
+    --     -- Refresh all unit frames to update tank indicators
+    --     for _, frame in pairs(pfUI.uf.units) do
+    --         if frame.label == "party" or frame.label == "player" then
+    --             pfUI.uf:RefreshUnit(frame)
+    --         end
+    --     end
+    -- end
 end
