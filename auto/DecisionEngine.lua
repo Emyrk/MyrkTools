@@ -156,22 +156,6 @@ function DecisionEngine:ForEach(ptype, callback)
     end)
 end
 
--- Helper function to get health percentage
-function DecisionEngine:getHealthPercent(unitId)
-    if not UnitExists(unitId) then
-        return 1.0 -- Assume healthy if unit doesn't exist
-    end
-    
-    local current = UnitHealth(unitId)
-    local max = UnitHealthMax(unitId)
-    
-    if max == 0 then
-        return 1.0
-    end
-    
-    return current / max
-end
-
 -- Helper function to check if target has a specific buff
 function DecisionEngine:hasBuff(unitId, buffName)
     local i = 1

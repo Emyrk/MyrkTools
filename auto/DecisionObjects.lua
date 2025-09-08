@@ -25,7 +25,7 @@ end
 ---@field targetType string
 ---@field instant boolean
 ---@field pct number
----@field prevent fun(unitID: string): boolean|nil If returns true, skip this target
+---@field prevent fun(engine: any,unitID: string): boolean|nil If returns true, skip this target
 HealSpell = {}
 HealSpell.__index = HealSpell
 
@@ -62,11 +62,12 @@ function HealSpell:evaluate(engine)
 
   local action = nil
   engine:ForEach(self.targetType, function(player)
+      ---@cast player AllyPlayer
     if not player.castable or not player.healable then
       return false
     end
 
-    local healthPct = engine:getHealthPercent(player.id)
+    local healthPct = player:GetHealthPercent()
     if healthPct < self.pct then
       if self.prevent and self.prevent(engine, player.id) then
         -- preventing this heal
