@@ -1,9 +1,13 @@
 RogueStrategy = {
+    IsDead,
     RefreshPartyState,
 }
 
 PriestStrategy = {
     Debounce:New(0.5),
+
+    IsDead,
+    PlayerIsDrinking,
     -- Quick exit if we're already doing something
     AlreadyCasting,
 

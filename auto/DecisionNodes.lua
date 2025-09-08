@@ -15,6 +15,21 @@ function Busy()
     end
 end
 
+function IsDead(engine)
+    if UnitIsDead("player") then
+        return Action:Busy("player is dead")
+    end
+    return nil
+end
+
+function PlayerIsDrinking(engine)
+    if IsDrinking() then
+        return Action:Busy("player is drinking")
+    end
+    return nil
+end
+
+
 -- function CancelOverHeal()
 --     return function(engine)
 --         if not engine.busy then
