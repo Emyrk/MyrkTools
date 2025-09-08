@@ -106,12 +106,63 @@ function EmergencyShield(targetType, pct)
         targetType = targetType,
         instant = true,
         pct = pct,
-        prevent = function(engine, unitId)
-            return engine:hasBuff(unitId, "Spell_Holy_PowerWordShield") or
-                   engine:hasDebuff(unitId, "AshesToAshes")
+        prevent = function(engine, player)
+            return engine:hasBuff(player.id, "Spell_Holy_PowerWordShield") or
+                   engine:hasDebuff(player.id, "AshesToAshes")
         end
     })
 end
+
+-- Emergency flash heal for specific target type
+---@param targetType string "player", "tank", "party"
+---@param pct number Health percentage threshold to consider
+---@param ttd number Time to death threshold in seconds
+function EmergencyFlashHeal(targetType, pct, ttd)
+   return HealSpell:new({
+        spellName = "Flash Heal",
+        targetType = targetType,
+        instant = false,
+        smartRank = true,
+        incDmgTime = 2,
+        pct = pct,
+        prevent = function(engine, player)
+            return player:CalculateTimeToDeath() > ttd;
+        end
+    })
+end
+
+---@param targetType string "player", "tank", "party"
+---@param pct number Health percentage threshold to consider
+function LesserHeal(targetType, pct)
+   return HealSpell:new({
+        spellName = "Lesser Heal",
+        targetType = targetType,
+        instant = false,
+        smartRank = true,
+        incDmgTime = 3,
+        pct = pct,
+        prevent = function(engine, player)
+            return false
+        end
+    })
+end
+
+---@param targetType string "player", "tank", "party"
+---@param pct number Health percentage threshold to consider
+function Priest_Heal(targetType, pct)
+   return HealSpell:new({
+        spellName = "Heal",
+        targetType = targetType,
+        instant = false,
+        smartRank = true,
+        incDmgTime = 3,
+        pct = pct,
+        prevent = function(engine, player)
+            return false
+        end
+    })
+end
+
 
 function Renew(targetType, pct)
    return HealSpell:new({
@@ -125,160 +176,6 @@ function Renew(targetType, pct)
     })
 end
 
--- -- Self preservation at threshold
--- function SelfPreservation(threshold)
---     return function(engine)
---         local healthPct = engine:getHealthPercent("player")
---         if healthPct < (threshold / 100) then
---             -- Use Flash Heal for emergency self-healing
---             return {
---                 action = "cast",
---                 spell = "Flash Heal",
---                 target = "player",
---                 reason = "self_preservation"
---             }
---         end
---         return nil
---     end
--- end
-
--- -- Emergency flash heal with time prediction
--- function EmergencyFlash(timeThreshold, targetType)
---     return function(engine)
---         local targets = {}
-        
---         if targetType == "tank" then
---             targets = engine:resolveTanks() -- Now returns all tanks
---         elseif targetType == "tanks" then
---             targets = engine:resolveTanks()
---         elseif targetType == "healers" then
---             targets = engine:resolveHealers()
---         elseif targetType == "dps" then
---             targets = engine:resolveDPS()
---         elseif targetType == "party" then
---             targets = engine:resolveParty()
---         end
-        
---         for _, unitId in ipairs(targets) do
---             if engine:willDieIn(unitId, timeThreshold) then
---                 return {
---                     action = "cast",
---                     spell = "Flash Heal",
---                     target = unitId,
---                     reason = "emergency_flash"
---                 }
---             end
---         end
-        
---         return nil
---     end
--- end
-
--- -- Emergency heal with time prediction (slower but more efficient)
--- function EmergencyHeal(timeThreshold, targetType)
---     return function(engine)
---         local targets = {}
-        
---         if targetType == "tank" then
---             targets = engine:resolveTanks() -- Now returns all tanks
---         elseif targetType == "tanks" then
---             targets = engine:resolveTanks()
---         elseif targetType == "healers" then
---             targets = engine:resolveHealers()
---         elseif targetType == "dps" then
---             targets = engine:resolveDPS()
---         elseif targetType == "party" then
---             targets = engine:resolveParty()
---         end
-        
---         for _, unitId in ipairs(targets) do
---             if engine:willDieIn(unitId, timeThreshold) then
---                 return {
---                     action = "cast",
---                     spell = "Heal", -- Or "Greater Heal" depending on need
---                     target = unitId,
---                     reason = "emergency_heal"
---                 }
---             end
---         end
-        
---         return nil
---     end
--- end
-
--- -- Regular healing at health threshold
--- function Heal(threshold, targetType)
---     return function(engine)
---         local targets = {}
-        
---         if targetType == "tank" then
---             targets = engine:resolveTanks() -- Now returns all tanks
---         elseif targetType == "tanks" then
---             targets = engine:resolveTanks()
---         elseif targetType == "healers" then
---             targets = engine:resolveHealers()
---         elseif targetType == "dps" then
---             targets = engine:resolveDPS()
---         elseif targetType == "party" then
---             targets = engine:resolveParty()
---         end
-        
---         for _, unitId in ipairs(targets) do
---             local healthPct = engine:getHealthPercent(unitId)
---             if healthPct < (threshold / 100) then
---                 return {
---                     action = "cast",
---                     spell = "Heal",
---                     target = unitId,
---                     reason = "regular_heal"
---                 }
---             end
---         end
-        
---         return nil
---     end
--- end
-
--- -- Priority-based healing (heals lowest health first)
--- function PriorityHeal(threshold, targetType)
---     return function(engine)
---         local targets = {}
-        
---         if targetType == "tank" then
---             targets = engine:resolveTanks() -- Now returns all tanks
---         elseif targetType == "tanks" then
---             targets = engine:resolveTanks()
---         elseif targetType == "healers" then
---             targets = engine:resolveHealers()
---         elseif targetType == "dps" then
---             targets = engine:resolveDPS()
---         elseif targetType == "party" then
---             targets = engine:resolveParty()
---         end
-        
---         local lowestHealth = 1.0
---         local lowestTarget = nil
-        
---         for _, unitId in ipairs(targets) do
---             local healthPct = engine:getHealthPercent(unitId)
---             if healthPct < (threshold / 100) and healthPct < lowestHealth then
---                 lowestHealth = healthPct
---                 lowestTarget = unitId
---             end
---         end
-        
---         if lowestTarget then
---             return {
---                 action = "cast",
---                 spell = "Heal",
---                 target = lowestTarget,
---                 reason = "priority_heal"
---             }
---         end
-        
---         return nil
---     end
--- end
 
 -- Only execute if not in an instance
 function NotInstance(actionFunc)

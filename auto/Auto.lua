@@ -56,8 +56,9 @@ function Auto:Perform()
         end
 
          if decision.action == ACTIONS.heal then
-            Logs.Info(string.format("Healing %s on %s (%s)", 
-                decision.spellID, decision.target_id, decision.reason))
+            local spellName, spellRank = GetSpellName(decision.spellID, BOOKTYPE_SPELL)
+            Logs.Info(string.format("Healing %s:%s on %s (%s)", 
+                spellName, spellRank, decision.target_id, decision.reason))
             return self.engine:ExecuteHeal(decision)
         end
 

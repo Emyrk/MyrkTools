@@ -22,10 +22,12 @@ end
 ---@class HealSpell
 ---@field spellName string
 ---@field spellRank? number
+---@field smartRank? boolean
+---@field incDmgTime? number seconds to expect for incoming damage
 ---@field targetType string
 ---@field instant boolean
 ---@field pct number
----@field prevent fun(engine: any,unitID: string): boolean|nil If returns true, skip this target
+---@field prevent fun(engine: any, player: AllyPlayer): boolean|nil If returns true, skip this target
 HealSpell = {}
 HealSpell.__index = HealSpell
 
@@ -51,7 +53,7 @@ function HealSpell:evaluate(engine)
   if self.spellRank then
     spellid = ranks[self.spellRank]
   else
-    spellid = ranks[table.getn(ranks) - 1] -- Highest rank
+    spellid = ranks[table.getn(ranks)] -- Highest rank
   end
 
   local _, duration = GetSpellCooldown(spellid, BOOKTYPE_SPELL)
@@ -69,9 +71,19 @@ function HealSpell:evaluate(engine)
 
     local healthPct = player:GetHealthPercent()
     if healthPct < self.pct then
-      if self.prevent and self.prevent(engine, player.id) then
+      if self.prevent and self.prevent(engine, player) then
         -- preventing this heal
       else
+
+        local dps = (player.recentDmg or 0) / 5
+        local hp_needed = (player.hpmax - player.hp + (player.incHeal or 0)) - (dps * (self.incDmgTime or 0))
+        if hp_needed > 1 then
+          print(player.name, hp_needed, (dps * (self.incDmgTime or 0)))
+        end
+        if self.smartRank then
+          spellid = ranks[GetOptimalRank(self.spellName, hp_needed)] -- TODO: Calculate actual hp needed
+        end
+
         action = Action:Heal(spellid, player.id, "heal")
         return true
       end

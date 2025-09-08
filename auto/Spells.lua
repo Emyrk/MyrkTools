@@ -1,3 +1,7 @@
+local libHC = AceLibrary("HealComm-1.0")
+local libSC = AceLibrary("SpellCache-1.0")
+local libIB = AceLibrary("ItemBonusLib-1.0")
+
 function GetSpellIDs(spellName)
     local i = 1;
     local List = {};
@@ -24,6 +28,56 @@ function GetSpellIDs(spellName)
         end
         i = i + 1;
     end
+end
+
+function GetOptimalRank(spell, hp_needed)
+    if not libSC.data[spell] then
+        self:Print('smartheal rank not found')
+        return
+    end
+
+    local bonus, power, mod
+    if TheoryCraft == nil then
+        bonus = tonumber(libIB:GetBonus("HEAL"))
+        power, mod = libHC:GetUnitSpellPower(unit, spell)
+        local buffpower, buffmod = libHC:GetBuffSpellPower()
+        bonus = bonus + buffpower
+        mod = mod * buffmod
+    end
+    local max_rank = tonumber(libSC.data[spell].Rank)
+    local rank = max_rank
+
+    local mana = UnitMana("player")
+    local spelldata = nil
+    for i = max_rank, 1, -1 do
+        spellData = TheoryCraft ~= nil and TheoryCraft_GetSpellDataByName(spell, i)
+        if spellData then
+            if mana >= spellData.manacost then
+                if spellData.averagehealnocrit > (hp_needed) then
+                    rank = i
+                else
+                    break
+                end
+            else
+                rank = i > 1 and i - 1 or 1
+            end
+        else
+            local heal = (libHC.Spells[spell][i](bonus) + power) * mod
+            if heal > (hp_needed) then
+                rank = i
+            else
+                break
+            end
+        end
+    end
+    --[[
+    self:Print(spell
+            .. ' rank ' .. rank
+            .. ' hp ' .. math.floor(spellData.averagehealnocrit)
+            .. ' hpm ' .. (spellData.averagehealnocrit / spellData.manacost)
+            .. ' mana ' .. spellData.manacost )
+    ]]
+    return rank
 end
 
 
