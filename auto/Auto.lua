@@ -45,8 +45,10 @@ function Auto:Perform()
         end
 
         if decision.action == ACTIONS.cast then
+            local name = UnitName(decision.target_id) or decision.target_id
+
             Logs.Info(string.format("Casting %s on %s (%s)", 
-                decision.spellID, decision.target_id or "??", decision.reason or "no reason"))
+                decision.spellID, name, decision.reason or "no reason"))
             return self.engine:ExecuteCast(decision)
         end
 
@@ -56,9 +58,10 @@ function Auto:Perform()
         end
 
          if decision.action == ACTIONS.heal then
+            local name = UnitName(decision.target_id) or decision.target_id
             local spellName, spellRank = GetSpellName(decision.spellID, BOOKTYPE_SPELL)
             Logs.Info(string.format("Healing %s:%s on %s (%s)", 
-                spellName, spellRank, decision.target_id, decision.reason))
+                spellName, spellRank, name, decision.reason))
             return self.engine:ExecuteHeal(decision)
         end
 

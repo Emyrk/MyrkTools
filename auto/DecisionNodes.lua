@@ -166,6 +166,10 @@ function LesserHeal(targetType, pct)
         incDmgTime = 0,
         pct = pct,
         prevent = function(engine, player)
+            -- Don't use lesser heal if we need a bigger heal
+            if player:HPNeeded(3) > 150 then
+                return true
+            end
             return false
         end
     })

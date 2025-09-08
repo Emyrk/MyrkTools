@@ -186,6 +186,12 @@ function AllyPlayer:IsTank()
   return self.role == Party.ROLES.TANK
 end
 
+function AllyPlayer:HPNeeded(time)
+  local dps = (self.recentDmg or 0) / 5
+  local hp_needed = (self.hpmax - self.hp + (self.incHeal or 0)) - (dps * (time or 0))
+  return hp_needed
+end
+
 function AllyPlayer:CalculateTimeToDeath()
     if not self or self.hp <= 0 then
         return 1000 -- Already dead or invalid

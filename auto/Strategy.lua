@@ -32,13 +32,15 @@ PriestStrategy = {
     EmergencyFlashHeal("party", 0.75, 3.5),
 
     -- Regular healing priorities
+    -- Any top ups
+    LesserHeal("tank", 0.85),
+
     -- Always heal the tank first
+    -- TODO: Downrank a heal if we don't need a big heal to a lesser heal
     Priest_Heal("tank", 0.85),
     Priest_Heal("party", 0.85),
 
-    -- Any top ups
-    -- LesserHeal("party", 0.95),
-    -- Priest_Heal("party", 0.95),
+    LesserHeal("party", 0.90),
 
 
     -- Renew("party", 0.1),
