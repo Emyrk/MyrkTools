@@ -28,6 +28,10 @@ function PartyMonitor:OnEnable()
   self:RegisterEvent("RAID_ROSTER_UPDATE", "UpdatePartyMembers")
 
   self:UpdatePartyMembers()
+  
+  -- Initialize pfUI integration
+  self:InitializePfUI()
+  
   DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[MyrkPartyMonitor]|r Loaded")
 end
 
@@ -53,6 +57,9 @@ function PartyMonitor:SetRole(playerName, role)
         -- Save to AceDB realm storage immediately
         self.db.realm.roleAssignments = self.party.roleAssignments
         DEFAULT_CHAT_FRAME:AddMessage(string.format("|cff00ff00[PartyMonitor]|r %s is now %s", playerName, role))
+        
+        -- Update pfUI indicators
+        self:UpdatePfUIIndicators()
     else
         DEFAULT_CHAT_FRAME:AddMessage(string.format("|cffff0000[PartyMonitor]|r %s", error))
     end
@@ -68,6 +75,9 @@ function PartyMonitor:ClearRole(playerName)
     -- Save to AceDB realm storage immediately
     self.db.realm.roleAssignments = self.party.roleAssignments
     DEFAULT_CHAT_FRAME:AddMessage(string.format("|cff00ff00[PartyMonitor]|r Cleared role for %s", playerName))
+    
+    -- Update pfUI indicators
+    self:UpdatePfUIIndicators()
 end
 
 -- Query functions for other modules to use
@@ -114,5 +124,95 @@ function PartyMonitor:Debug()
     for unitId, player in pairs(self.party.players) do
         DEFAULT_CHAT_FRAME:AddMessage(string.format("  %s: %s (HP: %d/%d, Incoming Heal: %d, Recent Damage: %d, Role: %s)", 
             unitId, player.name, player.hp, player.hpmax, player.incHeal, player.recentDmg, player.role))
+    end
+end
+
+-- pfUI integration for tank role indicators
+function PartyMonitor:PartyMonitorHookPfUI()
+    if not pfUI then
+        return -- pfUI not available
+    end
+    
+    pfUI:RegisterModule("TankRoleIndicator", "vanilla:tbc", function()
+        local HookRefreshUnit = pfUI.uf.RefreshUnit
+        function pfUI.uf:RefreshUnit(unit, component)
+            -- Always run pfUI's original logic first
+            HookRefreshUnit(this, unit, component)
+            
+            -- Only show on party members and player
+            if not unit or not (unit.label == "party" or unit.label == "player") then
+                if unit.tankIcon then 
+                    unit.tankIcon:Hide() 
+                end
+                return
+            end
+            
+            local unitstr = (unit.label or "") .. (unit.id or "")
+            if unitstr == "" or not UnitExists(unitstr) then
+                if unit.tankIcon then 
+                    unit.tankIcon:Hide() 
+                end
+                return
+            end
+            
+            -- Create the tank icon frame once
+            if not unit.tankIcon then
+                unit.tankIcon = CreateFrame("Frame", nil, unit.hp)
+                unit.tankIcon.tex = unit.tankIcon:CreateTexture(nil, "OVERLAY")
+                -- Use a shield-like texture for tank icon
+                unit.tankIcon.tex:SetTexture("Interface\\Icons\\Ability_Defend")
+                unit.tankIcon.tex:SetAllPoints()
+                unit.tankIcon:SetFrameStrata("HIGH")
+                unit.tankIcon:SetFrameLevel((unit.hp:GetFrameLevel() or 1) + 15)
+                unit.tankIcon:Hide()
+            end
+            
+            -- Check if this player has Tank role
+            local playerName = UnitName(unitstr)
+            local hasRole = false
+            
+            if playerName and PartyMonitor.party then
+                local role = PartyMonitor.party:GetRole(playerName)
+                hasRole = (role == "Tank")
+            end
+            
+            if hasRole then
+                -- Show tank icon in top-right corner of health bar
+                local width = unit.config.width or 100
+                local height = unit.config.height or 20
+                local iconSize = math.min(16, math.min(width, height) * 0.6)
+                
+                unit.tankIcon:SetWidth(iconSize)
+                unit.tankIcon:SetHeight(iconSize)
+                unit.tankIcon:ClearAllPoints()
+                unit.tankIcon:SetPoint("TOPRIGHT", unit.hp, "TOPRIGHT", -2, -2)
+                
+                -- Set icon color (slightly blue-tinted for visibility)
+                unit.tankIcon.tex:SetVertexColor(0.8, 0.9, 1.0, 0.9)
+                unit.tankIcon:Show()
+            else
+                unit.tankIcon:Hide()
+            end
+        end
+    end)
+end
+
+-- Initialize pfUI hook
+function PartyMonitor:InitializePfUI()
+    if pfUI then
+        self:PartyMonitorHookPfUI()
+        DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[PartyMonitor]|r pfUI tank role indicators enabled")
+    end
+end
+
+-- Update pfUI indicators when roles change
+function PartyMonitor:UpdatePfUIIndicators()
+    if pfUI and pfUI.uf and pfUI.uf.RefreshUnit then
+        -- Refresh all unit frames to update tank indicators
+        for _, frame in pairs(pfUI.uf.units) do
+            if frame.label == "party" or frame.label == "player" then
+                pfUI.uf:RefreshUnit(frame)
+            end
+        end
     end
 end
