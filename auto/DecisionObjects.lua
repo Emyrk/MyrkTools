@@ -74,9 +74,7 @@ function HealSpell:evaluate(engine)
       if self.prevent and self.prevent(engine, player) then
         -- preventing this heal
       else
-
-        local dps = (player.recentDmg or 0) / 5
-        local hp_needed = (player.hpmax - player.hp + (player.incHeal or 0)) - (dps * (self.incDmgTime or 0))
+        local hp_needed = player:HPNeeded(self.incDmgTime or 0)
         if self.smartRank then
           spellid = ranks[GetOptimalRank(self.spellName, hp_needed)] -- TODO: Calculate actual hp needed
         end
