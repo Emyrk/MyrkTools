@@ -36,11 +36,10 @@ PriestStrategy = {
     LesserHeal("tank", 0.85),
 
     -- Always heal the tank first
-    -- TODO: Downrank a heal if we don't need a big heal to a lesser heal
     Priest_Heal("tank", 0.85),
     Priest_Heal("party", 0.85),
 
-    LesserHeal("party", 0.90),
+    -- LesserHeal("party", 0.90),
 
     NotInstance( 
         -- Save mana in instances

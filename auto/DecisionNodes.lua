@@ -188,7 +188,14 @@ end
 ---@param pct number Health percentage threshold to consider
 function Priest_Heal(targetType, pct)
    return HealSpell:new({
-        spellName = "Heal",
+        spellName = function(hp_needed) 
+            -- Small hp needed, or not enough mana, use lesser heal
+            if hp_needed < 150 or
+                UnitMana("player") < 80 then 
+                return "Lesser Heal" 
+            end
+            return "Heal" 
+        end,
         targetType = targetType,
         instant = false,
         smartRank = true,

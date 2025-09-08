@@ -20,7 +20,7 @@ end
 
 
 ---@class HealSpell
----@field spellName string
+---@field spellName string|fun(hp_needed: number): string
 ---@field spellRank? number
 ---@field smartRank? boolean
 ---@field incDmgTime? number seconds to expect for incoming damage
@@ -38,6 +38,33 @@ function HealSpell:new(hp)
   return setmetatable(hp, self)
 end
 
+function HealSpell:SpellName(hp_needed) 
+  local name = self.spellName
+  if type(self.spellName) == "function" then
+    name = self.spellName(hp_needed)
+  end 
+  return name
+end
+
+function HealSpell:SpellID(hp_needed)
+  local name = self:SpellName(hp_needed)
+  local ranks = Spells[name]
+  local spellid = nil
+
+  if self.spellRank then
+    spellid = ranks[self.spellRank]
+  else
+    spellid = ranks[table.getn(ranks)] -- Highest rank
+  end
+
+  if self.smartRank then
+    local optimalRank = GetOptimalRank(name, hp_needed)
+    spellid = ranks[optimalRank]
+  end
+
+  return spellid
+end
+
 ---Evaluate the heal decision.
 ---@param engine any
 ---@return table|nil
@@ -48,14 +75,8 @@ function HealSpell:evaluate(engine)
     return nil
   end
 
-  local ranks = Spells[self.spellName]
-  local spellid = nil
-  if self.spellRank then
-    spellid = ranks[self.spellRank]
-  else
-    spellid = ranks[table.getn(ranks)] -- Highest rank
-  end
-
+  -- Assume a lot of health is needed. We will downrank later if needed.
+  local spellid = self:SpellID(5000)
   local _, duration = GetSpellCooldown(spellid, BOOKTYPE_SPELL)
   if duration ~= 0 then
     Logs.Debug("cooldown")
@@ -76,7 +97,7 @@ function HealSpell:evaluate(engine)
       else
         local hp_needed = player:HPNeeded(self.incDmgTime or 0)
         if self.smartRank then
-          spellid = ranks[GetOptimalRank(self.spellName, hp_needed)] -- TODO: Calculate actual hp needed
+          spellid = self:SpellID(hp_needed)
         end
 
         action = Action:Heal(spellid, player.id, "heal")
