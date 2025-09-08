@@ -38,24 +38,6 @@ function CastMonitor:OnEnable()
     DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[MyrkCastMonitor]|r Loaded")
 end
 
-function CastMonitor:CastSpell(spell, target, callbacks)
-    local name = UnitName("target")
-    if not name then
-        -- TODO: Double check this
-        name = UnitName("player")
-    end
-
-    self:StartMonitor(spell, name, "manual", callbacks)
-    
-    -- Cast the spell
-    if target then
-        CastSpellByName(spell, target)
-    else
-        CastSpellByName(spell)
-    end
-    self:UpdatePfUIIndicator()
-end
-
 -- /script CastMonitor:CastSpellByNameAndLog("Heal")
 -- /script print(CastMonitor:IsMonitoring())
 function CastMonitor:CastSpellByNameAndLog(spell)

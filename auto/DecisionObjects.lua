@@ -1,5 +1,27 @@
+Debounce = {}
+Debounce.__index = Debounce
+function Debounce:New(cooldown)
+  local instance = {
+    lastTime = 0,
+    cooldown = cooldown or 0.5, -- seconds
+  }
+  setmetatable(instance, Debounce)
+  return instance
+end
+
+function Debounce:evaluate(engine)
+  local now = GetTime()
+  if now - self.lastTime >= self.cooldown then
+    self.lastTime = now
+    return nil
+  end
+  return Action:Busy("debounce")
+end
+
+
 ---@class HealSpell
 ---@field spellName string
+---@field spellRank? number
 ---@field targetType string
 ---@field instant boolean
 ---@field pct number
@@ -24,6 +46,20 @@ function HealSpell:evaluate(engine)
     return nil
   end
 
+  local ranks = Spells[self.spellName]
+  local spellid = nil
+  if self.spellRank then
+    spellid = ranks[self.spellRank]
+  else
+    spellid = ranks[table.getn(ranks) - 1] -- Highest rank
+  end
+
+  local _, duration = GetSpellCooldown(spellid, BOOKTYPE_SPELL)
+  if duration ~= 0 then
+    Logs.Debug("cooldown")
+    return nil -- Spell is on cooldown
+  end
+
   local action = nil
   engine:ForEach(self.targetType, function(player)
     if not player.castable or not player.healable then
@@ -35,7 +71,7 @@ function HealSpell:evaluate(engine)
       if self.prevent and self.prevent(engine, player.id) then
         -- preventing this heal
       else
-        action = Action:Heal(self.spellName, player.id, "heal")
+        action = Action:Heal(spellid, player.id, "heal")
         return true
       end
     end

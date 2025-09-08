@@ -57,7 +57,7 @@ function Auto:Perform()
 
          if decision.action == ACTIONS.heal then
             Logs.Info(string.format("Healing %s on %s (%s)", 
-                decision.spell, decision.target_id, decision.reason))
+                decision.spellID, decision.target_id, decision.reason))
             return self.engine:ExecuteHeal(decision)
         end
 

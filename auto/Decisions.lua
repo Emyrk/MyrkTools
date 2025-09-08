@@ -8,7 +8,7 @@ ACTIONS = {
 
 
 ---@class Action
----@field spell? string The spell to cast.
+---@field spellID? string The spell id to cast.
 ---@field target_id? string The target unit ID.
 ---@field action actions What action to execute.
 ---@field reason string Explain why no action should be taken. For debugging purposes.
@@ -36,10 +36,10 @@ function Action:Error(reason)
     return instance
 end
 
-function Action:Heal(spell, target_id, reason)
+function Action:Heal(spellID, target_id, reason)
     local instance = {
       action = ACTIONS.heal,
-      spell = spell,
+      spellID = spellID,
       target_id = target_id,
       reason = reason,
     }

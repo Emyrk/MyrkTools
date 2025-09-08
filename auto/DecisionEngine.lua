@@ -28,6 +28,9 @@ function DecisionEngine:New()
     }
     
     setmetatable(instance, DecisionEngine)
+
+    ReloadSpells()
+    -- print(PrintTable(Spells))
     return instance
 end
 
@@ -104,8 +107,8 @@ function DecisionEngine:ExecuteHeal(decision)
     
 
     local result = WithAutoSelfCastOff(RetainTarget(function (engine)
-        engine.castMonitor:StartMonitor(decision.spell, decision.target_id, decision.reason, callbacks)
-        CastSpellByName(decision.spell)
+        engine.castMonitor:StartMonitor(decision.spellID, decision.target_id, decision.reason, callbacks)
+        CastSpell(decision.spellID, BOOKTYPE_SPELL)
 
         if not SpellIsTargeting() then
             return Action:Error("Spell is not targeting")

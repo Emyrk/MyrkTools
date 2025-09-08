@@ -3,6 +3,7 @@ RogueStrategy = {
 }
 
 PriestStrategy = {
+    Debounce:New(0.5),
     -- Quick exit if we're already doing something
     AlreadyCasting,
 
@@ -15,6 +16,8 @@ PriestStrategy = {
     -- Save yourself first - emergency situations
     EmergencyShield("player", 0.15),
     EmergencyShield("tank", 0.15),
+    EmergencyShield("party", 0.15),
+    Renew("party", 1.1),
 }
 
 -- This is the main healing strategy decision tree

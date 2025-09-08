@@ -70,6 +70,7 @@ function CastableHeal(channel, instant)
 
             if not SpellIsTargeting() then
                 engine.ctx.instantHeal = false
+                SpellStopTargeting()
                 return Action:Error("SpellIsTargeting failed")
             end
         end
@@ -108,6 +109,18 @@ function EmergencyShield(targetType, pct)
         prevent = function(engine, unitId)
             return engine:hasBuff(unitId, "Spell_Holy_PowerWordShield") or
                    engine:hasDebuff(unitId, "AshesToAshes")
+        end
+    })
+end
+
+function Renew(targetType, pct)
+   return HealSpell:new({
+        spellName = "Renew",
+        targetType = targetType,
+        instant = true,
+        pct = pct,
+        prevent = function(engine, unitId)
+            return engine:hasBuff(unitId, "Renew")
         end
     })
 end
