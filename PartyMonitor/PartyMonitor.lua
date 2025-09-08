@@ -45,11 +45,49 @@ function PartyMonitor:OnDisable()
 end
 
 ---@param callback function(player: PartyPlayer): boolean|nil Return true to stop iteration
-function PartyMonitor:ForEach(callback)
+function PartyMonitor:ForEach(callback, sortBy)
     if not self.party then
         return
     end
+
+    local players = {}
+    
+    -- Collect all players into an array for sorting
     for _, player in pairs(self.party.players) do
+        table.insert(players, player)
+    end
+    
+    -- Sort players if sortBy is specified
+    if sortBy then
+        if sortBy == "time_to_death" then
+            table.sort(players, function(a, b)
+                local timeA = self:CalculateTimeToDeath(a)
+                local timeB = self:CalculateTimeToDeath(b)
+                return timeA < timeB -- Shortest time to death first
+            end)
+        elseif sortBy == "health_percent" then
+            table.sort(players, function(a, b)
+                local pctA = a.hpmax > 0 and (a.hp / a.hpmax) or 1
+                local pctB = b.hpmax > 0 and (b.hp / b.hpmax) or 1
+                return pctA < pctB -- Lowest health percent first
+            end)
+        elseif sortBy == "health_absolute" then
+            table.sort(players, function(a, b)
+                return a.hp < b.hp -- Lowest absolute health first
+            end)
+        elseif sortBy == "incoming_damage" then
+            table.sort(players, function(a, b)
+                return a.recentDmg > b.recentDmg -- Highest incoming damage first
+            end)
+        elseif sortBy == "role_priority" then
+            table.sort(players, function(a, b)
+                return self:GetRolePriority(a.role) < self:GetRolePriority(b.role)
+            end)
+        end
+    end
+    
+    -- Iterate through sorted players
+    for _, player in ipairs(players) do
         local stop = callback(player)
         if stop then
             break
@@ -239,4 +277,44 @@ function PartyMonitor:UpdatePfUIIndicators()
     --         end
     --     end
     -- end
+end
+
+-- Calculate estimated time to death based on current HP, incoming damage, and incoming heals
+function PartyMonitor:CalculateTimeToDeath(player)
+    if not player or player.hp <= 0 then
+        return 0 -- Already dead or invalid
+    end
+    
+    if player.hpmax <= 0 then
+        return math.huge -- Invalid max health, assume safe
+    end
+    
+    -- Calculate net damage per second (damage - healing)
+    local netDamagePerSecond = player.recentDmg - player.incHeal
+    
+    if netDamagePerSecond <= 0 then
+        return math.huge -- Taking no net damage or being healed, won't die
+    end
+    
+    -- Calculate time until death
+    local timeToDeath = player.hp / netDamagePerSecond
+    
+    return math.max(0, timeToDeath)
+end
+
+-- Get role priority for sorting (lower number = higher priority)
+function PartyMonitor:GetRolePriority(role)
+    local priorities = {
+        ["Tank"] = 1,
+        ["Healer"] = 2,
+        ["Off-Tank"] = 3,
+        ["Off-Healer"] = 4,
+        ["Melee DPS"] = 5,
+        ["Ranged DPS"] = 6,
+        ["Caster DPS"] = 7,
+        ["Support"] = 8,
+        ["None"] = 9
+    }
+    
+    return priorities[role] or 10
 end
