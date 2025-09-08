@@ -19,3 +19,27 @@ if not string.match then
         return nil
     end
 end
+
+local AddonPath = "Interface\\AddOns\\MyrkTools\\"
+for _, name in pairs(tocs) do
+  local current = string.format("MyrkTools%s", name)
+  local _, title = GetAddOnInfo(current)
+  if title then
+    AddonPath = "Interface\\AddOns\\" .. current
+    break
+  end
+end
+
+-- handle/convert media dir paths
+Media = setmetatable({}, { __index = function(tab,key)
+  local value = tostring(key)
+  if strfind(value, "img:") then
+    value = string.gsub(value, "img:", AddonPath .. "\\img\\")
+  elseif strfind(value, "font:") then
+    value = string.gsub(value, "font:", AddonPath .. "\\fonts\\")
+  else
+    value = string.gsub(value, "Interface\\AddOns\\MyrkTools\\", AddonPath .. "\\")
+  end
+  rawset(tab,key,value)
+  return value
+end})

@@ -160,7 +160,7 @@ function PartyMonitor:PartyMonitorHookPfUI()
                 unit.tankIcon = CreateFrame("Frame", nil, unit.hp)
                 unit.tankIcon.tex = unit.tankIcon:CreateTexture(nil, "OVERLAY")
                 -- Use a shield-like texture for tank icon
-                unit.tankIcon.tex:SetTexture("Interface\\Icons\\Ability_Defend")
+                unit.tankIcon.tex:SetTexture("Interface\\AddOns\\MyrkTools\\img\\tank_icon.tga")
                 unit.tankIcon.tex:SetAllPoints()
                 unit.tankIcon:SetFrameStrata("HIGH")
                 unit.tankIcon:SetFrameLevel((unit.hp:GetFrameLevel() or 1) + 15)

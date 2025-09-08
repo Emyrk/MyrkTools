@@ -79,7 +79,7 @@ function EmergencyShield(targetType)
         
         for _, unitId in ipairs(targets) do
             local healthPct = engine:getHealthPercent(unitId)
-            if healthPct < engine.config.emergencyThreshold then
+            if healthPct < 0.15 then
                 -- Check if shield is available and not already on target
                 if not engine:hasBuff(unitId, "Power Word: Shield") then
                     return {

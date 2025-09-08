@@ -10,12 +10,6 @@ function DecisionEngine:New()
         partyMonitor = nil, -- Set by module
         castMonitor = nil, 
         config = {
-            emergencyThreshold = 0.15, -- 15% health for emergency
-            selfPreservationThreshold = 0.20, -- 20% for self preservation
-            tankHealThreshold = 0.50, -- 50% for tank healing
-            partyHealThreshold = 0.85, -- 85% for party healing
-            emergencyTimeThreshold = 3, -- seconds to predict death
-            tankEmergencyTimeThreshold = 5, -- seconds for tank emergency
         }
     }
     setmetatable(instance, DecisionEngine)
