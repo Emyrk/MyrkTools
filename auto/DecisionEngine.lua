@@ -40,8 +40,8 @@ function DecisionEngine:LoadModules()
     end
 
     if not self.castMonitor then
-        self.castMonitor = MyrkAddon:GetModule("MyrkCastMonitor")
         if not self.castMonitor then
+            self.castMonitor = MyrkAddon:GetModule("MyrkCastMonitor")
             DEFAULT_CHAT_FRAME:AddMessage("|cffff0000[MyrkAuto]|r MyrkCastMonitor not found")
         end
     end
@@ -53,7 +53,9 @@ function DecisionEngine:Ready()
 end
 
 -- Core decision tree executor
+---@return Action|nil
 function DecisionEngine:Execute()
+    self.ctx = {}
     for _, step in ipairs(self.strategy) do
         local result = self:evaluateStep(step)
         if result then
@@ -68,6 +70,8 @@ function DecisionEngine:evaluateStep(step)
         return step(self)
     elseif type(step) == "table" and step.evaluate then
         return step:evaluate(self)
+    else 
+        DEFAULT_CHAT_FRAME:AddMessage("|cffff0000[MyrkAuto]|r Invalid decision step: " .. type(step))
     end
     return nil
 end
@@ -77,8 +81,8 @@ function DecisionEngine:isAlreadyCasting()
     return self.castMonitor:IsCasting()
 end
 
-function DecisionEngine:ExecuteCast(decision)
-    if not decision or decision.action ~= "cast" then
+function DecisionEngine:ExecuteHeal(decision)
+    if not decision or decision.action ~= ACTIONS.heal then
         return false
     end
 
@@ -98,52 +102,94 @@ function DecisionEngine:ExecuteCast(decision)
         end
     }
     
-    self.castMonitor:StartMonitor(decision.spell, decision.target, decision.reason, callbacks)
-    
-    self.castMonitor:CastSpell(decision.spell, callbacks)
-    -- Target the unit first
-    TargetUnit(decision.target)
-    
-    -- Cast the spell
-    CastSpellByName(decision.spell, decision.target)
 
-end
+    local result = WithAutoSelfCastOff(RetainTarget(function (engine)
+        engine.castMonitor:StartMonitor(decision.spell, decision.target_id, decision.reason, callbacks)
+        CastSpellByName(decision.spell)
 
+        if not SpellIsTargeting() then
+            return Action:Error("Spell is not targeting")
+        end
 
--- Execute a healing action with monitoring
-function DecisionEngine:ExecuteAction(decision)
-    if not decision or decision.action ~= "cast" then
+        SpellTargetUnit(decision.target_id)
+
+        -- If the target failed to acquire, throw an error.
+        -- We should no longer be targeting after this point.
+        if SpellIsTargeting() then
+            SpellStopTargeting()
+            return Action:Error("Failed to target unit")
+        end
+
+        return nil
+    end))(self)
+   
+    if result and result.action == ACTIONS.error then
+        DEFAULT_CHAT_FRAME:AddMessage(string.format("|cffff0000[Auto]|r Cast error: %s -> %s (%s)", 
+            decision.spell, decision.target_id, result.reason))
         return false
     end
-    
-    -- Start monitoring the cast
-    local callbacks = {
-        onSuccess = function(spell, target, reason)
-            DEFAULT_CHAT_FRAME:AddMessage(string.format("|cff00ff00[Auto]|r Cast successful: %s -> %s (%s)", 
-                spell, target, reason))
-        end,
-        onFailed = function(spell, target, reason, error)
-            DEFAULT_CHAT_FRAME:AddMessage(string.format("|cffff0000[Auto]|r Cast failed: %s -> %s (%s) - %s", 
-                spell, target, reason, error or "Unknown"))
-        end,
-        onInterrupted = function(spell, target, reason, error)
-            DEFAULT_CHAT_FRAME:AddMessage(string.format("|cffffff00[Auto]|r Cast interrupted: %s -> %s (%s) - %s", 
-                spell, target, reason, error or "Unknown"))
-        end
-    }
-    
-    self.castMonitor:StartMonitor(decision.spell, decision.target, decision.reason, callbacks)
-    
-    -- Target the unit first
-    TargetUnit(decision.target)
-    
-    -- Cast the spell
-    CastSpellByName(decision.spell)
-    
+
     return true
 end
 
 -- Get current cast information
 function DecisionEngine:GetCurrentCast()
     return self.castMonitor:GetCurrentCast()
+end
+
+---@param ptype string "player", "tank", or "party"
+---@param callback fn(player: PartyPlayer): boolean|nil Return true to stop iteration
+function DecisionEngine:ForEach(ptype, callback)
+    self.partyMonitor:ForEach(function(player)
+        if ptype == "player" and player.unitId == "player" then
+            return callback(player)
+        elseif ptype == "tank" and player.role == "Tank" then
+            return callback(player)
+        elseif ptype == "party" then
+            return callback(player)
+        end
+
+        return false
+    end)
+end
+
+-- Helper function to get health percentage
+function DecisionEngine:getHealthPercent(unitId)
+    if not UnitExists(unitId) then
+        return 1.0 -- Assume healthy if unit doesn't exist
+    end
+    
+    local current = UnitHealth(unitId)
+    local max = UnitHealthMax(unitId)
+    
+    if max == 0 then
+        return 1.0
+    end
+    
+    return current / max
+end
+
+-- Helper function to check if target has a specific buff
+function DecisionEngine:hasBuff(unitId, buffName)
+    local i = 1
+    while UnitBuff(unitId, i) do
+        local icon, _, _, id = UnitBuff(unitId, i)
+        if string.find(icon, buffName) then
+            return true
+        end
+        i = i + 1
+    end
+    return false
+end
+
+function DecisionEngine:hasDebuff(unitId, debuffName)
+    local i = 1
+    while UnitDebuff(unitId, i) do
+        local icon, _, _, id = UnitDebuff(unitId, i)
+        if string.find(icon, debuffName) then
+            return true
+        end
+        i = i + 1
+    end
+    return false
 end

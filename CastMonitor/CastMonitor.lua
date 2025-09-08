@@ -48,7 +48,11 @@ function CastMonitor:CastSpell(spell, target, callbacks)
     self:StartMonitor(spell, name, "manual", callbacks)
     
     -- Cast the spell
-    CastSpellByName(spell, target)
+    if target then
+        CastSpellByName(spell, target)
+    else
+        CastSpellByName(spell)
+    end
     self:UpdatePfUIIndicator()
 end
 

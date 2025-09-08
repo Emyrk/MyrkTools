@@ -7,6 +7,8 @@ DamageComm = AceLibrary("DamageComm-1.0")
 Logs = AceLibrary("MyrkLogs-1.0")
 -- Party = AceLibrary("PartyMonitor-1.0")
 
+---@class Auto
+---@field engine DecisionEngine
 function Auto:OnEnable()
     -- Initialize the decision engine
     self.engine = DecisionEngine:New()
@@ -42,17 +44,25 @@ function Auto:Perform()
             return true -- Still busy, do not interrupt 
         end
 
-        if decision.action == ACTIONS.cast then
-            Logs.Info(string.format("Casting %s on %s (%s)", 
-                decision.spell, decision.target, decision.reason or "no reason"))
+        -- if decision.action == ACTIONS.cast then
+        --     Logs.Info(string.format("Casting %s on %s (%s)", 
+        --         decision.spell, decision.target, decision.reason or "no reason"))
+        --     return self.engine:ExecuteCast(decision)
+        -- end
+
+        if decision.action == ACTIONS.error then
+            Logs.Error("Error: " .. (decision.reason or "no reason"))
+            return false
         end
+
+         if decision.action == ACTIONS.heal then
+            Logs.Info(string.format("Healing %s on %s (%s)", 
+                decision.spell, decision.target_id, decision.reason))
+            return self.engine:ExecuteHeal(decision)
+        end
+
+        Logs.Error("Error: Unsupported action = " .. (decision.action or "no reason"))
     end
     
-    if decision and decision.action == ACTIONS.busy then
-        -- Execute the healing action with monitoring
-        return self.engine:ExecuteAction(decision)
-    end
-    
-    Logs.Info("No action taken")
-    return false -- No action taken
+    return false
 end

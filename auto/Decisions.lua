@@ -2,10 +2,14 @@
 ACTIONS = {
 	busy = "busy",
   cast = "cast",
+  heal = "heal",
+  error = "error",
 }
 
 
 ---@class Action
+---@field spell? string The spell to cast.
+---@field target_id? string The target unit ID.
 ---@field action actions What action to execute.
 ---@field reason string Explain why no action should be taken. For debugging purposes.
 Action = {}
@@ -17,6 +21,26 @@ Action.__index = Action
 function Action:Busy(reason)
     local instance = {
       action = ACTIONS.busy,
+      reason = reason,
+    }
+    setmetatable(instance, Action)
+    return instance
+end
+
+function Action:Error(reason)
+    local instance = {
+      action = ACTIONS.error,
+      reason = reason,
+    }
+    setmetatable(instance, Action)
+    return instance
+end
+
+function Action:Heal(spell, target_id, reason)
+    local instance = {
+      action = ACTIONS.heal,
+      spell = spell,
+      target_id = target_id,
       reason = reason,
     }
     setmetatable(instance, Action)

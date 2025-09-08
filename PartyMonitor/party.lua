@@ -144,6 +144,8 @@ end
 ---@field incHeal number Incoming heals
 ---@field class? string Player's class in English
 ---@field role string Player's role, e.g. "Tank"
+---@field healable? boolean True if the player can be healed
+---@field castable? boolean True if the player can be targeted by the spell
 AllyPlayer = {} -- Fixed: was PartyPlayer, should be AllyPlayer
 AllyPlayer.__index = AllyPlayer
 

@@ -40,8 +40,10 @@ PartyMonitor\PartyMonitor.lua
 CastMonitor\CastMonitor.lua
 
 # Auto System
+auto\Spells.lua
 auto\Decisions.lua
 auto\DecisionEngine.lua
+auto\DecisionObjects.lua
 auto\DecisionNodes.lua
 auto\Strategy.lua
 auto\Auto.lua

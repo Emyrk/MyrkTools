@@ -19,3 +19,42 @@ if not string.match then
         return nil
     end
 end
+
+
+-- Return true if the unit is healable by player
+function UnitIsHealable(unit, explain)
+    if UnitExists(unit) then
+        if EvaluateUnitCondition(unit, UnitIsFriend('player', unit), "is not a friend", explain) then
+            return false
+        end
+        if EvaluateUnitCondition(unit, not UnitIsEnemy(unit, 'player'), "is an enemy", explain) then
+            return false
+        end
+        if EvaluateUnitCondition(unit, not UnitCanAttack('player', unit), "can be attacked by player", explain) then
+            return false
+        end
+        if EvaluateUnitCondition(unit, UnitIsConnected(unit), "is not connected", explain) then
+            return false
+        end
+        if EvaluateUnitCondition(unit, not UnitIsDeadOrGhost(unit), "is dead or ghost", explain) then
+            return false
+        end
+        if EvaluateUnitCondition(unit, UnitIsVisible(unit), "is not visible to client", explain) then
+            return false
+        end
+    else
+        return false
+    end
+    return true
+end
+
+function EvaluateUnitCondition(unit, condition, debugText, explain)
+    if not condition then
+        if explain then
+            print(unit .. " " .. debugText)
+        end
+        return true
+    else
+        return false
+    end
+end

@@ -44,6 +44,19 @@ function PartyMonitor:OnDisable()
     end
 end
 
+---@param callback function(player: PartyPlayer): boolean|nil Return true to stop iteration
+function PartyMonitor:ForEach(callback)
+    if not self.party then
+        return
+    end
+    for _, player in pairs(self.party.players) do
+        local stop = callback(player)
+        if stop then
+            break
+        end
+    end
+end
+
 function PartyMonitor:UpdatePartyMembers()
     if not self.party then
         return
