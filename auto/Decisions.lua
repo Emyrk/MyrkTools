@@ -47,10 +47,10 @@ function Action:Heal(spellID, target_id, reason)
     return instance
 end
 
-function Action:Cast(spellID, target_id, reason)
+function Action:Cast(spellName, target_id, reason)
     local instance = {
       action = ACTIONS.cast,
-      spellID = spellID,
+      spellID = spellName, -- Name, not ID... confusing
       target_id = target_id,
       reason = reason,
     }

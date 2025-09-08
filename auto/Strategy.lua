@@ -42,6 +42,13 @@ PriestStrategy = {
 
     LesserHeal("party", 0.90),
 
+    NotInstance( 
+        -- Save mana in instances
+        TargetIsAttackable(
+            -- Do not acquire a target automatically
+            Smite()
+        )
+    ),
 
     -- Renew("party", 0.1),
     Wanding:New(),

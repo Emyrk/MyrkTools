@@ -29,6 +29,15 @@ function PlayerIsDrinking(engine)
     return nil
 end
 
+function TargetIsAttackable(actionFunc)
+    return function(engine)
+        if UnitExists("target") and UnitCanAttack("player", "target") then
+            return actionFunc(engine)
+        end
+        return nil
+    end
+end
+
 
 -- function CancelOverHeal()
 --     return function(engine)
@@ -229,14 +238,11 @@ end
 -- Smite action for when nothing else to do
 function Smite()
     return function(engine)
-        -- Only smite if we have a hostile target
-        if UnitExists("target") and UnitCanAttack("player", "target") then
-            return {
-                action = "cast",
-                spell = "Smite",
-                target = "target",
-                reason = "idle_smite"
-            }
+        local m = UnitMana("player") / UnitManaMax("player");
+        if m > 0.95 then
+            -- Cast mind Blast or Holy fire instead
+            -- Maybe shadow word pain
+            return Action:Cast("Smite", "target", "smite")
         end
         return nil
     end
