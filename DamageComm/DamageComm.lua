@@ -17,7 +17,13 @@ function DamageComm:OnEnable()
   DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[MyrkDamageComm]|r Loaded")
 end
 
+---@param unitname string Player name
+---@return number recent damage taken in last 5 seconds.
 function UnitGetIncomingDamage(unitname)
+  if not ShaguDPS then
+    return 0
+  end
+  
   -- Cleanup if necessary
   -- ShaguDPS.data["taken"]
   if not ShaguDPS.data or 
