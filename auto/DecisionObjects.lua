@@ -77,9 +77,6 @@ function HealSpell:evaluate(engine)
 
         local dps = (player.recentDmg or 0) / 5
         local hp_needed = (player.hpmax - player.hp + (player.incHeal or 0)) - (dps * (self.incDmgTime or 0))
-        if hp_needed > 1 then
-          print(player.name, hp_needed, (dps * (self.incDmgTime or 0)))
-        end
         if self.smartRank then
           spellid = ranks[GetOptimalRank(self.spellName, hp_needed)] -- TODO: Calculate actual hp needed
         end
