@@ -141,6 +141,7 @@ end
 ---@field hp number Current health
 ---@field hpmax number Maximum health
 ---@field recentDmg number Recent damage taken
+---@field incHeal number Incoming heals
 ---@field class? string Player's class in English
 ---@field role string Player's role, e.g. "Tank"
 AllyPlayer = {} -- Fixed: was PartyPlayer, should be AllyPlayer

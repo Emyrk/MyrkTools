@@ -63,7 +63,6 @@ function MyrkAddon:HandleTankCommand(input)
   end
   
   command = string.lower(command)
-  print(command, playerName)
   
   if command == "add" then
     if not playerName or playerName == "" then

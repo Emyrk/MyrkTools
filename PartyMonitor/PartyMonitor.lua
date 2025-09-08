@@ -72,7 +72,7 @@ end
 
 -- Query functions for other modules to use
 function PartyMonitor:GetTanks()
-  return self.party:GetTanks()
+  return self.party:GetPlayersByRole(Party.ROLES.TANK)
 end
 
 function PartyMonitor:GetPlayersByRole(role)
@@ -112,7 +112,7 @@ function PartyMonitor:Debug()
 
     DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[PartyMonitor]|r Debug Info:")
     for unitId, player in pairs(self.party.players) do
-        DEFAULT_CHAT_FRAME:AddMessage(string.format("  %s: %s (HP: %d/%d, Role: %s)", 
-            unitId, player.name, player.hp, player.hpmax, player.role))
+        DEFAULT_CHAT_FRAME:AddMessage(string.format("  %s: %s (HP: %d/%d, Incoming Heal: %d, Recent Damage: %d, Role: %s)", 
+            unitId, player.name, player.hp, player.hpmax, player.incHeal, player.recentDmg, player.role))
     end
 end
