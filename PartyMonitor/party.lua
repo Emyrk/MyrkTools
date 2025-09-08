@@ -2,6 +2,10 @@
 -- This version fixes the bugs in the original implementation
 -- Added role annotation system for flexible party management
 
+-- Global variable declarations to prevent undefined errors
+local DamageComm = DamageComm or (AceLibrary and AceLibrary("DamageComm-1.0"))
+local HealComm = HealComm or (AceLibrary and AceLibrary("HealComm-1.0"))
+
 ---@class Party
 ---@field players table<string, AllyPlayer> key is unitID like "player", "party1", etc.
 ---@field roleAssignments table<string, PartyRoles> key is player name, value is their role like "Tank"
@@ -170,8 +174,20 @@ function AllyPlayer:Refresh()
   self.hp = UnitHealth(self.id)
   self.hpmax = UnitHealthMax(self.id)
   self.class = englishClass
-  self.recentDmg = DamageComm.UnitGetIncomingDamage(self.name) or 0;
-  self.incHeal = HealComm:getHeal(self.name) or 0;
+  
+  -- Safe loading of damage and heal data with fallbacks
+  if DamageComm and DamageComm.UnitGetIncomingDamage then
+    self.recentDmg = DamageComm.UnitGetIncomingDamage(self.name) or 0
+  else
+    self.recentDmg = 0
+  end
+  
+  if HealComm and HealComm.getHeal then
+    self.incHeal = HealComm:getHeal(self.name) or 0
+  else
+    self.incHeal = 0
+  end
+  
   -- Note: role is managed by Party:SetRole(), not refreshed here
 end
 

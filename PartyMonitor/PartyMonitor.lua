@@ -258,10 +258,21 @@ end
 
 -- Initialize pfUI hook
 function PartyMonitor:InitializePfUI()
-    if pfUI then
-        self:PartyMonitorHookPfUI()
-        DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[PartyMonitor]|r pfUI tank role indicators enabled")
+    -- Check if pfUI is available before attempting integration
+    if not pfUI then
+        -- pfUI not available, skip integration silently
+        return
     end
+    
+    -- Additional safety checks
+    if not pfUI.RegisterModule or not pfUI.uf then
+        DEFAULT_CHAT_FRAME:AddMessage("|cffff8800[PartyMonitor]|r pfUI found but missing required components")
+        return
+    end
+    
+    -- Proceed with pfUI integration
+    self:PartyMonitorHookPfUI()
+    DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[PartyMonitor]|r pfUI tank role indicators enabled")
 end
 
 -- Update pfUI indicators when roles change

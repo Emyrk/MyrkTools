@@ -1,5 +1,20 @@
 MyrkAddon = LibStub("AceAddon-3.0"):NewAddon("MyrkAddon", "AceConsole-3.0", "AceEvent-3.0", "AceComm-3.0")
 
+-- Define AceLibrary for compatibility with older addon patterns
+if not AceLibrary then
+    AceLibrary = {
+        libraries = {},
+        Register = function(self, lib, name, version)
+            self.libraries[name] = lib
+        end
+    }
+    
+    -- Global function to get libraries
+    function AceLibrary(name)
+        return AceLibrary.libraries[name]
+    end
+end
+
 local initialized = false
 function MyrkAddon:OnInitialize()
   if initialized then return end

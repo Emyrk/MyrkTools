@@ -2,10 +2,20 @@
 -- Uses a modular decision tree approach for flexible healing strategies
 
 Auto = MyrkAddon:NewModule("MyrkAuto", "AceEvent-3.0")
-HealComm = AceLibrary("HealComm-1.0")
-DamageComm = AceLibrary("DamageComm-1.0")
-Logs = AceLibrary("MyrkLogs-1.0")
--- Party = AceLibrary("PartyMonitor-1.0")
+
+-- Safe library loading with error handling
+local function SafeLoadLibrary(name)
+    if AceLibrary and type(AceLibrary) == "function" then
+        return AceLibrary(name)
+    end
+    return nil
+end
+
+-- Load libraries safely
+local HealComm = SafeLoadLibrary("HealComm-1.0")
+local DamageComm = SafeLoadLibrary("DamageComm-1.0")
+local Logs = SafeLoadLibrary("MyrkLogs-1.0")
+-- Party = SafeLoadLibrary("PartyMonitor-1.0")
 
 ---@class Auto
 ---@field engine DecisionEngine

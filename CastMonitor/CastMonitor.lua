@@ -2,10 +2,13 @@
 -- Monitors spell casting state and provides feedback on cast success/failure
 -- Based on QuickHeal's StartMonitor/StopMonitor system
 
----@class CastMonitor
----@field instance ClassMonitorInstance
-CastMonitor = MyrkAddon:NewModule("MyrkCastMonitor")
-Logs = AceLibrary("MyrkLogs-1.0")
+-- Safe library loading
+local Logs = (AceLibrary and AceLibrary("MyrkLogs-1.0")) or {
+    Error = function(msg) DEFAULT_CHAT_FRAME:AddMessage("|cffff0000[CastMonitor]|r " .. msg) end,
+    Info = function(msg) DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[CastMonitor]|r " .. msg) end
+}
+
+CastMonitor = MyrkAddon:NewModule("MyrkCastMonitor", "AceEvent-3.0")
 
 -- Monitoring state
 local monitorFrame = nil
