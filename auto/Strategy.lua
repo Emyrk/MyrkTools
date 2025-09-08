@@ -18,22 +18,27 @@ PriestStrategy = {
     EmergencyShield("tank", 0.15),
     EmergencyShield("party", 0.15),
 
+    -- Using time to death (ttd) and pct to determine if we should cast
+    EmergencyShield("player", 0.50, 2),
+    EmergencyShield("tank", 0.50, 2),
+    EmergencyShield("party", 0.50, 2),
+
     -- EmergencyFlashHeal uses ttd and pct to determine if we should cast
     EmergencyFlashHeal("tank", 0.75, 3.5),
     EmergencyFlashHeal("party", 0.75, 3.5),
 
     -- Regular healing priorities
-
     -- Always heal the tank first
     Priest_Heal("tank", 0.85),
-    Priest_Heal("party", 0.65),
+    Priest_Heal("party", 0.85),
 
     -- Any top ups
-    LesserHeal("party", 0.95),
-    Priest_Heal("party", 0.95),
+    -- LesserHeal("party", 0.95),
+    -- Priest_Heal("party", 0.95),
 
 
     -- Renew("party", 0.1),
+    Wanding:New(),
 }
 
 -- This is the main healing strategy decision tree

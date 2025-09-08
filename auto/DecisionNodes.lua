@@ -100,15 +100,24 @@ function CastableHeal(channel, instant)
 end
 
 -- Emergency shield for specific target type
-function EmergencyShield(targetType, pct)
+function EmergencyShield(targetType, pct, ttd)
    return HealSpell:new({
         spellName = "Power Word: Shield",
         targetType = targetType,
         instant = true,
         pct = pct,
         prevent = function(engine, player)
-            return engine:hasBuff(player.id, "Spell_Holy_PowerWordShield") or
+            local cant = engine:hasBuff(player.id, "Spell_Holy_PowerWordShield") or
                    engine:hasDebuff(player.id, "AshesToAshes")
+            if cant then
+                return true
+            end
+
+            if ttd then
+                return player:CalculateTimeToDeath() > ttd;
+            end
+
+            return false
         end
     })
 end
@@ -139,7 +148,7 @@ function LesserHeal(targetType, pct)
         targetType = targetType,
         instant = false,
         smartRank = true,
-        incDmgTime = 3,
+        incDmgTime = 0,
         pct = pct,
         prevent = function(engine, player)
             return false
@@ -155,7 +164,7 @@ function Priest_Heal(targetType, pct)
         targetType = targetType,
         instant = false,
         smartRank = true,
-        incDmgTime = 3,
+        incDmgTime = 2.25,
         pct = pct,
         prevent = function(engine, player)
             return false
@@ -188,6 +197,16 @@ function NotInstance(actionFunc)
     end
 end
 
+function NotCombat(actionFunc)
+    return function(engine)
+        if IsInCombat() then
+            return nil -- Skip if in combat
+        end
+        
+        return actionFunc(engine)
+    end
+end
+
 -- Smite action for when nothing else to do
 function Smite()
     return function(engine)
@@ -198,22 +217,6 @@ function Smite()
                 spell = "Smite",
                 target = "target",
                 reason = "idle_smite"
-            }
-        end
-        return nil
-    end
-end
-
--- Wand action for when nothing else to do
-function Wand()
-    return function(engine)
-        -- Only wand if we have a hostile target
-        if UnitExists("target") and UnitCanAttack("player", "target") then
-            return {
-                action = "cast",
-                spell = "Shoot", -- Wand attack
-                target = "target",
-                reason = "idle_wand"
             }
         end
         return nil

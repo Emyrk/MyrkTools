@@ -105,6 +105,7 @@ function CastMonitor:StartMonitor(spell, target, reason, callbacks)
     monitorFrame:RegisterEvent("SPELLCAST_INTERRUPTED")
     monitorFrame:RegisterEvent("UI_ERROR_MESSAGE")
     
+
     local msg = string.format("[CastMonitor]Started monitoring %s -> %s (%s)", 
         spell, target, reason)
     Logs.Debug(msg)

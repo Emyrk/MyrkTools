@@ -40,15 +40,15 @@ function Auto:Perform()
     local decision = self.engine:Execute()
     if decision then
         if decision.action == ACTIONS.busy then
-            Logs.Debug("Busy: " .. (decision.reason or "no reason"))
+            -- Logs.Debug("Busy: " .. (decision.reason or "no reason"))
             return true -- Still busy, do not interrupt 
         end
 
-        -- if decision.action == ACTIONS.cast then
-        --     Logs.Info(string.format("Casting %s on %s (%s)", 
-        --         decision.spell, decision.target, decision.reason or "no reason"))
-        --     return self.engine:ExecuteCast(decision)
-        -- end
+        if decision.action == ACTIONS.cast then
+            Logs.Info(string.format("Casting %s on %s (%s)", 
+                decision.spellID, decision.target_id or "??", decision.reason or "no reason"))
+            return self.engine:ExecuteCast(decision)
+        end
 
         if decision.action == ACTIONS.error then
             Logs.Error("Error: " .. (decision.reason or "no reason"))

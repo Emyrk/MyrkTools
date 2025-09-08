@@ -84,6 +84,34 @@ function DecisionEngine:isAlreadyCasting()
     return self.castMonitor:IsCasting()
 end
 
+function DecisionEngine:ExecuteCast(decision)
+    if not decision or decision.action ~= ACTIONS.cast then
+        return false
+    end
+
+        -- Start monitoring the cast
+    local callbacks = {
+        onSuccess = function(spell, target, reason)
+            DEFAULT_CHAT_FRAME:AddMessage(string.format("|cff00ff00[Auto]|r Cast successful: %s -> %s (%s)", 
+                spell, target, reason))
+        end,
+        onFailed = function(spell, target, reason, error)
+            DEFAULT_CHAT_FRAME:AddMessage(string.format("|cffff0000[Auto]|r Cast failed: %s -> %s (%s) - %s", 
+                spell, target, reason, error or "Unknown"))
+        end,
+        onInterrupted = function(spell, target, reason, error)
+            DEFAULT_CHAT_FRAME:AddMessage(string.format("|cffffff00[Auto]|r Cast interrupted: %s -> %s (%s) - %s", 
+                spell, target, reason, error or "Unknown"))
+        end
+    }
+    
+    -- Assume the target is already correctly selected
+    self.castMonitor:StartMonitor(decision.spellID, decision.target_id, decision.reason, callbacks)
+    CastSpellByName(decision.spellID)
+
+    return true
+end
+
 function DecisionEngine:ExecuteHeal(decision)
     if not decision or decision.action ~= ACTIONS.heal then
         return false
@@ -128,7 +156,7 @@ function DecisionEngine:ExecuteHeal(decision)
    
     if result and result.action == ACTIONS.error then
         DEFAULT_CHAT_FRAME:AddMessage(string.format("|cffff0000[Auto]|r Cast error: %s -> %s (%s)", 
-            decision.spell, decision.target_id, result.reason))
+            decision.spell, decision.target_id or "??", result.reason))
         return false
     end
 

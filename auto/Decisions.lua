@@ -46,3 +46,14 @@ function Action:Heal(spellID, target_id, reason)
     setmetatable(instance, Action)
     return instance
 end
+
+function Action:Cast(spellID, target_id, reason)
+    local instance = {
+      action = ACTIONS.cast,
+      spellID = spellID,
+      target_id = target_id,
+      reason = reason,
+    }
+    setmetatable(instance, Action)
+    return instance
+end

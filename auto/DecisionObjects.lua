@@ -89,3 +89,37 @@ function HealSpell:evaluate(engine)
 
   return action
 end
+
+
+Wanding = {}
+Wanding.__index = Wanding
+function Wanding:New()
+  local wandSlot = nil
+  for slot = 1, 120 do
+    local _, _, id = GetActionText(slot)
+    if id == 5019 then
+      wandSlot = slot
+      Logs.Info("Wand slot found = " .. slot)
+      break
+    end
+  end
+
+  local instance = {
+    wandSlot = wandSlot,
+  }
+  setmetatable(instance, Wanding)
+  return instance
+end
+
+function Wanding:evaluate(engine)
+  if self.wandSlot ~= nil and
+    IsAutoRepeatAction(self.wandSlot) == 1 then
+    return Action:Busy("already wanding") -- Already wanding
+  end
+
+  if UnitExists("target") and UnitCanAttack("player", "target") then
+      return Action:Cast("Shoot", "target", "idle_wand")
+  end
+
+  return nil
+end
