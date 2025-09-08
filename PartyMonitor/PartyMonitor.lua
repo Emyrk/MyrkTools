@@ -159,8 +159,19 @@ function PartyMonitor:PartyMonitorHookPfUI()
             if not unit.tankIcon then
                 unit.tankIcon = CreateFrame("Frame", nil, unit.hp)
                 unit.tankIcon.tex = unit.tankIcon:CreateTexture(nil, "OVERLAY")
-                -- Use a shield-like texture for tank icon
-                unit.tankIcon.tex:SetTexture("Interface\\AddOns\\MyrkTools\\img\\tank_icon.tga")
+                
+                -- Try custom texture first, fallback to default if it fails
+                local customTexture = "Interface\\AddOns\\MyrkTools\\img\\tank_icon.tga"
+                local fallbackTexture = "Interface\\Icons\\Ability_Defend"
+                
+                unit.tankIcon.tex:SetTexture(customTexture)
+                
+                -- Check if custom texture loaded successfully
+                if not unit.tankIcon.tex:GetTexture() then
+                    -- Custom texture failed, use fallback
+                    unit.tankIcon.tex:SetTexture(fallbackTexture)
+                end
+                
                 unit.tankIcon.tex:SetAllPoints()
                 unit.tankIcon:SetFrameStrata("HIGH")
                 unit.tankIcon:SetFrameLevel((unit.hp:GetFrameLevel() or 1) + 15)
