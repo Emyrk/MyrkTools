@@ -196,7 +196,7 @@ function AllyPlayer:CalculateTimeToDeath()
     end
     
     -- Calculate net damage per second (damage - healing)
-    local netDamagePer5Second = self.recent0000Dmg or 0
+    local netDamagePer5Second = self.recentDmg or 0
     local netDamagePerSecond = netDamagePer5Second / 5.0
     local incHeal = self.incHeal or 0
     

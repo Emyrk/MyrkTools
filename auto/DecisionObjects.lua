@@ -76,7 +76,7 @@ function HealSpell:evaluate(engine)
         return true
       end
     end
-  end)
+  end, "time_to_death") -- Sort by time to death
 
   return action
 end

@@ -91,7 +91,7 @@ function CastableHeal(channel, instant)
                 player.castable = false
             end
             
-        end, "time_to_death")
+        end)
 
         SpellStopTargeting();
         return nil

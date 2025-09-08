@@ -50,42 +50,41 @@ function PartyMonitor:ForEach(callback, sortBy)
         return
     end
 
-    local players = {}
+    local sorted = {}
     
     -- Collect all players into an array for sorting
-    for _, player in pairs(self.party.players) do
-        table.insert(players, player)
+    for k in pairs(self.party.players) do
+        table.insert(sorted, k)
     end
     
     -- Sort players if sortBy is specified
     if sortBy then
         if sortBy == "time_to_death" then
-            table.sort(players, function(a, b)
-                local timeA = a:CalculateTimeToDeath()
-                local timeB = b:CalculateTimeToDeath()
+            table.sort(sorted, function(a, b)
+                local timeA = self.party.players[a]:CalculateTimeToDeath()
+                local timeB = self.party.players[b]:CalculateTimeToDeath()
                 return timeA < timeB -- Shortest time to death first
             end)
         elseif sortBy == "health_percent" then
-            table.sort(players, function(a, b)
-                local pctA = a.hpmax > 0 and (a.hp / a.hpmax) or 1
-                local pctB = b.hpmax > 0 and (b.hp / b.hpmax) or 1
+            table.sort(sorted, function(a, b)
+                local pctA = self.party.players[a].hpmax > 0 and (self.party.players[a].hp / self.party.players[a].hpmax) or 1
+                local pctB = self.party.players[b].hpmax > 0 and (self.party.players[b].hp / self.party.players[b].hpmax) or 1
                 return pctA < pctB -- Lowest health percent first
             end)
         elseif sortBy == "health_absolute" then
-            table.sort(players, function(a, b)
-                return a.hp < b.hp -- Lowest absolute health first
+            table.sort(sorted, function(a, b)
+                return self.party.players[a].hp < self.party.players[b].hp -- Lowest absolute health first
             end)
         elseif sortBy == "incoming_damage" then
-            table.sort(players, function(a, b)
-                return a.recentDmg > b.recentDmg -- Highest incoming damage first
+            table.sort(sorted, function(a, b)
+                return self.party.players[a].recentDmg > self.party.players[b].recentDmg -- Highest incoming damage first
             end)
         end
     end
     
-    print("---")
     -- Iterate through sorted players
-    for _, player in ipairs(players) do
-        print(player.name .. " " .. player:CalculateTimeToDeath())
+    for _, key in ipairs(sorted) do
+        local player = self.party.players[key]
         local stop = callback(player)
         if stop then
             break
