@@ -63,6 +63,10 @@ function PartyMonitor:ForEach(callback, sortBy)
             table.sort(sorted, function(a, b)
                 local timeA = self.party.players[a]:CalculateTimeToDeath()
                 local timeB = self.party.players[b]:CalculateTimeToDeath()
+
+                if timeA == timeB then
+                    return self.party.players[a].hp < self.party.players[b].hp -- If equal ttd, lowest health first
+                end
                 return timeA < timeB -- Shortest time to death first
             end)
         elseif sortBy == "health_percent" then
