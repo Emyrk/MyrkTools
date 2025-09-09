@@ -121,3 +121,21 @@ function Wanding:evaluate(engine)
 
   return nil
 end
+
+
+function SmartBuff(manaThreshold)
+  return function(engine)
+    if not SMARTBUFF_command then
+      return nil
+    end
+    
+    local pct = UnitMana("player") / UnitManaMax("player");
+    if pct < manaThreshold then
+      return nil
+    end
+
+    return Action:Custom(function (engine)
+      SMARTBUFF_command("")
+    end, "smart_buff")
+  end
+end

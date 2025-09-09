@@ -57,6 +57,13 @@ function Auto:Perform()
             return false
         end
 
+        if decision.action == ACTIONS.custom then
+            Logs.Info(string.format("Custom action: %s", 
+                decision.reason or "no reason"))
+            decision.doFunction(self.engine)
+            return true
+        end
+
          if decision.action == ACTIONS.heal then
             local name = UnitName(decision.target_id) or decision.target_id
             local spellName, spellRank = GetSpellName(decision.spellID, BOOKTYPE_SPELL)

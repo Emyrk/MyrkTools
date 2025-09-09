@@ -4,10 +4,12 @@ ACTIONS = {
   cast = "cast",
   heal = "heal",
   error = "error",
+  custom = "custom",
 }
 
 
 ---@class Action
+---@field doFunction fun(engine) A function that does something
 ---@field spellID? string The spell id to cast.
 ---@field target_id? string The target unit ID.
 ---@field action actions What action to execute.
@@ -52,6 +54,17 @@ function Action:Cast(spellID, target_id, reason)
       action = ACTIONS.cast,
       spellID = spellID,
       target_id = target_id,
+      reason = reason,
+    }
+    setmetatable(instance, Action)
+    return instance
+end
+
+---@param doFunction fun(engine)  A function that does something
+function Action:Custom(doFunction, reason)
+    local instance = {
+      action = ACTIONS.custom,
+      doFunction = doFunction,
       reason = reason,
     }
     setmetatable(instance, Action)
