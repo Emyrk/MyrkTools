@@ -93,3 +93,4 @@ function ReloadSpells()
   Spells["Smite"] = GetSpellIDs("Smite")
   Spells["Wand"] = GetSpellIDs("Wand")
 end
+

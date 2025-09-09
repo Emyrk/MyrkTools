@@ -53,14 +53,14 @@ PriestStrategy = {
 WarriorAFK = {
     Debounce:New(0.5),
     IsDead,
+    AwaitHP,
+
     -- https://github.com/Emyrk/MyrkTools/blob/5ca6ee25a82cde582c0985e06f0b40c7fce972bd/MyrkTools.lua
     InCombat(
-        TargetIsAttackable(
-            HeroicStrike()
-        )
+        WarriorCombat()
     ),
     NotCombat(
-        TargetAndThrow()
+        WarriorPull()
     )
 }
 

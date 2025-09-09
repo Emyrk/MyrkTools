@@ -265,15 +265,50 @@ function Smite()
     end
 end
 
-function HeroicStrike()
+function AwaitHP(engine)
+    local combat = UnitAffectingCombat("player")
+    local h=UnitHealth("player")
+    local m=UnitHealthMax("player")
+    
+    if h/m < 0.9 and not combat then
+        return Action:Busy("healing up before combat")
+    end
+    return nil
+end
+
+function WarriorCombat()
     return function(engine)
-         if UnitExists("target") and UnitCanAttack("player", "target") and UnitName("targettarget") ~= UnitName("player") then
+        local h=UnitHealth("player")
+        local m=UnitHealthMax("player")
+
+        if UnitExists("target") and UnitCanAttack("player", "target") and UnitName("targettarget") ~= UnitName("player") then
             ClearTarget()
+        end
+
+        -- If we have no target, find one
+        if not UnitExists("target") then
             TargetNearestEnemy()
         end
 
-        AttackTarget()
-        return Action:Cast("Heroic Strike", "target", "heroic_strike")
+        if CheckInteractDistance("target",3) then
+            IWin.DoShit()
+            return Action:Busy("in melee range, doing shit")
+        end
+
+        return Action:Cast("Throw", "target", "pulling")
+    end
+end
+
+local pullTick = 0;
+function WarriorPull()
+    return function(engine)
+        if(math.fmod(pullTick, 5) == 0) then
+            ClearTarget() -- Try a new target
+        end
+        TargetNearestEnemy() 
+        
+        pullTick = pullTick + 1;
+        return Action:Cast("Throw", "target", "pulling")
     end
 end
 
