@@ -14,6 +14,7 @@ PriestStrategy = {
     -- Calc incoming dmg, heals, etc
     RefreshPartyState,
 
+    -- TODO: If spell targeting, reset it.
     -- See if we can cast anything
     CastableHeal("Lesser Heal(Rank 1)", "Renew(Rank 1)"),
 
@@ -30,6 +31,8 @@ PriestStrategy = {
     -- EmergencyFlashHeal uses ttd and pct to determine if we should cast
     EmergencyFlashHeal("tank", 0.75, 3.5),
     EmergencyFlashHeal("party", 0.75, 3.5),
+
+    -- Dispel Magic on party members
 
     -- Regular healing priorities
     -- Any top ups

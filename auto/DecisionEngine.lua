@@ -156,7 +156,7 @@ function DecisionEngine:ExecuteHeal(decision)
    
     if result and result.action == ACTIONS.error then
         DEFAULT_CHAT_FRAME:AddMessage(string.format("|cffff0000[Auto]|r Cast error: %s -> %s (%s)", 
-            decision.spell, decision.target_id or "??", result.reason))
+            decision.spellID, decision.target_id or "??", result.reason))
         return false
     end
 
