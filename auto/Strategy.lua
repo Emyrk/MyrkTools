@@ -18,8 +18,11 @@ PriestStrategy = {
     -- See if we can cast anything
     CastableHeal("Lesser Heal(Rank 1)", "Renew(Rank 1)"),
 
+    -- TODO: If spirit of redemption, use max rank flash heals
+    -- TODO: Check enough mana on all spells.
+
     -- Save yourself first - emergency situations
-    EmergencyShield("player", 0.15),
+    EmergencyShield("player", 0.15), 
     EmergencyShield("tank", 0.15),
     EmergencyShield("party", 0.15),
 
