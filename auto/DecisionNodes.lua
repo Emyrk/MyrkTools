@@ -121,6 +121,8 @@ function EmergencyShield(targetType, pct, ttd)
         targetType = targetType,
         instant = true,
         pct = pct,
+        spellRank = 4,
+        minimumMana = 175,
         prevent = function(engine, player)
             local cant = engine:hasBuff(player.id, "Spell_Holy_PowerWordShield") or
                    engine:hasDebuff(player.id, "AshesToAshes")
@@ -148,6 +150,7 @@ function EmergencyFlashHeal(targetType, pct, ttd)
         instant = false,
         smartRank = true,
         incDmgTime = 2,
+        minimumMana = 125,
         pct = pct,
         prevent = function(engine, player)
             return player:CalculateTimeToDeath() > ttd;
@@ -164,6 +167,7 @@ function LesserHeal(targetType, pct)
         instant = false,
         smartRank = true,
         incDmgTime = 0,
+        minimumMana = 25,
         pct = pct,
         prevent = function(engine, player)
             -- Don't use lesser heal if we need a bigger heal
@@ -184,6 +188,7 @@ function Priest_Heal(targetType, pct)
         instant = false,
         smartRank = true,
         incDmgTime = 2.25,
+        minimumMana = 135,
         pct = pct,
         prevent = function(engine, player)
             return false
@@ -242,6 +247,17 @@ function Smite()
     end
 end
 
+function EvaluateSteps(engine, ...)
+    local nodes = arg
+    for _, node in ipairs(nodes) do
+        local result = engine:evaluateStep(node)
+        if result then
+            return result -- First successful decision wins
+        end
+    end
+    return nil -- No decision made
+end
+
 -- Setup/Teardown wrapper for decision nodes
 -- Executes setup before evaluating nodes, teardown after (regardless of success/failure)
 function WithSetup(setupFunc, teardownFunc, ...)
@@ -256,13 +272,13 @@ function WithSetup(setupFunc, teardownFunc, ...)
         end
         
         -- Evaluate the wrapped decision nodes
-        local result = nil
-        for _, node in ipairs(nodes) do
-            result = engine:evaluateStep(node)
-            if result then
-                break -- First successful decision wins
-            end
-        end
+        local result = EvaluateSteps(engine, unpack(nodes))
+        -- for _, node in ipairs(nodes) do
+        --     result = engine:evaluateStep(node)
+        --     if result then
+        --         break -- First successful decision wins
+        --     end
+        -- end
         
         -- Always execute teardown, passing setup result for context
         if teardownFunc then

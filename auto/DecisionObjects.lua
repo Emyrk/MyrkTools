@@ -26,6 +26,7 @@ end
 ---@field incDmgTime? number seconds to expect for incoming damage
 ---@field targetType string
 ---@field instant boolean
+---@field minimumMana? number Minimum mana required to cast
 ---@field pct number
 ---@field prevent fun(engine: any, player: AllyPlayer): boolean|nil If returns true, skip this target
 HealSpell = {}
@@ -46,6 +47,13 @@ function HealSpell:evaluate(engine)
     return nil
   elseif not engine.ctx.channelHeal then
     return nil
+  end
+
+  if self.minimumMana and self.minimumMana ~= 0 then
+    local mana = UnitMana("player")
+    if mana < self.minimumMana then
+      return nil
+    end
   end
 
   local ranks = Spells[self.spellName]
