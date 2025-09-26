@@ -8,6 +8,7 @@ PriestStrategy = {
 
     IsDead,
     PlayerIsDrinking,
+    Mounted(),
     -- Quick exit if we're already doing something
     AlreadyCasting,
 

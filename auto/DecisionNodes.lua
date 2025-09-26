@@ -29,6 +29,15 @@ function PlayerIsDrinking(engine)
     return nil
 end
 
+function Mounted()
+    return function(engine)
+        if engine:hasBuff("player", "inv_pet_speedy") then
+            return Action:Busy("player is mounted")
+        end
+        return nil
+    end
+end
+
 
 -- function CancelOverHeal()
 --     return function(engine)
@@ -66,8 +75,8 @@ function RefreshPartyState(engine)
     engine.partyMonitor:UpdatePartyMembers()
     return nil -- This is a state modifier, not an action
 end
-
 function CastableHeal(channel, instant)
+
     local castable = function(engine)
         if not engine.partyMonitor then
             return Action:Error("No party monitor")

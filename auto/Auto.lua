@@ -40,7 +40,7 @@ function Auto:Perform()
     local decision = self.engine:Execute()
     if decision then
         if decision.action == ACTIONS.busy then
-            -- Logs.Debug("Busy: " .. (decision.reason or "no reason"))
+            Logs.Debug("Busy: " .. (decision.reason or "no reason"))
             return true -- Still busy, do not interrupt 
         end
 

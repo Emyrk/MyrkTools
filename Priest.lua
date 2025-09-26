@@ -113,22 +113,7 @@ function MyrkPriest:Smite()
   return false
 end
 
--- Wand will use our wand as the offensive ability.
-function MyrkPriest:Wand()
-  if Wanding() then
-    -- If we are already shooting, do not cast "Shoot" again.
-    -- It would cancel the auto-shot.
-    MyrkPriest:Debug("Already shooting", 1, 1, 0)
-    return true
-  end
-
-  -- This starts the auto-shooting
-  CastSpellByName("Shoot");
-  MyrkPriest:Debug("Shoot", 1, 1, 0)
-  return true
-end
-
-function Wanding()
+function MyrkPriest:Wanding()
   if MyrkPriest.WandSlot == 0 then
     -- If wand is not on the bars, that is an issue.
     -- TODO: Throw an error.
@@ -140,6 +125,21 @@ function Wanding()
   end
 
   return false
+end
+
+-- Wand will use our wand as the offensive ability.
+function MyrkPriest:Wand()
+  if MyrkPriest:Wanding() then
+    -- If we are already shooting, do not cast "Shoot" again.
+    -- It would cancel the auto-shot.
+    MyrkPriest:Debug("Already shooting", 1, 1, 0)
+    return true
+  end
+
+  -- This starts the auto-shooting
+  CastSpellByName("Shoot");
+  MyrkPriest:Debug("Shoot", 1, 1, 0)
+  return true
 end
 
 -- Convenience wrappers
