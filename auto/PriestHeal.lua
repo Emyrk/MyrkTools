@@ -2,17 +2,23 @@
 -- spellrank number
 -- spellnumber number
 -- manacost number
+-- TODO: Make these local
 local PriestSpells = {}
 local PriestSingleHeals = {}
 
 local initialized = false
-function InitPriestTable()
-  if initialized then
+function InitPriestTable(force)
+  if initialized and not force then
     return
   end
+  initialized = true
+
+  PriestSpells = {}
+  PriestSingleHeals = {}
   
   local localizedClass, englishClass = UnitClass("player")
   if englishClass ~= "PRIEST" then
+    Logs.Error("InitPriestTable called for non-priest class " .. tostring(englishClass))
     return
   end
 
@@ -47,8 +53,6 @@ function InitPriestTable()
   -- for _, spell in ipairs(PriestSingleHeals) do
   --   Logs.Debug(spell.spellname .. " rank " .. tostring(spell.spellrank) .. " heal " .. tostring(math.floor(spell.averagehealnocrit)))
   -- end
-
-  initialized = true
 end
 
 function LoadSpellRanks(spellName)
@@ -58,6 +62,10 @@ function LoadSpellRanks(spellName)
   while true do
     local info = TheoryCraft_GetSpellDataByName(spellName, i)
     if info == nil then
+      break
+    end
+
+    if info.spellname == nil then
       break
     end
     table.insert(ranks, info)
@@ -104,7 +112,14 @@ function BestPriestSingleHeal(pid, mana, hp_needed)
   for _, spell in ipairs(PriestSingleHeals) do
     healingSpell = spell
 
-    if spell.manacost > mana then
+    if not spell.manacost then
+      -- Debug log this error
+      Logs.Error(string.format("PriestSingleHeals=%d", table.getn(PriestSingleHeals)))
+      Logs.Error("No manacost for spell " .. tostring(spell.spellname) .. " rank " .. tostring(spell.spellrank))
+      healingSpell = nil
+      break
+    end
+    if (spell.manacost or 0) > mana then
       -- Can't afford this spell, will use a lower rank
       break
     end
