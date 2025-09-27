@@ -26,8 +26,16 @@ end
 
 function Party:Refresh()
   self:RefreshID("player") -- Always include player
+  
   for i=1,4 do
     self:RefreshID("party" .. i)
+  end
+  if UnitInRaid("player") == 1 then
+    for i=1,40 do
+      if not self:RefreshID("raid" .. i) then
+        break
+      end
+    end
   end
 end
 
@@ -48,11 +56,12 @@ function Party:RefreshID(id)
         self.players[id].role = self.roleAssignments[name]
       end
       
-      return
+      return true
     end
   end
 
   self:RemoveID(id)
+  return false
 end
 
 function Party:RemoveID(id) 
@@ -121,6 +130,18 @@ function Party:GetUnitIdByName(playerName)
     local unitId = "party" .. i
     if UnitExists(unitId) and UnitName(unitId) == playerName then
       return unitId
+    end
+  end
+
+  if UnitInRaid("player") == 1 then
+    for i = 1, 40 do
+      local unitId = "raid" .. i
+      if not UnitExists(unitId) then
+        break
+      end
+      if UnitName(unitId) == playerName then
+        return unitId
+      end
     end
   end
   

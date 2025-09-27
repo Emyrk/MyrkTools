@@ -40,7 +40,9 @@ PriestStrategy = {
 
     -- Regular healing priorities
     -- Any top ups
-    LesserHeal("tank", 0.85),
+    -- NotCombat(
+    --     LesserHeal("tank", 0.85)
+    -- ),
 
     -- Always heal the tank first
     -- TODO: Downrank a heal if we don't need a big heal to a lesser heal

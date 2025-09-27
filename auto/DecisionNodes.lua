@@ -232,7 +232,7 @@ end
 
 function NotCombat(actionFunc)
     return function(engine)
-        if IsInCombat() then
+        if InCombat() then
             return nil -- Skip if in combat
         end
         
