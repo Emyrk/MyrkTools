@@ -56,7 +56,7 @@ function HealSpell:evaluate(engine, player)
     end
   end
 
-  local ranks = Spells[self.spellName]
+  local ranks = SpellIndex[self.spellName]
   local spellid = nil
   if self.spellRank then
     spellid = ranks[self.spellRank]

@@ -101,6 +101,12 @@ function DecisionEngine:ExecuteLoopedStrategy()
         end
     end
 
+    local restSteps = self.loopStrategy.rest or {}
+    local restResult = self:executeSteps(restSteps)
+    if restResult then
+        return restResult
+    end
+
     return nil
 end
 

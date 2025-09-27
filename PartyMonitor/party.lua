@@ -59,9 +59,6 @@ function Party:Sorted()
       table.insert(sorted, k)
   end
 
-  -- TODO: REMOVE, DEBUG
-  self.players["party1"].hp = 20
-
   table.sort(sorted, function(a, b)
     local timeA = self.players[a]:CalculateTimeToDeath()
     local timeB = self.players[b]:CalculateTimeToDeath()

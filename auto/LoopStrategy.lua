@@ -5,6 +5,7 @@ NoopLoopStrategy = {
   player = {},
   tank = {},
   party = {},
+  rest = {},
 }
 
 PriestLoopStrategy = {
@@ -24,11 +25,22 @@ PriestLoopStrategy = {
   ---@type table<string, fun(engine:DecisionEngine, player:AllyPlayer):Action|nil> List of decision nodes to evaluate every loop
   player = {
     PowerWordShield(0.15),
+    FlashHeal(0.75, 2.5),
   },
   tank = {
-
+    PowerWordShield(0.15),
+    FlashHeal(0.75, 3.5),
+    -- Always heal a tank that is ttd 5s and <50%
+    PriestDynamicHeal(0.5, 5, nil, 2.5),
+    -- Always heal a tank at <25%
+    PriestDynamicHeal(0.25, nil, nil, 2.5)
   },
   party = {
-
+    PowerWordShield(0.15, 4),
+    FlashHeal(0.75, 3.5),
+    PriestDynamicHeal(0.9, nil, nil, 2.5)
+  },
+  rest = {
+    Wanding:New(),
   },
 }

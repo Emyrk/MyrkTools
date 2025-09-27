@@ -20,3 +20,20 @@ function PowerWordShield(pct, ttd)
         end
     })
 end
+
+-- Emergency flash heal for specific target type
+---@param pct number Health percentage threshold to consider
+---@param ttd number Time to death threshold in seconds
+function FlashHeal(pct, ttd)
+   return HealSpell:new({
+        spellName = "Flash Heal",
+        instant = false,
+        smartRank = true,
+        incDmgTime = 2,
+        minimumMana = 125,
+        pct = pct,
+        prevent = function(engine, player)
+            return player:CalculateTimeToDeath() > ttd;
+        end
+    })
+end
