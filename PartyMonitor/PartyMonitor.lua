@@ -45,55 +45,12 @@ function PartyMonitor:OnDisable()
 end
 
 ---@param callback function(player: PartyPlayer): boolean|nil Return true to stop iteration
-function PartyMonitor:ForEach(callback, sortBy)
+function PartyMonitor:ForEach(callback)
     if not self.party then
         return
     end
 
-    local sorted = {}
-    
-    -- Collect all players into an array for sorting
-    for k in pairs(self.party.players) do
-        table.insert(sorted, k)
-    end
-    
-    -- Sort players if sortBy is specified
-    if sortBy then
-        if sortBy == "time_to_death" then
-            table.sort(sorted, function(a, b)
-                local timeA = self.party.players[a]:CalculateTimeToDeath()
-                local timeB = self.party.players[b]:CalculateTimeToDeath()
-
-                if timeA == timeB then
-                    return self.party.players[a].hp < self.party.players[b].hp -- If equal ttd, lowest health first
-                end
-                return timeA < timeB -- Shortest time to death first
-            end)
-        elseif sortBy == "health_percent" then
-            table.sort(sorted, function(a, b)
-                local pctA = self.party.players[a].hpmax > 0 and (self.party.players[a].hp / self.party.players[a].hpmax) or 1
-                local pctB = self.party.players[b].hpmax > 0 and (self.party.players[b].hp / self.party.players[b].hpmax) or 1
-                return pctA < pctB -- Lowest health percent first
-            end)
-        elseif sortBy == "health_absolute" then
-            table.sort(sorted, function(a, b)
-                return self.party.players[a].hp < self.party.players[b].hp -- Lowest absolute health first
-            end)
-        elseif sortBy == "incoming_damage" then
-            table.sort(sorted, function(a, b)
-                return self.party.players[a].recentDmg > self.party.players[b].recentDmg -- Highest incoming damage first
-            end)
-        end
-    end
-    
-    -- Iterate through sorted players
-    for _, key in ipairs(sorted) do
-        local player = self.party.players[key]
-        local stop = callback(player)
-        if stop then
-            break
-        end
-    end
+    self.party:ForEach(callback)
 end
 
 function PartyMonitor:UpdatePartyMembers()

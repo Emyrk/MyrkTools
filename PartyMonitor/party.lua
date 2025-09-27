@@ -37,6 +37,52 @@ function Party:Refresh()
       end
     end
   end
+
+  -- Reset sorted
+  this.sorted = nil
+  self:Sorted() -- Force sort to update
+end
+
+function Party:Sorted()
+  if self.sorted then
+    return self.sorted
+  end
+
+  local sorted = {}
+  for k in pairs(self.players) do
+      table.insert(sorted, k)
+  end
+
+  self.players["party1"].hp = 20
+
+  table.sort(sorted, function(a, b)
+    local timeA = self.players[a]:CalculateTimeToDeath()
+    local timeB = self.players[b]:CalculateTimeToDeath()
+
+    if timeA == timeB or (timeA > 20 and timeB > 20) then
+        -- If equal ttd, lowest health first
+        return (self.players[a].hp / self.players[a].hpmax) < (self.players[b].hp / self.players[b].hpmax)
+    end
+    return timeA < timeB -- Shortest time to death first
+  end)
+
+  self.sorted = sorted
+  return self.sorted
+end
+
+function Party:ForEach(callback)
+    if not self.players then
+        return
+    end
+
+    for _, id in ipairs(self:Sorted()) do
+        local player = self.players[id]
+        if player then
+            if callback(player) then
+                break
+            end
+        end
+    end
 end
 
 -- id should be party1, party2, etc.

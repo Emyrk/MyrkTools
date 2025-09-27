@@ -19,6 +19,8 @@ PriestStrategy = {
     -- See if we can cast anything
     CastableHeal("Lesser Heal(Rank 1)", "Renew(Rank 1)"),
 
+    LesserHeal("party", 100),
+
     -- TODO: If spirit of redemption, use max rank flash heals
     -- TODO: Check enough mana on all spells.
 
