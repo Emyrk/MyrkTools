@@ -6,6 +6,10 @@
 local PriestSpells = {}
 local PriestSingleHeals = {}
 
+function GetPriestSingleHeals()
+  return PriestSingleHeals
+end
+
 local initialized = false
 function InitPriestTable(force)
   if initialized and not force then
@@ -114,6 +118,7 @@ function BestPriestSingleHeal(pid, mana, hp_needed)
 
     if not spell.manacost then
       -- Debug log this error
+      InitPriestTable(true)
       Logs.Error(string.format("PriestSingleHeals=%d", table.getn(PriestSingleHeals)))
       Logs.Error("No manacost for spell " .. tostring(spell.spellname) .. " rank " .. tostring(spell.spellrank))
       healingSpell = nil
