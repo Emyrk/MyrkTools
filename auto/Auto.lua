@@ -37,7 +37,7 @@ function Auto:Perform()
     end
         
     -- Execute the healing strategy
-    local decision = self.engine:Execute()
+    local decision = self.engine:ExecuteLoopedStrategy()
     if decision then
         if decision.action == ACTIONS.busy then
             Logs.Debug("Busy: " .. (decision.reason or "no reason"))

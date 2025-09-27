@@ -4,16 +4,20 @@
 ---@class DecisionEngine
 ---@field partyMonitor PartyMonitor
 ---@field castMonitor CastMonitor
+---@field strategy table List of decision nodes to evaluate
+---@field loopStrategy table List of decision nodes to evaluate every loop
 DecisionEngine = {}
 DecisionEngine.__index = DecisionEngine
 
 function DecisionEngine:New()
     local localizedClass, englishClass = UnitClass("player")
     local strategy = {}
+    local loopStrategy = NoopLoopStrategy
     if englishClass == "ROGUE" then
         strategy = RogueStrategy
     elseif englishClass == "PRIEST" then
         strategy = PriestStrategy
+        loopStrategy = PriestLoopStrategy
     else
         DEFAULT_CHAT_FRAME:AddMessage("|cffff0000[MyrkAuto]|r Unsupported class: " .. tostring(englishClass))
         return nil
@@ -23,6 +27,7 @@ function DecisionEngine:New()
         partyMonitor = nil, -- Set by module
         castMonitor = nil, 
         strategy = strategy, -- Current strategy (list of decision nodes)
+        loopStrategy = loopStrategy,
         config = {
         }
     }
@@ -59,8 +64,51 @@ end
 ---@return Action|nil
 function DecisionEngine:Execute()
     self.ctx = {}
-    for _, step in ipairs(self.strategy) do
-        local result = self:evaluateStep(step)
+    return self:executeSteps(self.strategy)
+end
+
+function DecisionEngine:ExecuteLoopedStrategy()
+    self.ctx = {}
+    local always = self:executeSteps(self.loopStrategy.always or {})
+    if always then
+        return always
+    end
+
+    -- Player, Tank, Party
+    if self.partyMonitor.party.players["player"] then
+        
+        local steps = self.loopStrategy.player or {}
+        local result = self:executeSteps(steps, self.partyMonitor.party.players["player"])
+        if result then
+            return result
+        end
+    end
+
+    local order = {"tank", "party"}
+    for _, ptype in ipairs(order) do
+        local steps = self.loopStrategy[ptype] or {}
+        local loopResult = nil
+        self:ForEach(ptype, function(player)
+            local result = self:executeSteps(steps, player)
+            if result then
+                loopResult = result
+                return true -- Stop iteration
+            end
+            return false
+        end)
+        if loopResult then
+            return loopResult
+        end
+    end
+
+    return nil
+end
+
+-- Core decision tree executor
+---@return Action|nil
+function DecisionEngine:executeSteps(steps, player)
+    for _, step in ipairs(steps) do
+        local result = self:evaluateStep(step, player)
         if result then
             return result -- First successful decision wins
         end
@@ -68,12 +116,12 @@ function DecisionEngine:Execute()
     return nil -- No decision matched
 end
 
-function DecisionEngine:evaluateStep(step)
+function DecisionEngine:evaluateStep(step, player)
     if type(step) == "function" then
-        return step(self)
+        return step(self, player)
     elseif type(step) == "table" and step.evaluate then
-        return step:evaluate(self)
-    else 
+        return step:evaluate(self, player)
+    else
         DEFAULT_CHAT_FRAME:AddMessage("|cffff0000[MyrkAuto]|r Invalid decision step: " .. type(step))
     end
     return nil
@@ -170,7 +218,7 @@ function DecisionEngine:GetCurrentCast()
 end
 
 ---@param ptype string "player", "tank", or "party"
----@param callback fn(player: PartyPlayer): boolean|nil Return true to stop iteration
+---@param callback function(player: PartyPlayer): boolean|nil Return true to stop iteration
 function DecisionEngine:ForEach(ptype, callback)
     self.partyMonitor:ForEach(function(player)
         if ptype == "player" and player.unitId == "player" then

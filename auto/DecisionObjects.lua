@@ -24,7 +24,7 @@ end
 ---@field spellRank? number
 ---@field smartRank? boolean
 ---@field incDmgTime? number seconds to expect for incoming damage
----@field targetType string
+---@field targetType? string TODO REMOVE
 ---@field instant boolean
 ---@field minimumMana? number Minimum mana required to cast
 ---@field pct number
@@ -42,7 +42,7 @@ end
 ---Evaluate the heal decision.
 ---@param engine any
 ---@return table|nil
-function HealSpell:evaluate(engine)
+function HealSpell:evaluate(engine, player)
   if self.instant and not engine.ctx.instantHeal then
     return nil
   elseif not engine.ctx.channelHeal then
@@ -71,6 +71,28 @@ function HealSpell:evaluate(engine)
   end
 
   local action = nil
+  if player then
+    if not player.castable or not player.healable then
+      return nil
+    end
+
+    local healthPct = player:GetHealthPercent()
+    if healthPct < self.pct then
+      if self.prevent and self.prevent(engine, player) then
+        -- preventing this heal
+      else
+        local hp_needed = player:HPNeeded(self.incDmgTime or 0)
+        if self.smartRank then
+          spellid = ranks[GetOptimalRank(self.spellName, hp_needed)] -- TODO: Calculate actual hp needed
+        end
+
+        return Action:Heal(spellid, player.id, "heal")
+      end
+    end
+    return nil
+  end
+  -- TODO: Remove this code after this comment
+
   engine:ForEach(self.targetType, function(player)
       ---@cast player AllyPlayer
     if not player.castable or not player.healable then
