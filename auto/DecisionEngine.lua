@@ -120,16 +120,17 @@ function DecisionEngine:ExecuteHeal(decision)
         -- Start monitoring the cast
     local callbacks = {
         onSuccess = function(spell, target, reason)
-            DEFAULT_CHAT_FRAME:AddMessage(string.format("|cff00ff00[Auto]|r Cast successful: %s -> %s (%s)", 
-                spell, target, reason))
+            -- DEFAULT_CHAT_FRAME:AddMessage(string.format("|cff00ff00[Auto]|r Cast successful: %s -> %s (%s)", 
+            --     spell, target, reason))
         end,
         onFailed = function(spell, target, reason, error)
-            DEFAULT_CHAT_FRAME:AddMessage(string.format("|cffff0000[Auto]|r Cast failed: %s -> %s (%s) - %s", 
-                spell, target, reason, error or "Unknown"))
+            self.partyMonitor:BlackList(target, 5)
+            -- DEFAULT_CHAT_FRAME:AddMessage(string.format("|cffff0000[Auto]|r Cast failed: %s -> %s (%s) - %s", 
+            --     spell, target, reason, error or "Unknown"))
         end,
         onInterrupted = function(spell, target, reason, error)
-            DEFAULT_CHAT_FRAME:AddMessage(string.format("|cffffff00[Auto]|r Cast interrupted: %s -> %s (%s) - %s", 
-                spell, target, reason, error or "Unknown"))
+            -- DEFAULT_CHAT_FRAME:AddMessage(string.format("|cffffff00[Auto]|r Cast interrupted: %s -> %s (%s) - %s", 
+            --     spell, target, reason, error or "Unknown"))
         end
     }
     

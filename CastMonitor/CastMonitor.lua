@@ -151,25 +151,27 @@ function CastMonitor:OnEvent(event, arg1, arg2, arg3, arg4, arg5)
         Logs.Debug("CastMonitor received event while not active: " .. (event or "nil"))
         return
     end
+
+    local instance = self.instance
     
     if event == "SPELLCAST_STOP" then
         -- Spell cast completed successfully
-        if self.callbacks and self.callbacks.onSuccess then
-            self.callbacks.onSuccess(self.currentSpell, self.currentTarget, self.currentReason)
+        if instance.callbacks and instance.callbacks.onSuccess then
+            instance.callbacks.onSuccess(instance.currentSpell, instance.currentTarget, instance.currentReason)
         end
         self:StopMonitor("SPELLCAST_STOP")
         
     elseif event == "SPELLCAST_FAILED" then
         -- Spell cast failed
-        if self.callbacks and self.callbacks.onFailed then
-            self.callbacks.onFailed(self.currentSpell, self.currentTarget, self.currentReason, arg1)
+        if instance.callbacks and instance.callbacks.onFailed then
+            instance.callbacks.onFailed(instance.currentSpell, instance.currentTarget, instance.currentReason, arg1)
         end
         self:StopMonitor("SPELLCAST_FAILED: " .. (arg1 or "Unknown"))
         
     elseif event == "SPELLCAST_INTERRUPTED" then
         -- Spell cast was interrupted
-        if self.callbacks and self.callbacks.onInterrupted then
-            self.callbacks.onInterrupted(self.currentSpell, self.currentTarget, self.currentReason, arg1)
+        if instance.callbacks and instance.callbacks.onInterrupted then
+            instance.callbacks.onInterrupted(instance.currentSpell, instance.currentTarget, instance.currentReason, arg1)
         end
         self:StopMonitor("SPELLCAST_INTERRUPTED: " .. (arg1 or "Unknown"))
         
@@ -177,17 +179,17 @@ function CastMonitor:OnEvent(event, arg1, arg2, arg3, arg4, arg5)
         -- Handle specific error messages
         if arg1 == ERR_SPELL_OUT_OF_RANGE then
             DEFAULT_CHAT_FRAME:AddMessage(string.format("|cffff0000[CastMonitor]|r Out of range: %s", 
-                self.currentTarget or "unknown"))
-            if self.callbacks and self.callbacks.onFailed then
-                self.callbacks.onFailed(self.currentSpell, self.currentTarget, self.currentReason, "OUT_OF_RANGE")
+                instance.currentTarget or "unknown"))
+            if instance.callbacks and instance.callbacks.onFailed then
+                instance.callbacks.onFailed(instance.currentSpell, instance.currentTarget, instance.currentReason, "OUT_OF_RANGE")
             end
             self:StopMonitor(Reasons.OUT_OF_RANGE)
             
         elseif arg1 == SPELL_FAILED_LINE_OF_SIGHT then
             DEFAULT_CHAT_FRAME:AddMessage(string.format("|cffff0000[CastMonitor]|r Line of sight: %s", 
-                self.currentTarget or "unknown"))
-            if self.callbacks and self.callbacks.onFailed then
-                self.callbacks.onFailed(self.currentSpell, self.currentTarget, self.currentReason, "LINE_OF_SIGHT")
+                instance.currentTarget or "unknown"))
+            if instance.callbacks and instance.callbacks.onFailed then
+                instance.callbacks.onFailed(instance.currentSpell, instance.currentTarget, instance.currentReason, "LINE_OF_SIGHT")
             end
             self:StopMonitor(Reasons.LINE_OF_SIGHT)
         end

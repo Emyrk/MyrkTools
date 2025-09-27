@@ -5,6 +5,7 @@
 ---@class Party
 ---@field players table<string, AllyPlayer> key is unitID like "player", "party1", etc.
 ---@field roleAssignments table<string, PartyRoles> key is player name, value is their role like "Tank"
+---@field blacklist table<string, number> key is unitID, value is timestamp when blacklist expires
 Party = {}
 Party.__index = Party
 
@@ -19,9 +20,14 @@ function Party:New()
     local instance = {
       players = {},
       roleAssignments = {}, -- Persistent role storage by player name
+      blacklist = {}, -- Temporary blacklist by unit IDs
     }
     setmetatable(instance, Party)
     return instance
+end
+
+function Party:BlackList(id, duration)
+  self.blacklist[id] = GetTime() + duration
 end
 
 function Party:Refresh()
@@ -53,6 +59,7 @@ function Party:Sorted()
       table.insert(sorted, k)
   end
 
+  -- TODO: REMOVE, DEBUG
   self.players["party1"].hp = 20
 
   table.sort(sorted, function(a, b)
@@ -71,18 +78,23 @@ function Party:Sorted()
 end
 
 function Party:ForEach(callback)
-    if not self.players then
-        return
-    end
+  if not self.players then
+      return
+  end
 
-    for _, id in ipairs(self:Sorted()) do
-        local player = self.players[id]
-        if player then
-            if callback(player) then
-                break
-            end
+  local currentTime = GetTime()
+
+  for _, id in ipairs(self:Sorted()) do
+    local player = self.players[id]
+    local blacklisted = self.blacklist[id]
+    if blacklisted and blacklisted > currentTime then
+      -- Still blacklisted, skip
+    elseif player then
+        if callback(player) then
+            break
         end
     end
+  end
 end
 
 -- id should be party1, party2, etc.

@@ -44,6 +44,13 @@ function PartyMonitor:OnDisable()
     end
 end
 
+function PartyMonitor:BlackList(id, duration)
+    if not self.party then
+        return
+    end
+    self.party:BlackList(id, duration)
+end
+
 ---@param callback function(player: PartyPlayer): boolean|nil Return true to stop iteration
 function PartyMonitor:ForEach(callback)
     if not self.party then
