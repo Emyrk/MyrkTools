@@ -160,7 +160,9 @@ function DecisionEngine:ExecuteCast(decision)
     }
     
     -- Assume the target is already correctly selected
-    self.castMonitor:StartMonitor(decision.spellID, decision.target_id, decision.reason, callbacks)
+    if decision.spellID ~= "Shoot" then
+        self.castMonitor:StartMonitor(decision.spellID, decision.target_id, decision.reason, callbacks)
+    end
     CastSpellByName(decision.spellID)
 
     return true
@@ -176,6 +178,7 @@ function DecisionEngine:ExecuteHeal(decision)
         onSuccess = function(spell, target, reason)
             -- DEFAULT_CHAT_FRAME:AddMessage(string.format("|cff00ff00[Auto]|r Cast successful: %s -> %s (%s)", 
             --     spell, target, reason))
+            self.partyMonitor:UpdatePartyMembers()
         end,
         onFailed = function(spell, target, reason, error)
             self.partyMonitor:BlackList(target, 5)

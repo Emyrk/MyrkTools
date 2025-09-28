@@ -180,18 +180,17 @@ function CastMonitor:OnEvent(event, arg1, arg2, arg3, arg4, arg5)
         if arg1 == ERR_SPELL_OUT_OF_RANGE then
             DEFAULT_CHAT_FRAME:AddMessage(string.format("|cffff0000[CastMonitor]|r Out of range: %s", 
                 instance.currentTarget or "unknown"))
+            self:StopMonitor(Reasons.OUT_OF_RANGE)
             if instance.callbacks and instance.callbacks.onFailed then
                 instance.callbacks.onFailed(instance.currentSpell, instance.currentTarget, instance.currentReason, "OUT_OF_RANGE")
             end
-            self:StopMonitor(Reasons.OUT_OF_RANGE)
-            
         elseif arg1 == SPELL_FAILED_LINE_OF_SIGHT then
             DEFAULT_CHAT_FRAME:AddMessage(string.format("|cffff0000[CastMonitor]|r Line of sight: %s", 
                 instance.currentTarget or "unknown"))
+            self:StopMonitor(Reasons.LINE_OF_SIGHT)
             if instance.callbacks and instance.callbacks.onFailed then
                 instance.callbacks.onFailed(instance.currentSpell, instance.currentTarget, instance.currentReason, "LINE_OF_SIGHT")
             end
-            self:StopMonitor(Reasons.LINE_OF_SIGHT)
         end
     end
 end
