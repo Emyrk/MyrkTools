@@ -207,11 +207,11 @@ function CastMonitor:GetCurrentCast()
     end
     
     return {
-        spell = self.currentSpell,
-        target = self.currentTarget,
-        reason = self.currentReason,
-        startTime = self.startTime,
-        duration = GetTime() - (self.startTime or 0)
+        spell = self.instance.currentSpell,
+        target = self.instance.currentTarget,
+        reason = self.instance.currentReason,
+        startTime = self.instance.startTime,
+        duration = GetTime() - (self.instance.startTime or 0)
     }
 end
 

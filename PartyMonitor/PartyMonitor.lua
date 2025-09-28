@@ -68,6 +68,15 @@ function PartyMonitor:UpdatePartyMembers()
     self.party:Refresh()
 end
 
+function PartyMonitor:DebugPrint()
+  self:UpdatePartyMembers() -- Ensure data is current
+  for _, id in ipairs(self.party.sorted) do
+    local player = self.party.players[id]
+    DEFAULT_CHAT_FRAME:AddMessage(string.format("ID: %s, Name: %s, Role: %s, HP: %d/%d, Class: %s, RecentDmg: %d, IncHeal: %d, TTD: %.1f", 
+      id, player.name or "Unknown", player.role or "None", player.hp or -1, player.hpmax or -1, player.class or "Unknown", player.recentDmg or 0, player.incHeal or 0, player:CalculateTimeToDeath()))
+  end
+end
+
 -- Role management functions
 function PartyMonitor:SetRole(playerName, role)
     local success, error = self.party:SetRole(playerName, role)
