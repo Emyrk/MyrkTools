@@ -10,12 +10,12 @@ function GetPriestSingleHeals()
   return PriestSingleHeals
 end
 
-local initialized = false
+local initializedPriestTable = false
 function InitPriestTable(force)
-  if initialized and not force then
+  if initializedPriestTable and not force then
     return
   end
-  initialized = true
+  initializedPriestTable = true
 
   PriestSpells = {}
   PriestSingleHeals = {}
@@ -125,38 +125,45 @@ function PriestDynamicHeal(pct, ttd, prevent, incDmgTime)
   end
 end
 
-function BestPriestSingleHeal(pid, mana, hp_needed)
-  InitPriestTable()
-  local healingSpell = nil
-  for _, spell in ipairs(PriestSingleHeals) do
-    healingSpell = spell
+---@param table table List of healing spells sorted by averagehealnocrit ascending
+---@param reloadTable function(force:boolean) Function to initialize the table if needed
+---@return function(pid: string, mana: number, hp_needed: number): Action|nil
+function BestSingleHeal(table, reloadTable)
+  return function(pid, mana, hp_needed)
+    reloadTable(false)
+    local healingSpell = nil
+    for _, spell in ipairs(table) do
+      healingSpell = spell
 
-    if not spell.manacost then
-      -- Debug log this error
-      InitPriestTable(true)
-      Logs.Error(string.format("PriestSingleHeals=%d", table.getn(PriestSingleHeals)))
-      Logs.Error("No manacost for spell " .. tostring(spell.spellname) .. " rank " .. tostring(spell.spellrank))
-      healingSpell = nil
-      break
+      if not spell.manacost then
+        -- Debug log this error
+        reloadTable(true)
+        Logs.Error(string.format("SingleHeals=%d", table.getn(table)))
+        Logs.Error("No manacost for spell " .. tostring(spell.spellname) .. " rank " .. tostring(spell.spellrank))
+        healingSpell = nil
+        break
+      end
+      if (spell.manacost or 0) > mana then
+        -- Can't afford this spell, will use a lower rank
+        break
+      end
+
+      if spell.averagehealnocrit >= hp_needed then
+        break
+      end
     end
-    if (spell.manacost or 0) > mana then
-      -- Can't afford this spell, will use a lower rank
-      break
+
+    if healingSpell == nil then
+      return nil -- No heal found
     end
 
-    if spell.averagehealnocrit >= hp_needed then
-      break
-    end
-  end
-
-  if healingSpell == nil then
-    return nil -- No heal found
-  end
-
-  return Action:Heal(
-    SpellIndex[healingSpell.spellname][healingSpell.spellrank],
-    pid,
-    -- "dynamic heal",
-    string.format("dynamic %s %d", healingSpell.spellname, healingSpell.spellrank)
-  )
+    return Action:Heal(
+      SpellIndex[healingSpell.spellname][healingSpell.spellrank],
+      pid,
+      -- "dynamic heal",
+      string.format("dynamic %s %d", healingSpell.spellname, healingSpell.spellrank)
+    )
+  end 
 end
+
+BestPriestSingleHeal = BestSingleHeal(PriestSingleHeals, InitPriestTable)

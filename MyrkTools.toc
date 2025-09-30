@@ -42,6 +42,7 @@ CastMonitor\CastMonitor.lua
 # Auto System
 auto\Spells.lua
 auto\PriestHeal.lua
+auto\ShamanHeal.lua
 auto\Decisions.lua
 auto\DecisionEngine.lua
 auto\DecisionObjects.lua
