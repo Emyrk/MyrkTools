@@ -109,6 +109,7 @@ function CastMonitor:StartMonitor(spell, target, reason, callbacks)
     local msg = string.format("[CastMonitor]Started monitoring %s -> %s (%s)", 
         spell, target, reason)
     Logs.Debug(msg)
+    self:UpdatePfUIIndicator()
     -- DEFAULT_CHAT_FRAME:AddMessage(msg)
 end
 

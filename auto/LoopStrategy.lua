@@ -21,6 +21,8 @@ PriestLoopStrategy = {
     -- TODO: If spell targeting, reset it.
     -- See if we can cast anything
     CastableHeal("Lesser Heal(Rank 1)", "Renew(Rank 1)"),
+    -- If in spirit mode, go full send on healing
+    SpiritFlashHeal,
   },
   ---@type table<string, fun(engine:DecisionEngine, player:AllyPlayer):Action|nil> List of decision nodes to evaluate every loop
   player = {
@@ -38,8 +40,10 @@ PriestLoopStrategy = {
   party = {
     PowerWordShield(0.15, 4),
     FlashHeal(0.75, 3.5),
-    PriestDynamicHeal(0.9, nil, nil, 2.5)
+    PriestDynamicHeal(0.9, nil, nil, 2.5),
     -- TODO: Pets and prayer of healing
+
+    FlashHeal(1.1, nil),
   },
   rest = {
     Wanding:New(),

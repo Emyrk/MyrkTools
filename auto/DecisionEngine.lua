@@ -181,9 +181,12 @@ function DecisionEngine:ExecuteHeal(decision)
             self.partyMonitor:UpdatePartyMembers()
         end,
         onFailed = function(spell, target, reason, error)
+
             self.partyMonitor:BlackList(target, 5)
             -- DEFAULT_CHAT_FRAME:AddMessage(string.format("|cffff0000[Auto]|r Cast failed: %s -> %s (%s) - %s", 
             --     spell, target, reason, error or "Unknown"))
+            Logs.Error(string.format("Cast failed, blacklist: %s -> %s (%s) - %s", 
+                spell, target, reason, error or "Unknown"))
         end,
         onInterrupted = function(spell, target, reason, error)
             -- DEFAULT_CHAT_FRAME:AddMessage(string.format("|cffffff00[Auto]|r Cast interrupted: %s -> %s (%s) - %s", 
@@ -240,6 +243,16 @@ function DecisionEngine:ForEach(ptype, callback)
 
         return false
     end)
+end
+
+function DecisionEngine:PrintBuffs(unitId, buffName)
+    local i = 1
+    while UnitBuff(unitId, i) do
+        local icon, applications, _, id = UnitBuff(unitId, i)
+        print(string.format("Buff %d: %s (id=%s, applications=%d)", i, icon or "nil", id or "nil", applications or 0))
+        i = i + 1
+    end
+    return false
 end
 
 -- Helper function to check if target has a specific buff

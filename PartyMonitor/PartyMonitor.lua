@@ -72,8 +72,8 @@ function PartyMonitor:DebugPrint()
   self:UpdatePartyMembers() -- Ensure data is current
   for _, id in ipairs(self.party.sorted) do
     local player = self.party.players[id]
-    DEFAULT_CHAT_FRAME:AddMessage(string.format("ID: %s, Name: %s, Role: %s, HP: %d/%d, Class: %s, RecentDmg: %d, IncHeal: %d, TTD: %.1f", 
-      id, player.name or "Unknown", player.role or "None", player.hp or -1, player.hpmax or -1, player.class or "Unknown", player.recentDmg or 0, player.incHeal or 0, player:CalculateTimeToDeath()))
+    DEFAULT_CHAT_FRAME:AddMessage(string.format("ID: %s, Name: %s, Healable: %s, Role: %s, HP: %d/%d, Class: %s, RecentDmg: %d, IncHeal: %d, TTD: %.1f", 
+      id, player.name or "Unknown", player.role or "None", tostring(player.healable), player.hp or -1, player.hpmax or -1, player.class or "Unknown", player.recentDmg or 0, player.incHeal or 0, player:CalculateTimeToDeath()))
   end
 end
 
@@ -251,21 +251,4 @@ function PartyMonitor:UpdatePfUIIndicators()
     --         end
     --     end
     -- end
-end
-
--- Get role priority for sorting (lower number = higher priority)
-function PartyMonitor:GetRolePriority(role)
-    local priorities = {
-        ["Tank"] = 1,
-        ["Healer"] = 2,
-        ["Off-Tank"] = 3,
-        ["Off-Healer"] = 4,
-        ["Melee DPS"] = 5,
-        ["Ranged DPS"] = 6,
-        ["Caster DPS"] = 7,
-        ["Support"] = 8,
-        ["None"] = 9
-    }
-    
-    return priorities[role] or 10
 end
