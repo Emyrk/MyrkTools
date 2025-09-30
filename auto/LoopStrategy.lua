@@ -42,8 +42,6 @@ PriestLoopStrategy = {
     FlashHeal(0.75, 3.5),
     PriestDynamicHeal(0.9, nil, nil, 2.5),
     -- TODO: Pets and prayer of healing
-
-    FlashHeal(1.1, nil),
   },
   rest = {
     Wanding:New(),

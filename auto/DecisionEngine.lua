@@ -181,12 +181,14 @@ function DecisionEngine:ExecuteHeal(decision)
             self.partyMonitor:UpdatePartyMembers()
         end,
         onFailed = function(spell, target, reason, error)
+            if error ~= "LeftButton" then
+                self.partyMonitor:BlackList(target, 5)
+                Logs.Error(string.format("Cast failed, blacklist: %s -> %s (%s) - %s", 
+                spell, target, reason, error or "Unknown"))
+            end
 
-            self.partyMonitor:BlackList(target, 5)
             -- DEFAULT_CHAT_FRAME:AddMessage(string.format("|cffff0000[Auto]|r Cast failed: %s -> %s (%s) - %s", 
             --     spell, target, reason, error or "Unknown"))
-            Logs.Error(string.format("Cast failed, blacklist: %s -> %s (%s) - %s", 
-                spell, target, reason, error or "Unknown"))
         end,
         onInterrupted = function(spell, target, reason, error)
             -- DEFAULT_CHAT_FRAME:AddMessage(string.format("|cffffff00[Auto]|r Cast interrupted: %s -> %s (%s) - %s", 
