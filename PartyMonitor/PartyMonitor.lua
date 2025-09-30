@@ -179,6 +179,10 @@ function PartyMonitor:PartyMonitorHookPfUI()
                 if unit.tankIcon then 
                     unit.tankIcon:Hide() 
                 end
+
+                if unit.blackListIcon then
+                    unit.blackListIcon:Hide()
+                end
                 return
             end
             
@@ -205,6 +209,29 @@ function PartyMonitor:PartyMonitorHookPfUI()
                 unit.tankIcon:Hide()
             end
             
+            -- Blacklist icon
+            if not unit.blackListIcon then
+                unit.blackListIcon = CreateFrame("Frame", nil, unit.hp)
+                unit.blackListIcon.tex = unit.blackListIcon:CreateTexture(nil, "OVERLAY")
+                
+                -- Try custom texture first, fallback to default if it fails
+                local customTexture = ""
+                local fallbackTexture = "Interface\\Icons\\Ability_rogue_feigndeath"
+                
+                unit.blackListIcon.tex:SetTexture(customTexture)
+                
+                -- Check if custom texture loaded successfully
+                if not unit.blackListIcon.tex:GetTexture() then
+                    -- Custom texture failed, use fallback
+                    unit.blackListIcon.tex:SetTexture(fallbackTexture)
+                end
+                
+                unit.blackListIcon.tex:SetAllPoints()
+                unit.blackListIcon:SetFrameStrata("HIGH")
+                unit.blackListIcon:SetFrameLevel((unit.hp:GetFrameLevel() or 1) + 15)
+                unit.blackListIcon:Hide()
+            end
+
             -- Check if this player has Tank role
             local playerName = UnitName(unitstr)
             local hasRole = false
@@ -228,6 +255,22 @@ function PartyMonitor:PartyMonitorHookPfUI()
                 unit.tankIcon:Show()
             else
                 unit.tankIcon:Hide()
+            end
+
+            if PartyMonitor.party:IsBlacklisted(unitstr) then
+                -- Show blacklist icon in bottom-right corner of health bar
+                local iconSize = math.min(13)
+                
+                unit.blackListIcon:SetWidth(iconSize)
+                unit.blackListIcon:SetHeight(iconSize)
+                unit.blackListIcon:ClearAllPoints()
+                unit.blackListIcon:SetPoint("BOTTOMRIGHT", unit.hp, "BOTTOMRIGHT", 0, 0)
+
+                -- Set icon color (slightly blue-tinted for visibility)
+                unit.blackListIcon.tex:SetVertexColor(0.8, 0.9, 1.0, 0.9)
+                unit.blackListIcon:Show()
+            else
+                unit.blackListIcon:Hide()
             end
         end
     end)

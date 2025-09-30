@@ -158,6 +158,14 @@ function Party:GetRole(playerName)
   return self.roleAssignments[playerName] or self.ROLES.NONE
 end
 
+function Party:IsBlacklisted(id)
+  local expiry = self.blacklist[id]
+  if expiry and expiry > GetTime() then
+    return true
+  end
+  return false
+end
+
 function Party:ClearRole(playerName)
   self:SetRole(playerName, self.ROLES.NONE)
 end
