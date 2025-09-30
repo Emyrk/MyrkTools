@@ -59,6 +59,21 @@ function InitPriestTable(force)
   -- end
 end
 
+function PrintPriestTable()
+  InitPriestTable()
+  for spellName, ranks in pairs(PriestSpells) do
+    Logs.Debug("Spell: " .. spellName)
+    for _, rank in ipairs(ranks) do
+      Logs.Debug(string.format("  Rank %d: id=%d mana=%d heal=%d", rank.spellrank, rank.spellnumber, rank.manacost, math.floor(rank.averagehealnocrit)))
+    end
+  end
+
+  Logs.Debug("Single heals:")
+  for _, spell in ipairs(PriestSingleHeals) do
+    Logs.Debug(spell.spellname .. " rank " .. tostring(spell.spellrank) .. " heal " .. tostring(math.floor(spell.averagehealnocrit)) .. "with mana " .. tostring(spell.manacost))
+  end
+end
+
 function LoadSpellRanks(spellName)
   local ranks = {}
   local i = 1
