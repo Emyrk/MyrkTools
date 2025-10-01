@@ -63,9 +63,14 @@ function Party:Sorted()
     local timeA = self.players[a]:CalculateTimeToDeath()
     local timeB = self.players[b]:CalculateTimeToDeath()
 
-    if timeA == timeB or (timeA > 20 and timeB > 20) then
-        -- If equal ttd, lowest health first
-        return (self.players[a].hp / self.players[a].hpmax) < (self.players[b].hp / self.players[b].hpmax)
+    local apct = self.players[a]:GetHealthPercent()
+    local bpct = self.players[b]:GetHealthPercent()
+
+    if (timeA == timeB) or 
+        (timeA > 20 and timeB > 20) or
+        (apct >= 1 or bpct >= 1) then
+        -- If equal ttd or someone has 100%, then lowest health first
+        return apct < bpct
     end
     return timeA < timeB -- Shortest time to death first
   end)
