@@ -13,7 +13,7 @@ end
 local initializedShamanTable = false
 function InitShamanTable(force)
   if initializedShamanTable and not force then
-    return
+    return ShamanHeals, ShamanSingleHeals
   end
   initializedShamanTable = true
 
@@ -48,10 +48,11 @@ function InitShamanTable(force)
   table.sort(ShamanSingleHeals, function(a, b) 
     return a.averagehealnocrit < b.averagehealnocrit
   end)
-
+  
   -- for _, spell in ipairs(ShamanSingleHeals) do
   --   Logs.Debug(spell.spellname .. " rank " .. tostring(spell.spellrank) .. " heal " .. tostring(math.floor(spell.averagehealnocrit)))
   -- end
+  return ShamanHeals, ShamanSingleHeals
 end
 
 function PrintShamanTable()
@@ -101,4 +102,4 @@ function ShamanDynamicHeal(pct, ttd, prevent, incDmgTime)
 end
 
 
-BestShamanSingleHeal = BestSingleHeal(ShamanSingleHeals, InitShamanTable)
+BestShamanSingleHeal = BestSingleHeal(InitShamanTable)

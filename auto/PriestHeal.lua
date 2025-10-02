@@ -13,7 +13,7 @@ end
 local initializedPriestTable = false
 function InitPriestTable(force)
   if initializedPriestTable and not force then
-    return
+    return PriestSpells, PriestSingleHeals
   end
   initializedPriestTable = true
 
@@ -57,6 +57,7 @@ function InitPriestTable(force)
   -- for _, spell in ipairs(PriestSingleHeals) do
   --   Logs.Debug(spell.spellname .. " rank " .. tostring(spell.spellrank) .. " heal " .. tostring(math.floor(spell.averagehealnocrit)))
   -- end
+  return PriestSpells, PriestSingleHeals
 end
 
 function PrintPriestTable()
@@ -125,20 +126,19 @@ function PriestDynamicHeal(pct, ttd, prevent, incDmgTime)
   end
 end
 
----@param table table List of healing spells sorted by averagehealnocrit ascending
----@param reloadTable function(force:boolean) Function to initialize the table if needed
+---@param reloadTable function(force:boolean): table, table Function to initialize the table if needed
 ---@return function(pid: string, mana: number, hp_needed: number): Action|nil
-function BestSingleHeal(table, reloadTable)
+function BestSingleHeal(reloadTable)
   return function(pid, mana, hp_needed)
-    reloadTable(false)
+    local _, singleHeals = reloadTable(false)
     local healingSpell = nil
-    for _, spell in ipairs(table) do
+    for _, spell in ipairs(singleHeals) do
       healingSpell = spell
 
       if not spell.manacost then
         -- Debug log this error
-        reloadTable(true)
-        Logs.Error(string.format("SingleHeals=%d", table.getn(table)))
+        _, singleHeals = reloadTable(true)
+        Logs.Error(string.format("SingleHeals=%d", table.getn(singleHeals)))
         Logs.Error("No manacost for spell " .. tostring(spell.spellname) .. " rank " .. tostring(spell.spellrank))
         healingSpell = nil
         break
@@ -166,4 +166,4 @@ function BestSingleHeal(table, reloadTable)
   end 
 end
 
-BestPriestSingleHeal = BestSingleHeal(PriestSingleHeals, InitPriestTable)
+BestPriestSingleHeal = BestSingleHeal(InitPriestTable)

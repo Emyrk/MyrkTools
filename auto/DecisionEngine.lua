@@ -4,7 +4,6 @@
 ---@class DecisionEngine
 ---@field partyMonitor PartyMonitor
 ---@field castMonitor CastMonitor
----@field strategy table List of decision nodes to evaluate
 ---@field loopStrategy table List of decision nodes to evaluate every loop
 DecisionEngine = {}
 DecisionEngine.__index = DecisionEngine
@@ -14,12 +13,9 @@ function DecisionEngine:New()
     local strategy = {}
     local loopStrategy = NoopLoopStrategy
     if englishClass == "ROGUE" then
-        strategy = RogueStrategy
     elseif englishClass == "PRIEST" then
-        strategy = PriestStrategy
         loopStrategy = PriestLoopStrategy
     elseif englishClass == "SHAMAN" then
-        strategy = RogueStrategy
         loopStrategy = ShamanLoopStrategy
     else
         DEFAULT_CHAT_FRAME:AddMessage("|cffff0000[MyrkAuto]|r Unsupported class: " .. tostring(englishClass))
@@ -29,7 +25,6 @@ function DecisionEngine:New()
     local instance = {
         partyMonitor = nil, -- Set by module
         castMonitor = nil, 
-        strategy = strategy, -- Current strategy (list of decision nodes)
         loopStrategy = loopStrategy,
         config = {
         }
@@ -61,13 +56,6 @@ end
 function DecisionEngine:Ready()
     self:LoadModules()
     return self.partyMonitor and self.castMonitor
-end
-
--- Core decision tree executor
----@return Action|nil
-function DecisionEngine:Execute()
-    self.ctx = {}
-    return self:executeSteps(self.strategy)
 end
 
 function DecisionEngine:ExecuteLoopedStrategy()

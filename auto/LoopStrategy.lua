@@ -73,7 +73,7 @@ ShamanLoopStrategy = {
     ShamanDynamicHeal(0.25, nil, nil, 2.5)
   },
   party = {
-    ShamanDynamicHeal(0.9, nil, nil, 2.5),
+    ShamanDynamicHeal(1.9, nil, nil, 0),
   },
   rest = {
   },
