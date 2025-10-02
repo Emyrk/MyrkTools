@@ -90,9 +90,14 @@ function CastableHeal(channel, instant)
         if not SpellIsTargeting() then
             engine.ctx.instantHeal = true
             engine.ctx.channelHeal = false
-            CastSpellByName(instant)
-
-            if not SpellIsTargeting() then
+            if instant ~= nil then
+                CastSpellByName(instant)
+                if not SpellIsTargeting() then
+                    engine.ctx.instantHeal = false
+                    SpellStopTargeting()
+                    return Action:Error("SpellIsTargeting failed")
+                end
+            else
                 engine.ctx.instantHeal = false
                 SpellStopTargeting()
                 return Action:Error("SpellIsTargeting failed")

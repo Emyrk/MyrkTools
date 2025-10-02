@@ -18,6 +18,9 @@ function DecisionEngine:New()
     elseif englishClass == "PRIEST" then
         strategy = PriestStrategy
         loopStrategy = PriestLoopStrategy
+    elseif englishClass == "SHAMAN" then
+        strategy = RogueStrategy
+        loopStrategy = ShamanLoopStrategy
     else
         DEFAULT_CHAT_FRAME:AddMessage("|cffff0000[MyrkAuto]|r Unsupported class: " .. tostring(englishClass))
         return nil

@@ -47,3 +47,34 @@ PriestLoopStrategy = {
     Wanding:New(),
   },
 }
+
+ShamanLoopStrategy = {
+  always = {
+    Debounce:New(0.5),
+    IsDead,
+    PlayerIsDrinking,
+    Mounted(),
+    -- Quick exit if we're already doing something
+    AlreadyCasting,
+    -- Calc incoming dmg, heals, etc
+    RefreshPartyState,
+    -- TODO: If spell targeting, reset it.
+    -- See if we can cast anything
+    CastableHeal("Healing Wave(Rank 1)", nil),
+  },
+  ---@type table<string, fun(engine:DecisionEngine, player:AllyPlayer):Action|nil> List of decision nodes to evaluate every loop
+  player = {
+
+  },
+  tank = {
+    -- Always heal a tank that is ttd 5s and <50%
+    ShamanDynamicHeal(0.5, 5, nil, 2.5),
+    -- Always heal a tank at <25%
+    ShamanDynamicHeal(0.25, nil, nil, 2.5)
+  },
+  party = {
+    ShamanDynamicHeal(0.9, nil, nil, 2.5),
+  },
+  rest = {
+  },
+}
