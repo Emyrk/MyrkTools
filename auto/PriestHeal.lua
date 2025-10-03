@@ -53,6 +53,7 @@ function InitPriestTable(force)
   table.sort(PriestSingleHeals, function(a, b) 
     return a.averagehealnocrit < b.averagehealnocrit
   end)
+  Logs.Debug(string.format("%d Single heals", table.getn(PriestSingleHeals)))
 
   -- for _, spell in ipairs(PriestSingleHeals) do
   --   Logs.Debug(spell.spellname .. " rank " .. tostring(spell.spellrank) .. " heal " .. tostring(math.floor(spell.averagehealnocrit)))
@@ -69,7 +70,7 @@ function PrintPriestTable()
     end
   end
 
-  Logs.Debug("Single heals:")
+  Logs.Debug(string.format("%d Single heals", table.getn(PriestSingleHeals)))
   for _, spell in ipairs(PriestSingleHeals) do
     Logs.Debug(spell.spellname .. " rank " .. tostring(spell.spellrank) .. " heal " .. tostring(math.floor(spell.averagehealnocrit)) .. "with mana " .. tostring(spell.manacost))
   end
