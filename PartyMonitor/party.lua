@@ -46,11 +46,11 @@ function Party:Refresh()
 
   -- Reset sorted
   this.sorted = nil
-  self:Sorted() -- Force sort to update
+  self:Sorted(true) -- Force sort to update
 end
 
-function Party:Sorted()
-  if self.sorted then
+function Party:Sorted(force)
+  if self.sorted and not force then
     return self.sorted
   end
 

@@ -2,12 +2,35 @@
 -- spellrank number
 -- spellnumber number
 -- manacost number
+
+HealTable = MyrkAddon:NewModule("MyrkHealTable", "AceEvent-3.0")
+
+function HealTable:OnEnable()
+
+end
+
+
 -- TODO: Make these local
-local PriestSpells = {}
-local PriestSingleHeals = {}
+PriestSpells = {}
+PriestSingleHeals = {}
 
 function GetPriestSingleHeals()
   return PriestSingleHeals
+end
+
+function PrintPriestSingleHeals()
+  InitPriestTable(false)
+  Logs.Debug(string.format("%d Single heals", table.getn(PriestSingleHeals)))
+  for _, spell in ipairs(PriestSingleHeals) do
+    if spell == nil then
+      Logs.Debug("nil spell in PriestSingleHeals")
+    elseif spell.spellname == nil then
+      Logs.Debug("nil spellname in PriestSingleHeals")
+    else
+      Logs.Debug(spell.spellname .. " rank " .. tostring(spell.spellrank) .. " heal " .. tostring(spell.averagehealnocrit) .. " with mana "
+      .. tostring(spell.manacost)) 
+    end
+  end
 end
 
 local initializedPriestTable = false
@@ -53,7 +76,7 @@ function InitPriestTable(force)
   table.sort(PriestSingleHeals, function(a, b) 
     return a.averagehealnocrit < b.averagehealnocrit
   end)
-  Logs.Debug(string.format("%d Single heals", table.getn(PriestSingleHeals)))
+  Logs.Debug(string.format("forced=%s, %d Single heals", tostring(force), table.getn(PriestSingleHeals)))
 
   -- for _, spell in ipairs(PriestSingleHeals) do
   --   Logs.Debug(spell.spellname .. " rank " .. tostring(spell.spellrank) .. " heal " .. tostring(math.floor(spell.averagehealnocrit)))
@@ -62,7 +85,7 @@ function InitPriestTable(force)
 end
 
 function PrintPriestTable()
-  InitPriestTable()
+  InitPriestTable(false)
   for spellName, ranks in pairs(PriestSpells) do
     Logs.Debug("Spell: " .. spellName)
     for _, rank in ipairs(ranks) do
@@ -105,7 +128,7 @@ end
 ---@param incDmgTime number|nil Time in seconds to consider incoming damage when calculating heal amount
 function PriestDynamicHeal(pct, ttd, prevent, incDmgTime)
   return function(engine, player)
-    InitPriestTable()
+    InitPriestTable(false)
 
     if not engine.ctx.channelHeal then
       return nil -- Cannot channel, so nothing to do
