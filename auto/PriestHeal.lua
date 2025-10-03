@@ -106,7 +106,11 @@ function PriestDynamicHeal(pct, ttd, prevent, incDmgTime)
     if not engine.ctx.channelHeal then
       return nil -- Cannot channel, so nothing to do
     end
-  
+
+    if not player.castable then
+      return nil -- Cannot cast on this player
+    end
+
     local playerPct = player:GetHealthPercent()
     if playerPct > pct then
       return nil -- Player ok, no heal needed

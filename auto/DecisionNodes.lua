@@ -100,7 +100,7 @@ function CastableHeal(channel, instant)
             else
                 engine.ctx.instantHeal = false
                 SpellStopTargeting()
-                return Action:Error("SpellIsTargeting failed")
+                return Action:Error("SpellIsTargeting failed, are you moving?")
             end
         end
 

@@ -78,6 +78,10 @@ function ShamanDynamicHeal(pct, ttd, prevent, incDmgTime)
   return function(engine, player)
     InitShamanTable()
 
+    if not player.castable then
+      return nil -- Cannot cast on this player
+    end
+
     if not engine.ctx.channelHeal then
       return nil -- Cannot channel, so nothing to do
     end
@@ -97,7 +101,8 @@ function ShamanDynamicHeal(pct, ttd, prevent, incDmgTime)
     end
 
     local hp_needed = player:HPNeeded(incDmgTime or 0)
-    return BestShamanSingleHeal(player.id, UnitMana("player"), hp_needed)
+    local action = BestShamanSingleHeal(player.id, UnitMana("player"), hp_needed)
+    return action
   end
 end
 
