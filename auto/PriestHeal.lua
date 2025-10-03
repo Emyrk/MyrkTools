@@ -81,6 +81,9 @@ function LoadSpellRanks(spellName)
 
   while true do
     local info = TheoryCraft_GetSpellDataByName(spellName, i)
+    if info == nil or info.manacost == nil then
+      info = TheoryCraft_GetSpellDataByName(spellName, i)
+    end
     if info == nil then
       break
     end
