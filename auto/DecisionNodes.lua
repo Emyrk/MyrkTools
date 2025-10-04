@@ -235,29 +235,23 @@ function NotInstance(actionFunc)
     end
 end
 
-function NotCombat(actionFunc)
+function InCombat(actionFunc)
     return function(engine)
-        if InCombat() then
-            return nil -- Skip if in combat
+        if not InCombat() then
+            return nil -- Skip if not in combat
         end
         
         return actionFunc(engine)
     end
 end
 
--- Smite action for when nothing else to do
-function Smite()
-    return function(engine)
-        -- Only smite if we have a hostile target
-        if UnitExists("target") and UnitCanAttack("player", "target") then
-            return {
-                action = "cast",
-                spell = "Smite",
-                target = "target",
-                reason = "idle_smite"
-            }
+function NotCombat(actionFunc)
+    return function(engine, player)
+        if InCombat() then
+            return nil -- Skip if in combat
         end
-        return nil
+        
+        return actionFunc(engine, player)
     end
 end
 

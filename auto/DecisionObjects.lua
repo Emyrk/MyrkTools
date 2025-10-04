@@ -152,6 +152,25 @@ function Wanding:evaluate(engine)
   return nil
 end
 
+function Smite()
+  return function(engine)
+    if not HostileTarget() then
+      return nil
+    end
+
+    local m = UnitMana("player") / UnitManaMax("player");
+    if m < 0.8 then
+      return nil
+    end
+
+    local _, duration = GetSpellCooldown(HealTable:MaxRank("Mind Blast"), BOOKTYPE_SPELL)
+    if duration == 0 then
+      return Action:Cast("Mind Blast", "target", "mind blast")
+    end
+
+    return Action:Cast("Smite", "target", "smite")
+  end
+end
 
 function SmartBuff(manaThreshold)
   return function(engine)

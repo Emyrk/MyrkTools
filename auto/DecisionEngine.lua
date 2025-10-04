@@ -79,17 +79,30 @@ function DecisionEngine:ExecuteLoopedStrategy()
     for _, ptype in ipairs(order) do
         local steps = self.loopStrategy[ptype] or {}
         local loopResult = nil
-        self:ForEach(ptype, function(player)
-            local result = self:executeSteps(steps, player)
-            if result then
-                loopResult = result
-                return true -- Stop iteration
+        for _, step in ipairs(steps) do
+            self:ForEach(ptype, function(player)
+                local result = self:evaluateStep(step, player)
+                if result then
+                    loopResult = result
+                    return true -- Stop iteration
+                end
+                return false
+            end)
+            if loopResult then
+                return loopResult
             end
-            return false
-        end)
-        if loopResult then
-            return loopResult
         end
+        -- self:ForEach(ptype, function(player)
+        --     local result = self:executeSteps(steps, player)
+        --     if result then
+        --         loopResult = result
+        --         return true -- Stop iteration
+        --     end
+        --     return false
+        -- end)
+        -- if loopResult then
+        --     return loopResult
+        -- end
     end
 
     local restSteps = self.loopStrategy.rest or {}

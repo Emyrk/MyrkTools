@@ -14,6 +14,15 @@ function HealTable:OnEnable()
   self.SpellIndex = {}
 end
 
+function HealTable:MaxRank(spellName)
+  self:Load(false)
+  local ranks = self.SpellIndex[spellName]
+  if ranks == nil or table.getn(ranks) == 0 then
+    return nil
+  end
+  return ranks[table.getn(ranks)]
+end
+
 function HealTable:Load(force)
   if self.loaded and not force then
     return 
@@ -32,6 +41,9 @@ function HealTable:Load(force)
       "Heal",
       "Prayer of Healing",
       "Renew",
+      "Power Word: Shield",
+      "Smite",
+      "Mind Blast",
     }
 
     single = {
