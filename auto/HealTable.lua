@@ -1,0 +1,108 @@
+HealTable = MyrkAddon:NewModule("MyrkHealTable", "AceEvent-3.0")
+HealTable.loaded = false
+
+function HealTable:OnEnable()
+  DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[MyrkHealTable]|r Loaded")
+
+  -- spellname string
+  -- spellrank number
+  -- spellnumber number
+  -- manacost number
+  -- TODO: Make these local
+  self.Spells = {}
+  self.SingleHeals = {}
+  self.SpellIndex = {}
+end
+
+function HealTable:Load(force)
+  if self.loaded and not force then
+    return 
+  end
+
+  self:Unload() -- Clear any existing data
+
+  local spells = {}
+  local single = {}
+
+  local localizedClass, englishClass = UnitClass("player")
+  if englishClass == "PRIEST" then
+    spells = {
+      "Lesser Heal",
+      "Flash Heal",
+      "Heal",
+      "Prayer of Healing",
+      "Renew",
+    }
+
+    single = {
+      "Lesser Heal",
+      "Heal",
+    }
+  elseif englishClass == "SHAMAN" then
+    spells = {
+      "Healing Wave",
+    }
+
+    single = {
+      "Healing Wave",
+    }
+
+  else
+    spells = {}
+    single = {}
+  end
+
+  local all, index, partial = self:ReloadSpells(spells, single)
+  self.Spells = all
+  self.SpellIndex = index
+  self.SingleHeals = partial
+  self.loaded = true
+  Logs.Debug(string.format("Reloaded %d Single heals", table.getn(partial)))
+end
+
+function HealTable:Unload()
+  self.Spells = {}
+  self.SingleHeals = {}
+  self.SpellIndex = {}
+  self.loaded = false
+end
+
+function HealTable:ReloadSpells(all, single)
+  local spells = {}
+  local index = {}
+  for _, spellName in ipairs(all) do
+    spells[spellName] = LoadSpellRanks(spellName)
+    index[spellName] = GetSpellIDs(spellName)
+  end
+
+  local singles = {}
+  for _, spellName in ipairs(single) do
+    for _, spellRank in ipairs(spells[spellName]) do
+      table.insert(singles, spellRank)
+    end
+  end
+
+  table.sort(singles, function(a, b) 
+    return a.averagehealnocrit < b.averagehealnocrit
+  end)
+  return spells, index, singles
+end
+
+function HealTable:Print()
+  self:Load(false)
+  for spellName, ranks in pairs(self.Spells) do
+    Logs.Debug("Spell: " .. spellName)
+    for _, rank in ipairs(ranks) do
+      if rank.manacost == nil then
+        Logs.Error("No manacost for spell " .. tostring(spellName) .. " rank " .. tostring(rank.spellrank))
+      else
+        Logs.Debug(string.format("  Rank %d: id=%d mana=%d heal=%d", rank.spellrank, rank.spellnumber, rank.manacost, math.floor(rank.averagehealnocrit)))
+      end
+    end
+  end
+
+  Logs.Debug("Single heals:")
+  for _, spell in ipairs(self.SingleHeals) do
+    Logs.Debug(spell.spellname .. " rank " .. tostring(spell.spellrank) .. " heal " .. tostring(math.floor(spell.averagehealnocrit)) .. "with mana " .. tostring(spell.manacost))
+  end
+end

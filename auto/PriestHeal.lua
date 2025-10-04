@@ -3,119 +3,26 @@
 -- spellnumber number
 -- manacost number
 
-HealTable = MyrkAddon:NewModule("MyrkHealTable", "AceEvent-3.0")
-
-function HealTable:OnEnable()
-
-end
-
-
--- TODO: Make these local
-PriestSpells = {}
-PriestSingleHeals = {}
-
-function GetPriestSingleHeals()
-  return PriestSingleHeals
-end
-
-function PrintPriestSingleHeals()
-  InitPriestTable(false)
-  Logs.Debug(string.format("%d Single heals", table.getn(PriestSingleHeals)))
-  for _, spell in ipairs(PriestSingleHeals) do
-    if spell == nil then
-      Logs.Debug("nil spell in PriestSingleHeals")
-    elseif spell.spellname == nil then
-      Logs.Debug("nil spellname in PriestSingleHeals")
-    else
-      Logs.Debug(spell.spellname .. " rank " .. tostring(spell.spellrank) .. " heal " .. tostring(spell.averagehealnocrit) .. " with mana "
-      .. tostring(spell.manacost)) 
-    end
-  end
-end
-
-local initializedPriestTable = false
-function InitPriestTable(force)
-  if initializedPriestTable and not force then
-    return PriestSpells, PriestSingleHeals
-  end
-  initializedPriestTable = true
-
-  PriestSpells = {}
-  PriestSingleHeals = {}
-  
-  local localizedClass, englishClass = UnitClass("player")
-  if englishClass ~= "PRIEST" then
-    Logs.Error("InitPriestTable called for non-priest class " .. tostring(englishClass))
-    return
-  end
-
-  local spells = {
-    "Lesser Heal",
-    "Flash Heal",
-    "Heal",
-    "Prayer of Healing",
-    "Renew",
-  }
-
-  for _, spellName in ipairs(spells) do
-    PriestSpells[spellName] = LoadSpellRanks(spellName)
-  end
-
-  local singleHeals = {
-    "Lesser Heal",
-    "Heal",
-  }
-
-  -- For each spell in the single heals, load all the ranks into PriestSingleHeals
-  for _, spellName in ipairs(singleHeals) do
-    for _, spellRank in ipairs(PriestSpells[spellName]) do
-      table.insert(PriestSingleHeals, spellRank)
-    end
-  end
-
-  table.sort(PriestSingleHeals, function(a, b) 
-    return a.averagehealnocrit < b.averagehealnocrit
-  end)
-  Logs.Debug(string.format("forced=%s, %d Single heals", tostring(force), table.getn(PriestSingleHeals)))
-
-  -- for _, spell in ipairs(PriestSingleHeals) do
-  --   Logs.Debug(spell.spellname .. " rank " .. tostring(spell.spellrank) .. " heal " .. tostring(math.floor(spell.averagehealnocrit)))
-  -- end
-  return PriestSpells, PriestSingleHeals
-end
-
-function PrintPriestTable()
-  InitPriestTable(false)
-  for spellName, ranks in pairs(PriestSpells) do
-    Logs.Debug("Spell: " .. spellName)
-    for _, rank in ipairs(ranks) do
-      Logs.Debug(string.format("  Rank %d: id=%d mana=%d heal=%d", rank.spellrank, rank.spellnumber, rank.manacost, math.floor(rank.averagehealnocrit)))
-    end
-  end
-
-  Logs.Debug(string.format("%d Single heals", table.getn(PriestSingleHeals)))
-  for _, spell in ipairs(PriestSingleHeals) do
-    Logs.Debug(spell.spellname .. " rank " .. tostring(spell.spellrank) .. " heal " .. tostring(math.floor(spell.averagehealnocrit)) .. "with mana " .. tostring(spell.manacost))
-  end
-end
-
 function LoadSpellRanks(spellName)
   local ranks = {}
   local i = 1
 
   while true do
-    local info = TheoryCraft_GetSpellDataByName(spellName, i)
-    if info == nil or info.manacost == nil then
-      info = TheoryCraft_GetSpellDataByName(spellName, i)
-    end
-    if info == nil then
+    local tcinfo = TheoryCraft_GetSpellDataByName(spellName, i)
+    if tcinfo == nil then
       break
     end
 
-    if info.spellname == nil then
+    if tcinfo.spellname == nil then
       break
     end
-    table.insert(ranks, info)
+    table.insert(ranks, {
+      spellname = tcinfo.spellname,
+      spellrank = tcinfo.spellrank,
+      manacost = tcinfo.manacost,
+      spellnumber = tcinfo.spellnumber,
+      averagehealnocrit = tcinfo.averagehealnocrit
+    })
     i = i + 1
   end
 
@@ -128,8 +35,6 @@ end
 ---@param incDmgTime number|nil Time in seconds to consider incoming damage when calculating heal amount
 function PriestDynamicHeal(pct, ttd, prevent, incDmgTime)
   return function(engine, player)
-    InitPriestTable(false)
-
     if not engine.ctx.channelHeal then
       return nil -- Cannot channel, so nothing to do
     end
@@ -157,19 +62,19 @@ function PriestDynamicHeal(pct, ttd, prevent, incDmgTime)
   end
 end
 
----@param reloadTable function(force:boolean): table, table Function to initialize the table if needed
 ---@return function(pid: string, mana: number, hp_needed: number): Action|nil
-function BestSingleHeal(reloadTable)
+function BestSingleHeal()
   return function(pid, mana, hp_needed)
-    local _, singleHeals = reloadTable(false)
+    HealTable:Load(false)
+
     local healingSpell = nil
-    for _, spell in ipairs(singleHeals) do
+    for _, spell in ipairs(HealTable.SingleHeals) do
       healingSpell = spell
 
       if not spell.manacost then
         -- Debug log this error
-        _, singleHeals = reloadTable(true)
-        Logs.Error(string.format("SingleHeals=%d", table.getn(singleHeals)))
+        HealTable:Load(true)
+        Logs.Error(string.format("SingleHeals=%d", table.getn(HealTable.SingleHeals)))
         Logs.Error("No manacost for spell " .. tostring(spell.spellname) .. " rank " .. tostring(spell.spellrank))
         healingSpell = nil
         break
@@ -189,7 +94,7 @@ function BestSingleHeal(reloadTable)
     end
 
     return Action:Heal(
-      SpellIndex[healingSpell.spellname][healingSpell.spellrank],
+      HealTable.SpellIndex[healingSpell.spellname][healingSpell.spellrank],
       pid,
       -- "dynamic heal",
       string.format("dynamic %s %d", healingSpell.spellname, healingSpell.spellrank)
@@ -197,4 +102,4 @@ function BestSingleHeal(reloadTable)
   end 
 end
 
-BestPriestSingleHeal = BestSingleHeal(InitPriestTable)
+BestPriestSingleHeal = BestSingleHeal()

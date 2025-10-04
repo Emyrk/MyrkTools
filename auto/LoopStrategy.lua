@@ -44,7 +44,7 @@ PriestLoopStrategy = {
     -- TODO: Pets and prayer of healing
   },
   rest = {
-    Wanding:New(),
+    -- Wanding:New(),
   },
 }
 
