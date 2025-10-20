@@ -39,6 +39,7 @@ function HealTable:Load(force)
       "Lesser Heal",
       "Flash Heal",
       "Heal",
+      "Greater Heal",
       "Prayer of Healing",
       "Renew",
       "Power Word: Shield",
@@ -47,18 +48,19 @@ function HealTable:Load(force)
     }
 
     single = {
+      "Greater Heal",
       "Lesser Heal",
       "Heal",
     }
   elseif englishClass == "SHAMAN" then
     spells = {
       "Healing Wave",
-      "Lesser Healing Wave",
+      -- "Lesser Healing Wave",
     }
 
     single = {
       "Healing Wave",
-      "Lesser Healing Wave",
+      -- "Lesser Healing Wave",
     }
 
   else

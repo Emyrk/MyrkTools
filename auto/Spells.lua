@@ -87,6 +87,7 @@ SpellIndex = {
 function ReloadSpells()
   SpellIndex["Healing Wave"] = GetSpellIDs("Healing Wave")
   SpellIndex["Lesser Heal"] = GetSpellIDs("Lesser Heal")
+  SpellIndex["Greater Heal"] = GetSpellIDs("Greater Heal")
   SpellIndex["Heal"] = GetSpellIDs("Heal")
   SpellIndex["Flash Heal"] = GetSpellIDs("Flash Heal")
   SpellIndex["Renew"] = GetSpellIDs("Renew")
