@@ -40,16 +40,18 @@ PriestLoopStrategy = {
   party = {
     PowerWordShield(0.15, 4),
     FlashHeal(0.75, 3.5),
-    PriestDynamicHeal(0.85, 12, nil, 2.5),
-    PriestDynamicHeal(0.60, nil, nil, 2.5),
+    PriestDynamicHeal(0.85, 10, nil, 2.5),
+    PriestDynamicHeal(0.75, nil, nil, 2.5),
     NotCombat(
       PriestDynamicHeal(0.90, nil, nil, 2.5)
     ),
     -- TODO: Pets and prayer of healing
   },
   rest = {
-    InCombat(Smite()),
-    Wanding:New(),
+    NotInstance(
+     InCombat(Smite())
+    ),
+    -- Wanding:New(),
   },
 }
 
@@ -78,7 +80,11 @@ ShamanLoopStrategy = {
     ShamanDynamicHeal(0.25, nil, nil, 2.5)
   },
   party = {
-    ShamanDynamicHeal(0.90, nil, nil, 2),
+    ShamanDynamicHeal(0.85, 10, nil, 2),
+    ShamanDynamicHeal(0.60, nil, nil, 2),
+    NotCombat(
+      ShamanDynamicHeal(0.90, nil, nil, 2.5)
+    ),
   },
   rest = {
   },

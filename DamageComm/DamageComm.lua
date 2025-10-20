@@ -30,10 +30,11 @@ function UnitGetIncomingDamage(unitname)
     not ShaguDPS.data["recent"] or 
     not ShaguDPS.data["recent"][1] or 
     not ShaguDPS.data["recent"][1][unitname] or
-    not ShaguDPS.data["recent"][1][unitname]["_sum"] then
+    not ShaguDPS.data["recent"][1][unitname]["_sum"] or
+    not ShaguDPS.data["taken"][1][unitname] or 
+    not ShaguDPS.data["taken"][1][unitname]["_tick"] then
     return 0
   end
-
   if ShaguDPS.data["taken"][1][unitname]["_tick"] then
     local now = GetTime()
     if now - ShaguDPS.data["taken"][1][unitname]["_tick"] > 5 then
