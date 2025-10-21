@@ -55,7 +55,7 @@ function HealTable:Load(force)
   elseif englishClass == "SHAMAN" then
     spells = {
       "Healing Wave",
-      -- "Lesser Healing Wave",
+      "Lesser Healing Wave",
     }
 
     single = {

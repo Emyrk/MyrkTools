@@ -53,9 +53,8 @@ function SpiritFlashHeal(engine)
             return false
         end
 
-        local ranks = SpellIndex["Flash Heal"]
-        local spellid = ranks[table.getn(ranks)] -- Highest rank
-        action = Action:Heal(spellid, player.id, "spam free flash heals")
+        local spellID = HealTable:MaxRank("Flash Heal") 
+        action = Action:Heal(spellID, player.id, "spam free flash heals")
         return true
     end)
 
