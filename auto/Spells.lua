@@ -79,19 +79,3 @@ function GetOptimalRank(spell, hp_needed)
     ]]
     return rank
 end
-
-
-SpellIndex = {
-}
-
-function ReloadSpells()
-  SpellIndex["Healing Wave"] = GetSpellIDs("Healing Wave")
-  SpellIndex["Lesser Heal"] = GetSpellIDs("Lesser Heal")
-  SpellIndex["Greater Heal"] = GetSpellIDs("Greater Heal")
-  SpellIndex["Heal"] = GetSpellIDs("Heal")
-  SpellIndex["Flash Heal"] = GetSpellIDs("Flash Heal")
-  SpellIndex["Renew"] = GetSpellIDs("Renew")
-  SpellIndex["Power Word: Shield"] = GetSpellIDs("Power Word: Shield")
-  SpellIndex["Smite"] = GetSpellIDs("Smite")
-  SpellIndex["Wand"] = GetSpellIDs("Wand")
-end
