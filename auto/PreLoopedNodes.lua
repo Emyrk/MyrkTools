@@ -53,7 +53,7 @@ function SpiritFlashHeal(engine)
             return false
         end
 
-        local spellID = HealTable:MaxRank("Flash Heal") 
+        local spellID = HealTable:MaxRankID("Flash Heal") 
         action = Action:Heal(spellID, player.id, "spam free flash heals")
         return true
     end)

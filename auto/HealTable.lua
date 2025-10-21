@@ -1,3 +1,13 @@
+---@class SpellData
+---@field spellname string
+---@field spellrank number
+---@field spellnumber number
+---@field manacost number
+
+---@class HealTable
+---@field Spells table<string, table<number, SpellData>> spellName -> rank -> spellData
+---@field SingleHeals table<HealSpell>
+---@field SpellIndex table<string, table<number, number>> spellName -> rank -> spellID
 HealTable = MyrkAddon:NewModule("MyrkHealTable", "AceEvent-3.0")
 HealTable.loaded = false
 
@@ -15,7 +25,7 @@ function HealTable:OnEnable()
 end
 
 --- @return number|nil spellID
-function HealTable:Rank(spellName, rank)
+function HealTable:RankID(spellName, rank)
   self:Load(false)
   local ranks = self.SpellIndex[spellName]
   if ranks == nil or ranks[rank] == nil then
@@ -26,7 +36,7 @@ end
 
 
 --- @return number|nil spellID
-function HealTable:MaxRank(spellName)
+function HealTable:MaxRankID(spellName)
   self:Load(false)
   local ranks = self.SpellIndex[spellName]
   if ranks == nil or table.getn(ranks) == 0 then

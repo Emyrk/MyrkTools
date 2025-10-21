@@ -58,9 +58,9 @@ function HealSpell:evaluate(engine, player)
 
   local spellid = nil
   if self.spellRank then
-    spellid = HealTable:Rank(self.spellName, self.spellRank)
+    spellid = HealTable:RankID(self.spellName, self.spellRank)
   else
-    spellid = HealTable:MaxRank(self.spellName)-- Highest rank
+    spellid = HealTable:MaxRankID(self.spellName)-- Highest rank
   end
 
   local _, duration = GetSpellCooldown(spellid, BOOKTYPE_SPELL)
@@ -82,7 +82,7 @@ function HealSpell:evaluate(engine, player)
       else
         local hp_needed = player:HPNeeded(self.incDmgTime or 0)
         if self.smartRank then
-          spellid = ranks[GetOptimalRank(self.spellName, hp_needed)] -- TODO: Calculate actual hp needed
+          spellid = HealTable:RankID(self.spellName, GetOptimalRank(self.spellName, hp_needed))
         end
 
         return Action:Heal(spellid, player.id, "heal")
@@ -162,7 +162,7 @@ function Smite()
       return nil
     end
 
-    local _, duration = GetSpellCooldown(HealTable:MaxRank("Mind Blast"), BOOKTYPE_SPELL)
+    local _, duration = GetSpellCooldown(HealTable:MaxRankID("Mind Blast"), BOOKTYPE_SPELL)
     if duration == 0 then
       return Action:Cast("Mind Blast", "target", "mind blast")
     end
