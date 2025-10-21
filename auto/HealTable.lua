@@ -14,6 +14,15 @@ function HealTable:OnEnable()
   self.SpellIndex = {}
 end
 
+function HealTable:Rank(spellName, rank)
+  self:Load(false)
+  local ranks = self.SpellIndex[spellName]
+  if ranks == nil or ranks[rank] == nil then
+    return nil
+  end
+  return ranks[rank]
+end
+
 function HealTable:MaxRank(spellName)
   self:Load(false)
   local ranks = self.SpellIndex[spellName]

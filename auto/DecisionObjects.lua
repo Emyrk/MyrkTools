@@ -56,12 +56,11 @@ function HealSpell:evaluate(engine, player)
     end
   end
 
-  local ranks = SpellIndex[self.spellName]
   local spellid = nil
   if self.spellRank then
-    spellid = ranks[self.spellRank]
+    spellid = HealTable:Rank(self.spellName, self.spellRank)
   else
-    spellid = ranks[table.getn(ranks)] -- Highest rank
+    spellid = HealTable:MaxRank(self.spellName)-- Highest rank
   end
 
   local _, duration = GetSpellCooldown(spellid, BOOKTYPE_SPELL)
