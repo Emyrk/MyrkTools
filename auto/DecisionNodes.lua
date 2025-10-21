@@ -108,6 +108,7 @@ function CastableHeal(channel, instant)
         ---@param player AllyPlayer
         engine.partyMonitor:ForEach(function(player)
             local healable = UnitIsHealable(player.id)
+            player.castable = false
             player.healable = healable -- set player state
             if not healable then
                 -- End of player state, nothing more to do

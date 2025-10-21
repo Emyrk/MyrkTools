@@ -26,6 +26,10 @@ function ShamanDynamicHeal(pct, ttd, prevent, incDmgTime)
       return nil -- Cannot cast on this player
     end
 
+    if not player.healable then
+      return nil -- Cannot cast on this player
+    end
+
     if not engine.ctx.channelHeal then
       return nil -- Cannot channel, so nothing to do
     end
