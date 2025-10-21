@@ -49,6 +49,5 @@ auto\DecisionEngine.lua
 auto\DecisionObjects.lua
 auto\DecisionNodes.lua
 auto\PreLoopedNodes.lua
-auto\Strategy.lua
 auto\LoopStrategy.lua
 auto\Auto.lua

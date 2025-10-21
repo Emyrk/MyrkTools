@@ -35,10 +35,30 @@ function HealTable:RankID(spellName, rank)
 end
 
 
---- @return number|nil spellID
+--- @return SpellData|nil
 function HealTable:MaxRankID(spellName)
   self:Load(false)
   local ranks = self.SpellIndex[spellName]
+  if ranks == nil or table.getn(ranks) == 0 then
+    return nil
+  end
+  return ranks[table.getn(ranks)]
+end
+
+function HealTable:RankData(spellName, rank)
+  self:Load(false)
+  local ranks = self.Spells[spellName]
+  if ranks == nil or ranks[rank] == nil then
+    return nil
+  end
+  return ranks[rank]
+end
+
+
+--- @return SpellData|nil
+function HealTable:MaxRankData(spellName)
+  self:Load(false)
+  local ranks = self.Spells[spellName]
   if ranks == nil or table.getn(ranks) == 0 then
     return nil
   end

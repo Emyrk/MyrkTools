@@ -43,6 +43,11 @@ end
 ---@param engine any
 ---@return table|nil
 function HealSpell:evaluate(engine, player)
+  if not player then
+    Logs.Error("HealSpell:evaluate called without player")
+    return nil
+  end
+
   if self.instant and not engine.ctx.instantHeal then
     return nil
   elseif not engine.ctx.channelHeal then
@@ -68,54 +73,26 @@ function HealSpell:evaluate(engine, player)
     Logs.Debug("cooldown")
     return nil -- Spell is on cooldown
   end
-
-  local action = nil
-  if player then
-    if not player.castable or not player.healable then
-      return nil
-    end
-
-    local healthPct = player:GetHealthPercent()
-    if healthPct < self.pct then
-      if self.prevent and self.prevent(engine, player) then
-        -- preventing this heal
-      else
-        local hp_needed = player:HPNeeded(self.incDmgTime or 0)
-        if self.smartRank then
-          spellid = HealTable:RankID(self.spellName, GetOptimalRank(self.spellName, hp_needed))
-        end
-
-        return Action:Heal(spellid, player.id, "heal")
-      end
-    end
+  if not player.castable or not player.healable then
     return nil
   end
-  -- TODO: Remove this code after this comment
 
-  engine:ForEach(self.targetType, function(player)
-      ---@cast player AllyPlayer
-    if not player.castable or not player.healable then
-      return false
-    end
-
-    local healthPct = player:GetHealthPercent()
-    if healthPct < self.pct then
-      if self.prevent and self.prevent(engine, player) then
-        -- preventing this heal
-      else
-        local hp_needed = player:HPNeeded(self.incDmgTime or 0)
-        if self.smartRank then
-          spellid = ranks[GetOptimalRank(self.spellName, hp_needed)] -- TODO: Calculate actual hp needed
-        end
-
-        action = Action:Heal(spellid, player.id, "heal")
-        return true
+  local healthPct = player:GetHealthPercent()
+  if healthPct < self.pct then
+    if self.prevent and self.prevent(engine, player) then
+      -- preventing this heal
+    else
+      local hp_needed = player:HPNeeded(self.incDmgTime or 0)
+      if self.smartRank then
+        spellid = HealTable:RankID(self.spellName, GetOptimalRank(self.spellName, hp_needed))
       end
-    end
-  end, "time_to_death") -- Sort by time to death
 
-  return action
+      return Action:Heal(spellid, player.id, "heal")
+    end
+  end
+  return nil
 end
+  
 
 
 Wanding = {}
@@ -162,8 +139,10 @@ function Smite()
       return nil
     end
 
+
     local _, duration = GetSpellCooldown(HealTable:MaxRankID("Mind Blast"), BOOKTYPE_SPELL)
     if duration == 0 then
+
       return Action:Cast("Mind Blast", "target", "mind blast")
     end
 
