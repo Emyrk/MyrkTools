@@ -49,5 +49,6 @@ auto\DecisionEngine.lua
 auto\DecisionObjects.lua
 auto\DecisionNodes.lua
 auto\PreLoopedNodes.lua
+auto\SpellQueue.lua
 auto\LoopStrategy.lua
 auto\Auto.lua

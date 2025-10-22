@@ -106,33 +106,4 @@ function BestSingleHeal()
   end 
 end
 
-ChampionBuff = {}
-ChampionBuff.__index = ChampionBuff
-
-function ChampionBuff:New(cooldown)
-  local instance = {
-    lastTime = 0,
-    cooldown = cooldown or 0.5, -- seconds
-  }
-  setmetatable(instance, ChampionBuff)
-  return instance
-end
-
-function ChampionBuff:evaluate(engine)
-  local now = GetTime()
-  if now - self.lastTime < self.cooldown then
-    return nil
-  end
-  
-
-  -- DO CHAMPION BUFF LOGIC HERE
-  engine:ForEach("party", function(player)
-    -- if not player:HasBuff("Champion's Resolve") then
-    --   self.lastTime = now
-    --   return Action:Buff(2651, player.id, "Champion's Resolve")
-    -- end
-  end)
-  return nil
-end
-
 BestPriestSingleHeal = BestSingleHeal()

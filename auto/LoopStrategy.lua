@@ -23,6 +23,7 @@ PriestLoopStrategy = {
     CastableHeal("Lesser Heal(Rank 1)", "Renew(Rank 1)"),
     -- If in spirit mode, go full send on healing
     SpiritFlashHeal,
+    SpellQueueEvaluate(),
   },
   ---@type table<string, fun(engine:DecisionEngine, player:AllyPlayer):Action|nil> List of decision nodes to evaluate every loop
   player = {
