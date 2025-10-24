@@ -11,8 +11,8 @@ SpellQueue = MyrkAddon:NewModule("MyrkSpellQueue", "AceEvent-3.0")
 
 function SpellQueueEvaluate()
   return function (engine)
-    print("SpellQueueEvaluate called")
-    return SpellQueue:Dequeue()
+    local dq = SpellQueue:Dequeue()
+    return dq
   end
 end
 

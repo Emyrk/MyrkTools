@@ -75,6 +75,7 @@ function RefreshPartyState(engine)
     engine.partyMonitor:UpdatePartyMembers()
     return nil -- This is a state modifier, not an action
 end
+
 function CastableHeal(channel, instant)
 
     local castable = function(engine)
@@ -157,6 +158,23 @@ function NotCombat(actionFunc)
         end
         
         return actionFunc(engine, player)
+    end
+end
+
+---@param ptype string "player", "tank", or "party"
+---@param step fun(engine:DecisionEngine, player: AllyPlayer) | table<string
+function PerPlayer(ptype, step) 
+    return function(engine)
+        local result = nil
+        engine:ForEach(ptype, function(player)
+            result = step(engine, player)
+            if result then
+                return true -- Stop iteration on first result
+            end
+            return false
+        end)
+
+        return result
     end
 end
 

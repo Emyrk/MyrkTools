@@ -1,6 +1,3 @@
-
-
-
 -- function PrintShamanTable()
 --   InitShamanTable()
 --   for spellName, ranks in pairs(ShamanHeals) do
@@ -16,12 +13,13 @@
 --   end
 -- end
 
+---@param ptype string "player", "tank", or "party"
 ---@param pct number Health percentage threshold to consider
 ---@param ttd number|nil Time to death threshold in seconds, or nil to ignore
 ---@param prevent function|nil Function(engine, player) that returns true if we should prevent this heal
 ---@param incDmgTime number|nil Time in seconds to consider incoming damage when calculating heal amount
-function ShamanDynamicHeal(pct, ttd, prevent, incDmgTime)
-  return function(engine, player)
+function ShamanDynamicHeal(ptype, pct, ttd, prevent, incDmgTime)
+  return PerPlayer(ptype, function(engine, player)
     if not player.castable then
       return nil -- Cannot cast on this player
     end
@@ -51,7 +49,7 @@ function ShamanDynamicHeal(pct, ttd, prevent, incDmgTime)
     local hp_needed = player:HPNeeded(incDmgTime or 0)
     local action = BestShamanSingleHeal(player.id, UnitMana("player"), hp_needed)
     return action
-  end
+  end)
 end
 
 

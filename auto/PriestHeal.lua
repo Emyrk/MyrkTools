@@ -29,12 +29,13 @@ function LoadSpellRanks(spellName)
   return ranks
 end
 
+---@param ptype string "player", "tank", or "party"
 ---@param pct number Health percentage threshold to consider
 ---@param ttd number|nil Time to death threshold in seconds, or nil to ignore
 ---@param prevent function|nil Function(engine, player) that returns true if we should prevent this heal
 ---@param incDmgTime number|nil Time in seconds to consider incoming damage when calculating heal amount
-function PriestDynamicHeal(pct, ttd, prevent, incDmgTime)
-  return function(engine, player)
+function PriestDynamicHeal(ptype, pct, ttd, prevent, incDmgTime)
+  return PerPlayer(ptype, function(engine, player)
     if not engine.ctx.channelHeal then
       return nil -- Cannot channel, so nothing to do
     end
@@ -63,7 +64,7 @@ function PriestDynamicHeal(pct, ttd, prevent, incDmgTime)
 
     local hp_needed = player:HPNeeded(incDmgTime or 0)
     return BestPriestSingleHeal(player.id, UnitMana("player"), hp_needed)
-  end
+  end)
 end
 
 ---@return function(pid: string, mana: number, hp_needed: number): Action|nil

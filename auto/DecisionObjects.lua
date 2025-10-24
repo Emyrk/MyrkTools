@@ -20,6 +20,7 @@ end
 
 
 ---@class HealSpell
+---@field playerType string "player", "tank", or "party"
 ---@field spellName string
 ---@field spellRank? number
 ---@field smartRank? boolean
@@ -39,10 +40,16 @@ function HealSpell:new(hp)
   return setmetatable(hp, self)
 end
 
+function HealSpell:evaluate(engine)
+  return PerPlayer(self.playerType or "party", function(engine, player)
+    return self:evaluatePlayer(engine, player)
+  end)(engine)
+end
+
 ---Evaluate the heal decision.
 ---@param engine any
 ---@return table|nil
-function HealSpell:evaluate(engine, player)
+function HealSpell:evaluatePlayer(engine, player)
   if not player then
     Logs.Error("HealSpell:evaluate called without player")
     return nil

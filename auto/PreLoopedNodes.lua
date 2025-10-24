@@ -1,5 +1,9 @@
-function PowerWordShield(pct, ttd)
+---@param ptype string "player", "tank", or "party"
+---@param pct any
+---@param ttd any
+function PowerWordShield(ptype, pct, ttd)
    return HealSpell:new({
+        playerType = ptype,
         spellName = "Power Word: Shield",
         instant = true,
         pct = pct,
@@ -24,8 +28,9 @@ end
 -- Emergency flash heal for specific target type
 ---@param pct number Health percentage threshold to consider
 ---@param ttd number|nil Time to death threshold in seconds
-function FlashHeal(pct, ttd)
+function FlashHeal(ptype, pct, ttd)
    return HealSpell:new({
+        playerType = ptype,
         spellName = "Flash Heal",
         instant = false,
         smartRank = true,
