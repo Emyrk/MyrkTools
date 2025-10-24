@@ -278,3 +278,30 @@ function RetainTarget(...)
         unpack(nodes)
     )
 end
+
+function HealFocus(pct)
+    return function(engine)
+        if not pfUI or not pfUI.uf or not pfUI.uf.focus then
+            return nil
+        end
+
+        local focusID = pfUI.uf.focus.label .. pfUI.uf.focus.id
+        if not UnitExists(focusID) then
+            return nil
+        end
+
+        if UnitInParty(focusID) then
+            return nil
+        end
+
+        local hp = UnitHealth(focusID)
+        local hpMax = UnitHealthMax(focusID)
+        local hpPct = hp / hpMax
+        if hpPct > pct then
+            return nil
+        end
+
+
+        return BestSingleHeal(focusID, UnitMana("player"), hpMax - hp)
+    end
+end

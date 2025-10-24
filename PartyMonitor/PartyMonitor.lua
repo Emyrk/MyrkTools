@@ -5,6 +5,7 @@
 -- Added role annotation system for flexible party management
 ---@class PartyMonitor
 ---@field instance PartyMonitor
+---@field party Party
 PartyMonitor = MyrkAddon:NewModule("MyrkPartyMonitor", "AceEvent-3.0")
 
 -- External deps

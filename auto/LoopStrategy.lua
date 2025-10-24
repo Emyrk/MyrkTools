@@ -33,7 +33,7 @@ PriestLoopStrategy = {
   PriestDynamicHeal("tank", 0.5, 5, nil, 2.5),
   -- Always heal a tank at <25%
   PriestDynamicHeal("tank", 0.25, nil, nil, 2.5),
-
+  
   PowerWordShield("party", 0.15, 4),
   FlashHeal("party", 0.75, 3.5),
   PriestDynamicHeal("party", 0.85, 10, nil, 2.5),
@@ -41,6 +41,8 @@ PriestLoopStrategy = {
   NotCombat(
     PriestDynamicHeal("party", 0.90, nil, nil, 2.5)
   ),
+
+  HealFocus(0.75),
 
   NotInstance(
     InCombat(Smite())

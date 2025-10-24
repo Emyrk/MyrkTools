@@ -127,3 +127,9 @@ end
 --     CastSpellByName("Shoot Bow")
 --   end
 -- end
+
+
+SlashCmdList.PFCASTFOCUS("Lesser Heal")
+print(pfUI.uf.focus.label .. pfUI.uf.focus.id)
+local id = pfUI.uf.focus.label .. pfUI.uf.focus.id
+print(UnitHealth(id))
