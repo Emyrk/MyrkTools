@@ -6,6 +6,9 @@
 ---@field players table<string, AllyPlayer> key is unitID like "player", "party1", etc.
 ---@field roleAssignments table<string, PartyRoles> key is player name, value is their role like "Tank"
 ---@field blacklist table<string, number> key is unitID, value is timestamp when blacklist expires
+---@field sorted string[] Cached sorted list of unitIDs by priority
+---@field minimumHealthPct number Minimum health percentage among party members
+---@field minimumTTD number Minimum time to death among party members
 Party = {}
 Party.__index = Party
 
@@ -31,6 +34,9 @@ function Party:BlackList(id, duration)
 end
 
 function Party:Refresh()
+  self.minimumHealthPct = 1.0
+  self.minimumTTD = 1000.0
+
   self:RefreshID("player") -- Always include player
   
   for i=1,4 do
@@ -45,7 +51,7 @@ function Party:Refresh()
   end
 
   -- Reset sorted
-  this.sorted = nil
+  self.sorted = nil
   self:Sorted(true) -- Force sort to update
 end
 
@@ -114,6 +120,18 @@ function Party:RefreshID(id)
       -- Apply stored role if available
       if self.roleAssignments[name] then
         self.players[id].role = self.roleAssignments[name]
+      end
+
+      if self.players and self.players[id] then
+        local hpct = self.players[id]:GetHealthPercent()
+        if hpct ~= 0 and hpct < self.minimumHealthPct then
+          self.minimumHealthPct = hpct
+        end
+
+        local ttd = self.players[id]:CalculateTimeToDeath()
+        if ttd ~= nil and ttd < self.minimumTTD then
+          self.minimumTTD = ttd
+        end
       end
       
       return true
@@ -261,6 +279,7 @@ function AllyPlayer:Refresh()
   self.class = englishClass
   self.recentDmg = DamageComm.UnitGetIncomingDamage(self.name) or 0;
   self.incHeal = HealComm:getHeal(self.name) or 0;
+
   -- Note: role is managed by Party:SetRole(), not refreshed here
 end
 

@@ -105,9 +105,11 @@ function CastableHeal(channel, instant)
             end
         end
 
+        DebugExecution(string.format("CastableHeal: channel=%s instant=%s", tostring(engine.ctx.instantHeal), tostring(engine.ctx.instantHeal)))
         -- Annotate party members with who is castable 
         ---@param player AllyPlayer
         engine.partyMonitor:ForEach(function(player)
+            -- TODO: Move min hp and min ttd checks to here
             local healable = UnitIsHealable(player.id)
             player.castable = false
             player.healable = healable -- set player state
@@ -121,12 +123,14 @@ function CastableHeal(channel, instant)
             else
                 player.castable = false
             end
-            
+
+            DebugExecution(string.format("HealableParty: %s:%s castable=%s healable=%s",player.id, player.name, tostring(player.castable), tostring(player.healable)))
         end)
 
         SpellStopTargeting();
         return nil
     end
+
     return RetainTarget(WithAutoSelfCastOff(castable))
 end
 
@@ -136,8 +140,8 @@ function NotInstance(actionFunc)
         if IsInInstance() then
             return nil -- Skip if in instance
         end
-        
-        return actionFunc(engine)
+
+        return engine:evaluateStep(actionFunc)        
     end
 end
 

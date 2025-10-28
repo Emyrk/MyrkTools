@@ -42,6 +42,11 @@ PriestLoopStrategy = {
     PriestDynamicHeal("party", 0.90, nil, nil, 2.5)
   ),
 
+  Renew("party", 0.75, 0.3, 12),
+  NotInstance(
+    Renew("party", 0.75, 0, 45)
+  ),
+
   HealFocus(0.75),
 
   NotInstance(
@@ -74,3 +79,8 @@ ShamanLoopStrategy = {
     ShamanDynamicHeal("party", 0.90, nil, nil, 2.5)
   ),
 }
+
+
+function DebugExecution(message) 
+  -- print("DEBUG: " .. message)
+end

@@ -62,6 +62,7 @@ function PriestDynamicHeal(ptype, pct, ttd, prevent, incDmgTime)
       return nil -- Prevented by custom logic
     end
 
+    DebugExecution(string.format("PriestDynamicHeal: considering heal for %s pct=%.2f ttd=%.2f", player.id, playerPct, playerTTD))
     local hp_needed = player:HPNeeded(incDmgTime or 0)
     return BestSingleHeal(player.id, UnitMana("player"), hp_needed)
   end)

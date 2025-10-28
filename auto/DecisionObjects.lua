@@ -28,6 +28,8 @@ end
 ---@field targetType? string TODO REMOVE
 ---@field instant boolean
 ---@field minimumMana? number Minimum mana required to cast
+---@field miniumPartyHPct? number Minimum party health percentage to consider. If less, then the heal skips
+---@field minimumTTD? number Minimum party ttd to consider. If less, then the heal skips
 ---@field pct number
 ---@field prevent fun(engine: any, player: AllyPlayer): boolean|nil If returns true, skip this target
 HealSpell = {}
@@ -40,10 +42,39 @@ function HealSpell:new(hp)
   return setmetatable(hp, self)
 end
 
+---@param engine DecisionEngine
 function HealSpell:evaluate(engine)
-  return PerPlayer(self.playerType or "party", function(engine, player)
+
+  DebugExecution(self.spellName .. " healspell evaluate")
+  if self.instant and not engine.ctx.instantHeal then
+ 
+    return nil -- Cannot cast instant heal
+  end
+  if not self.instant and not engine.ctx.channelHeal then
+ 
+    return nil -- Cannot cast channel heal
+  end
+  if self.minimumMana and self.minimumMana ~= 0 then
+    local mana = UnitMana("player")
+    if mana < self.minimumMana then
+      return nil
+    end
+  end
+
+  if self.miniumPartyHPct and engine.partyMonitor.party.minimumHealthPct < self.miniumPartyHPct then
+    DebugExecution(self.spellName .. " evaluate failed min party hpct at " .. tostring(engine.partyMonitor.party.minimumHealthPct) .. " < " .. tostring(self.miniumPartyHPct))
+    return nil
+  end
+
+  if self.minimumTTD and engine.partyMonitor.party.minimumTTD < self.minimumTTD then
+    DebugExecution(self.spellName .. " evaluate failed min party ttd")
+    return nil
+  end
+
+  local action = PerPlayer(self.playerType or "party", function(engine, player)
     return self:evaluatePlayer(engine, player)
   end)(engine)
+  return action
 end
 
 ---Evaluate the heal decision.
@@ -53,19 +84,6 @@ function HealSpell:evaluatePlayer(engine, player)
   if not player then
     Logs.Error("HealSpell:evaluate called without player")
     return nil
-  end
-
-  if self.instant and not engine.ctx.instantHeal then
-    return nil
-  elseif not engine.ctx.channelHeal then
-    return nil
-  end
-
-  if self.minimumMana and self.minimumMana ~= 0 then
-    local mana = UnitMana("player")
-    if mana < self.minimumMana then
-      return nil
-    end
   end
 
   local spellid = nil
