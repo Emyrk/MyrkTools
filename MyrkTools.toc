@@ -52,3 +52,7 @@ auto\PreLoopedNodes.lua
 auto\SpellQueue.lua
 auto\LoopStrategy.lua
 auto\Auto.lua
+
+
+# Overlay
+HealingIndicator\HealingIndicator.lua
