@@ -18,7 +18,6 @@ function Debounce:evaluate(engine)
   return Action:Busy("debounce")
 end
 
-
 ---@class HealSpell
 ---@field playerType string "player", "tank", or "party"
 ---@field spellName string
@@ -61,12 +60,12 @@ function HealSpell:evaluate(engine)
     end
   end
 
-  if self.miniumPartyHPct and engine.partyMonitor.party.minimumHealthPct < self.miniumPartyHPct then
-    DebugExecution(self.spellName .. " evaluate failed min party hpct at " .. tostring(engine.partyMonitor.party.minimumHealthPct) .. " < " .. tostring(self.miniumPartyHPct))
+  if self.miniumPartyHPct and engine.ctx.minimumHealthPct < self.miniumPartyHPct then
+    DebugExecution(self.spellName .. " evaluate failed min party hpct at " .. tostring(engine.ctx.minimumHealthPct) .. " < " .. tostring(self.miniumPartyHPct))
     return nil
   end
 
-  if self.minimumTTD and engine.partyMonitor.party.minimumTTD < self.minimumTTD then
+  if self.minimumTTD and engine.ctx.minimumTTD < self.minimumTTD then
     DebugExecution(self.spellName .. " evaluate failed min party ttd")
     return nil
   end

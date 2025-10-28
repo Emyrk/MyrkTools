@@ -34,9 +34,6 @@ function Party:BlackList(id, duration)
 end
 
 function Party:Refresh()
-  self.minimumHealthPct = 1.0
-  self.minimumTTD = 1000.0
-
   self:RefreshID("player") -- Always include player
   
   for i=1,4 do
@@ -120,18 +117,6 @@ function Party:RefreshID(id)
       -- Apply stored role if available
       if self.roleAssignments[name] then
         self.players[id].role = self.roleAssignments[name]
-      end
-
-      if self.players and self.players[id] then
-        local hpct = self.players[id]:GetHealthPercent()
-        if hpct ~= 0 and hpct < self.minimumHealthPct then
-          self.minimumHealthPct = hpct
-        end
-
-        local ttd = self.players[id]:CalculateTimeToDeath()
-        if ttd ~= nil and ttd < self.minimumTTD then
-          self.minimumTTD = ttd
-        end
       end
       
       return true

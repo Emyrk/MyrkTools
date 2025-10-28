@@ -66,24 +66,46 @@ function SpiritFlashHeal(engine)
     return action
 end
 
+-- function TankRenew(ptype) 
+--     return HealSpell:new({
+--         playerType = ptype,
+--         spellName = "Renew",
+--         instant = true,
+--         spellRank = 1,
+--         incDmgTime = 0,
+--         minimumMana = 28,
+--         pct = pct,
+--         minimumTTD = 18,
+--         miniumPartyHPct = 90,
+--         prevent = function(engine, player)
+--             local cant = engine:hasBuff(player.id, "Spell_Holy_Renew")
+--             if cant then
+--                 return true
+--             end
+
+--             return false
+--         end
+--     })
+-- end
+
 function Renew(ptype, pct, min_pct, min_ttd) 
     return HealSpell:new({
-    playerType = ptype,
-    spellName = "Renew",
-    instant = true,
-    smartRank = true,
-    incDmgTime = 0,
-    minimumMana = 28,
-    pct = pct,
-    minimumTTD = min_ttd,
-    miniumPartyHPct = min_pct,
-    prevent = function(engine, player)
-        local cant = engine:hasBuff(player.id, "Spell_Holy_Renew")
-        if cant then
-            return true
-        end
+        playerType = ptype,
+        spellName = "Renew",
+        instant = true,
+        smartRank = true,
+        incDmgTime = 0,
+        minimumMana = 28,
+        pct = pct,
+        minimumTTD = min_ttd,
+        miniumPartyHPct = min_pct,
+        prevent = function(engine, player)
+            local cant = engine:hasBuff(player.id, "Spell_Holy_Renew")
+            if cant then
+                return true
+            end
 
-        return false
-    end
-})
+            return false
+        end
+    })
 end

@@ -87,8 +87,12 @@ function DecisionEngine:evaluateStep(step)
 end
 
 -- Helper function to check if we're already casting
-function DecisionEngine:isAlreadyCasting()
-    return self.castMonitor:IsCasting()
+function DecisionEngine:IsMonitoredCasting()
+    return self.castMonitor:IsMonitoredCasting()
+end
+
+function DecisionEngine:IsGlobalCasting()
+    return self.castMonitor:IsGlobalCasting()
 end
 
 function DecisionEngine:ExecuteCast(decision)

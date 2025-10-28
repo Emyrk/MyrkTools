@@ -52,7 +52,7 @@ end
 
 -- Quick exit if already casting
 function AlreadyCasting(engine)
-    if engine:isAlreadyCasting() then
+    if engine:IsMonitoredCasting() then
         local currentCast = engine:GetCurrentCast()
         local reason = "already_casting"
         
@@ -64,6 +64,11 @@ function AlreadyCasting(engine)
         
         return Action:Busy(reason)
     end
+
+    if engine:IsGlobalCasting() then
+        return Action:Busy("global_casting")
+    end
+
     return nil
 end
 
@@ -106,6 +111,10 @@ function CastableHeal(channel, instant)
         end
 
         DebugExecution(string.format("CastableHeal: channel=%s instant=%s", tostring(engine.ctx.instantHeal), tostring(engine.ctx.instantHeal)))
+        
+        engine.ctx.minimumHealthPct = 1.0
+        engine.ctx.minimumTTD = 1000
+        
         -- Annotate party members with who is castable 
         ---@param player AllyPlayer
         engine.partyMonitor:ForEach(function(player)
@@ -122,6 +131,19 @@ function CastableHeal(channel, instant)
                 player.castable = true
             else
                 player.castable = false
+            end
+
+            if player.castable and player.healable then
+                local pct = player:GetHealthPercent()
+
+                if pct > 0 and pct < engine.ctx.minimumHealthPct then
+                    engine.ctx.minimumHealthPct = pct
+                end
+
+                local ttd = player:CalculateTimeToDeath()
+                if ttd and ttd > 0 and ttd < engine.ctx.minimumTTD then
+                    engine.ctx.minimumTTD = ttd
+                end
             end
 
             DebugExecution(string.format("HealableParty: %s:%s castable=%s healable=%s",player.id, player.name, tostring(player.castable), tostring(player.healable)))

@@ -1,2 +1,3 @@
 Need:
-- Spell monitor
+
+- Fade on threat

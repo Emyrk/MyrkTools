@@ -3,6 +3,7 @@
 -- Based on QuickHeal's StartMonitor/StopMonitor system
 
 ---@class CastMonitor
+---@field global ClassMonitorInstance
 ---@field instance ClassMonitorInstance
 CastMonitor = MyrkAddon:NewModule("MyrkCastMonitor")
 Logs = AceLibrary("MyrkLogs-1.0")
@@ -19,8 +20,10 @@ Reasons = {
 function CastMonitor:OnEnable()
     ---@class ClassMonitorInstance
     ---@field isActive boolean
+    ---@field castedAt? number
     self.instance = {
         isActive = false,
+        castedAt = 0,
         currentTarget = nil,
         currentSpell = nil,
         currentReason = nil,
@@ -31,6 +34,31 @@ function CastMonitor:OnEnable()
             onInterrupted = nil,
         }
     }
+
+    self.global = {
+        isActive = false,
+        castedAt = 0,
+    }
+
+    local globalCasting = CreateFrame("Frame")
+    -- Event registration
+    globalCasting:RegisterEvent("SPELLCAST_START")
+    globalCasting:RegisterEvent("SPELLCAST_STOP")
+    globalCasting:RegisterEvent("SPELLCAST_FAILED")
+    globalCasting:RegisterEvent("SPELLCAST_INTERRUPTED")
+
+    local cm = self
+    -- Event handler
+    globalCasting:SetScript("OnEvent", function()
+        if tostring(event) == "SPELLCAST_START" then
+            cm.global.castedAt = GetTime()
+            cm.global.isActive = true
+            cm:UpdatePfUIIndicator()
+        else
+            cm.global.isActive = false
+            cm:UpdatePfUIIndicator()
+        end
+    end)
 
     if pfUI then
         CastMonitor:CastMonitorHookPfUI()
@@ -80,6 +108,7 @@ function CastMonitor:StartMonitor(spell, target, reason, callbacks)
     -- Set up monitoring state
     self.instance = {
         isActive = true,
+        castedAt = GetTime(),
         currentTarget = target,
         currentSpell = spell,
         currentReason = reason or "unknown",
@@ -138,7 +167,8 @@ function CastMonitor:StopMonitor(trigger)
         currentTarget = nil,
         currentSpell = nil,
         currentReason = nil,
-        startTime = nil
+        startTime = nil,
+        castedAt = nil,
     }
     
     -- Clear callbacks
@@ -201,6 +231,10 @@ function CastMonitor:IsMonitoring()
     return self.instance.isActive
 end
 
+function CastMonitor:IsGlobalCasting()
+    return self.global.isActive and (GetTime() - self.global.castedAt) < 5
+end
+
 -- Get current cast info
 function CastMonitor:GetCurrentCast()
     if not self.instance.isActive then
@@ -217,7 +251,7 @@ function CastMonitor:GetCurrentCast()
 end
 
 -- Check if we're currently casting (either monitored or via WoW API)
-function CastMonitor:IsCasting()
+function CastMonitor:IsMonitoredCasting()
     if not self.instance then
         return false
     end
@@ -292,7 +326,7 @@ function CastMonitor:CastMonitorHookPfUI()
             end
             
             -- Show/hide based on monitoring state
-            if CastMonitor:IsCasting() then
+            if CastMonitor:IsMonitoredCasting() then
                 unit.castMonitor:Show()
             else
                 unit.castMonitor:Hide()
@@ -307,7 +341,11 @@ end
 -- TODO: Probably better to just call the PFUI refresh function directly
 function CastMonitor:UpdatePfUIIndicator()
     if playerUnitUI then
-        if CastMonitor:IsCasting() then
+        if CastMonitor:IsMonitoredCasting() then
+            playerUnitUI.tex:SetVertexColor(0.2, 1.0, 0.2, 0.8)
+            playerUnitUI:Show()
+        elseif CastMonitor:IsGlobalCasting() then
+            playerUnitUI.tex:SetVertexColor(1.0, 0.0, 0.0, 0.8)
             playerUnitUI:Show()
         else
             playerUnitUI:Hide()
