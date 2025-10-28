@@ -5,7 +5,7 @@ MyrkOverlay = MyrkAddon:NewModule("MyrkOverlay")
 
 local overlayFrame = nil
 local overlayTexture = "Interface\\AddOns\\MyrkTools\\img\\DruidNaturesGrace"
-local overlayDuration = 0.8
+local overlayDuration = 1.2
 local fadeTime = 0.8
 local activeTimer = 0
 local called = 0
@@ -23,6 +23,8 @@ function MyrkOverlay:OnEnable()
     overlayFrame.tex:SetAllPoints()
     overlayFrame.tex:SetTexture(overlayTexture)
     overlayFrame.tex:SetAlpha(1)
+    -- This might rotate it 90 degrees
+    overlayFrame.tex:SetTexCoord(0, 1, 1, 1, 0, 0, 1, 0)
 
     overlayFrame:SetScript("OnUpdate", function()
         if not overlayFrame:IsShown() then return end
