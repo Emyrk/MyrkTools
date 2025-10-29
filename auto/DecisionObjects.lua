@@ -146,7 +146,7 @@ function Wanding:evaluate(engine)
   end
 
   if UnitExists("target") and UnitCanAttack("player", "target") then
-      return Action:Cast("Shoot", "target", "idle_wand")
+      return Action:CastByName("Shoot", "target", "idle_wand")
   end
 
   return nil
@@ -167,10 +167,10 @@ function Smite()
     local _, duration = GetSpellCooldown(HealTable:MaxRankID("Mind Blast"), BOOKTYPE_SPELL)
     if duration == 0 then
 
-      return Action:Cast("Mind Blast", "target", "mind blast")
+      return Action:CastByName("Mind Blast", "target", "mind blast")
     end
 
-    return Action:Cast("Smite", "target", "smite")
+    return Action:CastByName("Smite", "target", "smite")
   end
 end
 

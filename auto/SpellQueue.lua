@@ -41,14 +41,32 @@ function SpellQueue:OnEnable()
   DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[SpellQueue]|r Enabled ")
 end
 
+function SpellQueue:CastOrQueueByName(spellName)
+  local spellID = HealTable:MaxRankID(spellName)
+  if spellID == nil then
+    DEFAULT_CHAT_FRAME:AddMessage(string.format("|cffff0000[SpellQueue]|r Unknown spell name: %s", spellName))
+    return
+  end
+  
+  if Auto:IsGlobalCasting() then
+    self:Enqueue(Action:Cast(spellID, "target", "queued_due_to_global_casting"))
+    return
+  end
+
+  print(spellID)
+  CastSpell(spellID, BOOKTYPE_SPELL)
+end
+
 ---@param action Action
 function SpellQueue:Enqueue(action)
   self:Dequeue()
 
   if action.spellID == nil then
+    DEFAULT_CHAT_FRAME:AddMessage(string.format("|cffff0000[SpellQueue]|r Unknown spell ID: %s", action.spellID))
     return
   end
 
+  print("queued spell ID: " .. tostring(action.spellID))
   self.queued = action
 end
 
@@ -104,7 +122,7 @@ function SpellQueue:ButtonUpdate()
     return
   end
 
-  if id ~= SpellQueue.queued then
+  if id ~= SpellQueue.queued.spellID then
     this.queueText:Hide()
     return
   end

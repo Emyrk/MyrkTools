@@ -20,6 +20,14 @@ function Auto:OnEnable()
     DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[MyrkAuto]|r Loaded")
 end
 
+function Auto:IsGlobalCasting()
+    if not self.engine then
+        return false
+    end
+
+    return self.engine:IsGlobalCasting()
+end
+
 function Auto:OnPartyChanged()
     -- PartyMonitor handles role management now
 end

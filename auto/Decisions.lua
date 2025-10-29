@@ -11,6 +11,7 @@ ACTIONS = {
 ---@class Action
 ---@field doFunction fun(engine) A function that does something
 ---@field spellID? string The spell id to cast.
+---@field spellName? string The spell name to cast.
 ---@field target_id? string The target unit ID.
 ---@field action actions What action to execute.
 ---@field reason string Explain why no action should be taken. For debugging purposes.
@@ -42,6 +43,17 @@ function Action:Heal(spellID, target_id, reason)
     local instance = {
       action = ACTIONS.heal,
       spellID = spellID,
+      target_id = target_id,
+      reason = reason,
+    }
+    setmetatable(instance, Action)
+    return instance
+end
+
+function Action:CastByName(spellName, target_id, reason)
+    local instance = {
+      action = ACTIONS.cast,
+      spellName = spellName,
       target_id = target_id,
       reason = reason,
     }

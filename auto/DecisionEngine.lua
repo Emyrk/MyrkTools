@@ -92,6 +92,9 @@ function DecisionEngine:IsMonitoredCasting()
 end
 
 function DecisionEngine:IsGlobalCasting()
+    if not self.castMonitor then
+        self.castMonitor = MyrkAddon:GetModule("MyrkCastMonitor")
+    end
     return self.castMonitor:IsGlobalCasting()
 end
 
@@ -115,12 +118,17 @@ function DecisionEngine:ExecuteCast(decision)
                 spell, target, reason, error or "Unknown"))
         end
     }
-    
-    -- Assume the target is already correctly selected
-    if decision.spellID ~= "Shoot" then
+
+    if decision.spellID then
         self.castMonitor:StartMonitor(decision.spellID, decision.target_id, decision.reason, callbacks)
+        CastSpell(decision.spellID, BOOKTYPE_SPELL)
+    else
+        -- Assume the target is already correctly selected
+        if decision.spellName ~= "Shoot" then
+            self.castMonitor:StartMonitor(decision.spellName, decision.target_id, decision.reason, callbacks)
+        end
+        CastSpellByName(decision.spellName)
     end
-    CastSpellByName(decision.spellID)
 
     return true
 end
