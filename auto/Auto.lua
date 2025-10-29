@@ -56,7 +56,7 @@ function Auto:Perform()
             local name = UnitName(decision.target_id) or decision.target_id
 
             Logs.Info(string.format("Casting %s on %s (%s)", 
-                decision.spellID, name, decision.reason or "no reason"))
+                decision.spellID or "", name, decision.reason or "no reason"))
             return self.engine:ExecuteCast(decision)
         end
 
