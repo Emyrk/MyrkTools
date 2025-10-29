@@ -12,6 +12,7 @@ ACTIONS = {
 ---@field doFunction fun(engine) A function that does something
 ---@field spellID? string The spell id to cast.
 ---@field spellName? string The spell name to cast.
+---@field globalSpellID? number The global spell id, used for comparisons
 ---@field target_id? string The target unit ID.
 ---@field action actions What action to execute.
 ---@field reason string Explain why no action should be taken. For debugging purposes.
@@ -40,9 +41,13 @@ function Action:Error(reason)
 end
 
 function Action:Heal(spellID, target_id, reason)
+  local name, rankName, globalSpellID = GetSpellName(spellID, BOOKTYPE_SPELL)
+
     local instance = {
       action = ACTIONS.heal,
       spellID = spellID,
+      globalSpellID = globalSpellID,
+      spellName = name,
       target_id = target_id,
       reason = reason,
     }
@@ -62,9 +67,13 @@ function Action:CastByName(spellName, target_id, reason)
 end
 
 function Action:Cast(spellID, target_id, reason)
+    local name, rankName, globalSpellID = GetSpellName(spellID, BOOKTYPE_SPELL)
+
     local instance = {
       action = ACTIONS.cast,
       spellID = spellID,
+      globalSpellID = globalSpellID,
+      spellName = name,
       target_id = target_id,
       reason = reason,
     }

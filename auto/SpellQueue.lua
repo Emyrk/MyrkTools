@@ -38,13 +38,28 @@ function SpellQueue:OnEnable()
   if SpellButton1 then
     for i = 1,12 do self:SetupButton("SpellButton"..i) end
   end
+
   DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[SpellQueue]|r Enabled ")
 end
 
-function SpellQueue:CastOrQueueByName(spellName)
+function SpellQueue:CastSpell(spellID, bookType)
+  print("SpellQueue:CastSpell called for " .. spellID)
+  CastSpell(spellID, bookType)
+end
+
+function SpellQueue:CastSpellByName(spellName, onSelf)
+  print("SpellQueue:CastSpellByName called for " .. spellName)
+
+  if not Auto:IsGlobalCasting() then
+    -- Pass through to normal
+    CastSpellByName(spellName, onSelf)
+    return
+  end
+
+
   local spellID = HealTable:MaxRankID(spellName)
   if spellID == nil then
-    DEFAULT_CHAT_FRAME:AddMessage(string.format("|cffff0000[SpellQueue]|r Unknown spell name: %s", spellName))
+    -- DEFAULT_CHAT_FRAME:AddMessage(string.format("|cffff0000[SpellQueue]|r Unknown spell name: %s", spellName))
     return
   end
   
@@ -53,7 +68,6 @@ function SpellQueue:CastOrQueueByName(spellName)
     return
   end
 
-  print(spellID)
   CastSpell(spellID, BOOKTYPE_SPELL)
 end
 
@@ -61,12 +75,11 @@ end
 function SpellQueue:Enqueue(action)
   self:Dequeue()
 
-  if action.spellID == nil then
-    DEFAULT_CHAT_FRAME:AddMessage(string.format("|cffff0000[SpellQueue]|r Unknown spell ID: %s", action.spellID))
+  if action.spellID == nil or action.globalSpellID == nil then
+    DEFAULT_CHAT_FRAME:AddMessage(string.format("|cffff0000[SpellQueue]|r Spell ID and Global Spell ID required to enqueue"))
     return
   end
 
-  print("queued spell ID: " .. tostring(action.spellID))
   self.queued = action
 end
 
@@ -121,15 +134,13 @@ function SpellQueue:ButtonUpdate()
     this.queueText:Hide()
     return
   end
-
-  if id ~= SpellQueue.queued.spellID then
+  if id ~= SpellQueue.queued.globalSpellID then
     this.queueText:Hide()
     return
   end
   
   this.queueText:Show()
 end
-
 
 -- Help find pf ui action buttons
 local function FindButtons()
