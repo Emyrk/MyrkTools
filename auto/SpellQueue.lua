@@ -67,7 +67,8 @@ function SpellQueue:PriestWhisper()
     end
 
     if text == "renew" then
-
+      SpellQueue:Renew(player, "priest_whisper_renew")
+      return
     end
 end
 
