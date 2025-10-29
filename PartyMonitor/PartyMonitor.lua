@@ -52,6 +52,14 @@ function PartyMonitor:BlackList(id, duration)
     self.party:BlackList(id, duration)
 end
 
+---@return AllyPlayer|nil
+function PartyMonitor:PlayerByName(name)
+    if not self.party then
+        return nil
+    end
+    return self.party:PlayerByName(name)
+end
+
 ---@param callback function(player: PartyPlayer): boolean|nil Return true to stop iteration
 function PartyMonitor:ForEach(callback)
     if not self.party then

@@ -189,6 +189,15 @@ function Party:GetPlayersByRole(role)
   return result
 end
 
+function Party:PlayerByName(playerName)
+  for _, player in pairs(self.players) do
+    if player.name == playerName then
+      return player
+    end
+  end
+  return nil
+end
+
 ---Return the player id for a given name if they are in the party. Otherwise returns nil
 ---@param playerName string
 ---@return string|nil playerID will be 'player', 'party1', etc. or nil if not found

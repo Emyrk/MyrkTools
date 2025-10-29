@@ -40,7 +40,66 @@ function SpellQueue:OnEnable()
     for i = 1,12 do self:SetupButton("SpellButton"..i) end
   end
 
+
+  local localizedClass, englishClass = UnitClass("player")
+  if englishClass == "PRIEST" then
+    -- Whisper the priest if you want something!
+    self:RegisterEvent("CHAT_MSG_WHISPER", "PriestWhisper")
+  end
+
   DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[SpellQueue]|r Enabled ")
+end
+
+function SpellQueue:PriestWhisper()
+    local msg = arg1
+    local sender = arg2
+    local text = string.lower(msg or "")
+
+    local player = PartyMonitor:PlayerByName(sender)
+    if not player then
+      return
+    end
+
+    if text == "shield" then
+
+      SpellQueue:PWS(player, "priest_whisper_shield")
+      return
+    end
+
+    if text == "renew" then
+
+    end
+end
+
+function SpellQueue:PWS(player, reason)
+  local ok, spellID = self:checkSpell("Power Word: Shield")
+  if not ok then
+    return
+  end
+
+
+  local cant = DecisionEngine:hasBuff(player.id, "Spell_Holy_PowerWordShield") or
+      DecisionEngine:hasDebuff(player.id, "AshesToAshes")
+  if cant then
+    return
+  end
+
+  self:Enqueue(Action:Heal(spellID, player.id, reason))
+end
+
+function SpellQueue:Renew(player, reason)
+  local ok, spellID = self:checkSpell("Renew")
+  if not ok then
+    return
+  end
+
+
+  local cant = DecisionEngine:hasBuff(player.id, "Spell_Holy_Renew")
+  if cant then
+    return
+  end
+
+  self:Enqueue(Action:Heal(spellID, player.id, reason))
 end
 
 function SpellQueue:CastSpellByName(spellName, onSelf)
@@ -50,17 +109,8 @@ function SpellQueue:CastSpellByName(spellName, onSelf)
     return
   end
 
-
-  local spellID = HealTable:MaxRankID(spellName)
-  if spellID == nil then
-    DEFAULT_CHAT_FRAME:AddMessage(string.format("|cffff0000[SpellQueue]|r Unknown spell name: %s", spellName))
-    return
-  end
-
-  -- Global CD is 1.5, so casting a spell puts others on a 1.5+ second cooldown
-  -- Just prevent queuing if the spell is on cooldown for more than that
-  local _, duration = GetSpellCooldown(spellID, BOOKTYPE_SPELL) 
-  if duration > 1.5 then
+  local ok, spellID = self:checkSpell(spellName)
+  if not ok then
     return
   end
 
@@ -76,12 +126,39 @@ function SpellQueue:Enqueue(action)
     return
   end
 
-  if previous ~= nil and previous.globalSpellID ~= action.globalSpellID then
+  if (previous ~= nil and previous.globalSpellID ~= action.globalSpellID) or previous == nil then
     Logs.Info(string.format("Enqueued spell: %s (ID: %d, GlobalID: %d)", action.spellName, action.spellID, action.globalSpellID))
   end
 
   self.queued = action
   self.queuedAt = GetTime()
+end
+
+function SpellQueue:checkSpell(spellName)
+  local spellData = HealTable:MaxRankData(spellName)
+  if spellData == nil then
+    DEFAULT_CHAT_FRAME:AddMessage(string.format("|cffff0000[SpellQueue]|r Unknown spell name: %s", spellName))
+    return false
+  end
+
+  if spellData.manacost > UnitMana("player") then
+    return false
+  end
+
+  local spellID = HealTable:MaxRankID(spellName)
+  if spellID == nil then
+    DEFAULT_CHAT_FRAME:AddMessage(string.format("|cffff0000[SpellQueue]|r Unknown spell name: %s", spellName))
+    return false
+  end
+
+  -- Global CD is 1.5, so casting a spell puts others on a 1.5+ second cooldown
+  -- Just prevent queuing if the spell is on cooldown for more than that
+  local _, duration = GetSpellCooldown(spellID, BOOKTYPE_SPELL) 
+  if duration > 1.5 then
+    return false
+  end
+
+  return true, spellID
 end
 
 function SpellQueue:Dequeue()
