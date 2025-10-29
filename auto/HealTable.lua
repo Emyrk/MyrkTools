@@ -87,6 +87,8 @@ function HealTable:Load(force)
       "Power Word: Shield",
       "Smite",
       "Mind Blast",
+      "Fade",
+      "Psychic Scream",
     }
 
     single = {

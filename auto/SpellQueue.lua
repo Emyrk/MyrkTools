@@ -2,6 +2,7 @@
 -- when using a strategy engine. The queued spell will have an indicator on the action bar.
 ---@class MyrkSpellQueue : AceEvent-3.0
 ---@field queued Action|nil
+---@field queuedAt number|nil
 SpellQueue = MyrkAddon:NewModule("MyrkSpellQueue", "AceEvent-3.0")
 
 -- function SpellQueue:evaluate(engine)
@@ -42,14 +43,7 @@ function SpellQueue:OnEnable()
   DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[SpellQueue]|r Enabled ")
 end
 
-function SpellQueue:CastSpell(spellID, bookType)
-  print("SpellQueue:CastSpell called for " .. spellID)
-  CastSpell(spellID, bookType)
-end
-
 function SpellQueue:CastSpellByName(spellName, onSelf)
-  print("SpellQueue:CastSpellByName called for " .. spellName)
-
   if not Auto:IsGlobalCasting() then
     -- Pass through to normal
     CastSpellByName(spellName, onSelf)
@@ -59,36 +53,52 @@ function SpellQueue:CastSpellByName(spellName, onSelf)
 
   local spellID = HealTable:MaxRankID(spellName)
   if spellID == nil then
-    -- DEFAULT_CHAT_FRAME:AddMessage(string.format("|cffff0000[SpellQueue]|r Unknown spell name: %s", spellName))
-    return
-  end
-  
-  if Auto:IsGlobalCasting() then
-    self:Enqueue(Action:Cast(spellID, "target", "queued_due_to_global_casting"))
+    DEFAULT_CHAT_FRAME:AddMessage(string.format("|cffff0000[SpellQueue]|r Unknown spell name: %s", spellName))
     return
   end
 
-  CastSpell(spellID, BOOKTYPE_SPELL)
+  -- Global CD is 1.5, so casting a spell puts others on a 1.5+ second cooldown
+  -- Just prevent queuing if the spell is on cooldown for more than that
+  local _, duration = GetSpellCooldown(spellID, BOOKTYPE_SPELL) 
+  if duration > 1.5 then
+    return
+  end
+
+  self:Enqueue(Action:Cast(spellID, "target", "queued_due_to_global_casting"))
 end
 
 ---@param action Action
 function SpellQueue:Enqueue(action)
-  self:Dequeue()
+  local previous = self:Dequeue()
 
-  if action.spellID == nil or action.globalSpellID == nil then
-    DEFAULT_CHAT_FRAME:AddMessage(string.format("|cffff0000[SpellQueue]|r Spell ID and Global Spell ID required to enqueue"))
+  if action.spellID == nil or action.globalSpellID == nil or action.spellName == "" then
+    DEFAULT_CHAT_FRAME:AddMessage(string.format("|cffff0000[SpellQueue]|r Spell ID, Global Spell ID, and Spell Name required to enqueue"))
     return
   end
 
+  if previous ~= nil and previous.globalSpellID ~= action.globalSpellID then
+    Logs.Info(string.format("Enqueued spell: %s (ID: %d, GlobalID: %d)", action.spellName, action.spellID, action.globalSpellID))
+  end
+
   self.queued = action
+  self.queuedAt = GetTime()
 end
 
 function SpellQueue:Dequeue()
-  if not self.queued then
+  if not self.queued or self.queuedAt == nil then
+    self.queuedAt = nil
     return nil
   end
+
+  if GetTime() - self.queuedAt > 10 then 
+    self.queuedAt = nil
+    self.queued = nil
+    return nil
+  end
+
   local action = self.queued
   self.queued = nil
+  self.queuedAt = nil
   return action
 end
 
@@ -130,16 +140,37 @@ function SpellQueue:ButtonUpdate()
   end
 
   local _, type, id = GetActionText(this:GetID())
-  if type ~= "SPELL" then 
+  if type == "SPELL" and id ~= SpellQueue.queued.globalSpellID then 
     this.queueText:Hide()
+    -- this.queueText:Show()
+    -- this.queueText:SetText(id)
     return
   end
-  if id ~= SpellQueue.queued.globalSpellID then
+  if type == "MACRO" then
+    local _, _, body, _ = GetMacroInfo(id)
+    local tt = ShowTooltip(body)
+    local show = tt == SpellQueue.queued.spellName
+
+    if not show then
+      this.queueText:Hide()
+      return
+    end
+  end
+
+  if type ~= "SPELL" and type ~= "MACRO" then
     this.queueText:Hide()
     return
   end
   
   this.queueText:Show()
+end
+
+---@param macroText string
+---@return string|nil
+function ShowTooltip(macroText) 
+  macroText = string.gsub(macroText, "^%s+", "")
+  local _, _, tt = string.find(macroText, "#showtooltip%s+([^\r\n]+)")
+  return tt
 end
 
 -- Help find pf ui action buttons
