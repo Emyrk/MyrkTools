@@ -13,8 +13,8 @@ local called = 0
 function MyrkOverlay:OnEnable()
     -- Create overlay frame above player
     overlayFrame = CreateFrame("Frame", "MyrkOverlayFrame", UIParent)
-    overlayFrame:SetWidth(128)
-    overlayFrame:SetHeight(128)
+    overlayFrame:SetWidth(256)
+    overlayFrame:SetHeight(200)
     overlayFrame:SetPoint("CENTER", UIParent, "CENTER", 0, 150) -- Above player
     overlayFrame:SetFrameStrata("HIGH")
     overlayFrame:Hide()
