@@ -156,7 +156,7 @@ function HealTable:Print()
       if rank.manacost == nil then
         Logs.Error("No manacost for spell " .. tostring(spellName) .. " rank " .. tostring(rank.spellrank))
       else
-        Logs.Debug(string.format("  Rank %d: id=%d mana=%d heal=%d", rank.spellrank, rank.spellnumber, rank.manacost, math.floor(rank.averagehealnocrit)))
+        Logs.Debug(string.format("  Rank %d: id=%d mana=%d heal=%d", rank.spellrank, rank.spellnumber, rank.manacost, math.floor(rank.averagehealnocrit or 0)))
       end
     end
   end

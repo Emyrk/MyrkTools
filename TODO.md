@@ -1,4 +1,4 @@
 Need:
 
 - Fade on threat
-- Pst me for a shield
+- Add Champions bond to champion

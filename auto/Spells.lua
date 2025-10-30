@@ -95,3 +95,73 @@ function ReloadSpells()
   SpellIndex["Smite"] = GetSpellIDs("Smite")
   SpellIndex["Wand"] = GetSpellIDs("Wand")
 end
+
+function ManualLookup(spellName, rank)
+  if spellName == "Fade" then
+    return Fade(rank)
+  elseif spellName == "Psychic Scream" then
+    return Scream(rank)
+  end
+
+  return nil
+end
+
+function Fade(rank) 
+    if rank >= 5 then
+        return nil
+    end
+
+    mana = {
+        [1] = 38,
+        [2] = 72,
+        [3] = 120,
+        [4] = 168,
+        [5] = 225,
+        [6] = 275,
+    }
+
+    spellnumber = {
+        [1] = 586,
+        [2] = 9578,
+        [3] = 9579,
+        [4] = 9592,
+        [5] = 10941,
+        [6] = 10942,
+    }
+
+    return {
+        spellname = "Fade",
+        spellrank = rank,
+        manacost = mana[rank],
+        spellnumber = spellnumber[rank],
+        averagehealnocrit = 0,
+    }
+end
+
+function Scream(rank) 
+    if rank >= 4 then
+        return nil
+    end
+
+    mana = {
+        [1] = 100,
+        [2] = 140,
+        [3] = 180,
+        [4] = 210,
+    }
+
+    spellnumber = {
+        [1] = 8122,
+        [2] = 8124,
+        [3] = 10888,
+        [4] = 10890,
+    }
+
+    return {
+        spellname = "Psychic Scream",
+        spellrank = rank,
+        manacost = mana[rank],
+        spellnumber = spellnumber[rank],
+        averagehealnocrit = 0,
+    }
+end

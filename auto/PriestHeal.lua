@@ -10,6 +10,10 @@ function LoadSpellRanks(spellName)
   while true do
     local tcinfo = TheoryCraft_GetSpellDataByName(spellName, i)
     if tcinfo == nil then
+      tcinfo = ManualLookup(spellName, i)
+    end
+
+    if tcinfo == nil then
       break
     end
 
