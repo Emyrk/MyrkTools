@@ -112,7 +112,7 @@ end
 
 
 function PriestChampion()
-  return PerPlayer("party", function(engine, player)
+  local step = PerPlayer("party", function(engine, player)
     if not player.castable then
       return nil
     end
@@ -135,4 +135,13 @@ function PriestChampion()
       "priest_champions_grace"
     )
   end)
+
+  return function(engine) 
+    -- Not enough mana
+    if UnitMana("player") < 250 then
+      return nil
+    end
+
+    return engine:evaluateStep(step)
+  end
 end
