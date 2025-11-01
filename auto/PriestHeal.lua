@@ -109,3 +109,30 @@ function BestSingleHeal(pid, mana, hp_needed)
     string.format("dynamic %s %d", healingSpell.spellname, healingSpell.spellrank)
   )
 end 
+
+
+function PriestChampion()
+  return PerPlayer("party", function(engine, player)
+    if not player.castable then
+      return nil
+    end
+
+    if not player.healable then
+      return nil
+    end
+
+    if not engine:hasBuff(player.id, "Spell_Holy_ProclaimChampion_02") then
+      return nil
+    end
+
+    if engine:hasBuff(player.id, "Spell_Holy_ChampionsGrace") then
+      return nil
+    end
+
+    return Action:Cast(
+      HealTable:MaxRankID("Champion's Grace"),
+      player.id,
+      "priest_champions_grace"
+    )
+  end)
+end

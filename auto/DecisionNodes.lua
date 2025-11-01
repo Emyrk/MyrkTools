@@ -167,28 +167,28 @@ function NotInstance(actionFunc)
     end
 end
 
-function InCombat(actionFunc)
+function OnlyInCombat(step)
     return function(engine)
         if not InCombat() then
             return nil -- Skip if not in combat
         end
         
-        return actionFunc(engine)
+        return engine:evaluateStep(step)
     end
 end
 
-function NotCombat(actionFunc)
+function OnlyNotCombat(step)
     return function(engine, player)
         if InCombat() then
             return nil -- Skip if in combat
         end
         
-        return actionFunc(engine, player)
+        return engine:evaluateStep(step)
     end
 end
 
 ---@param ptype string "player", "tank", or "party"
----@param step fun(engine:DecisionEngine, player: AllyPlayer) | table<string
+---@param step fun(engine:DecisionEngine, player: AllyPlayer): Action|nil
 function PerPlayer(ptype, step) 
     return function(engine)
         local result = nil

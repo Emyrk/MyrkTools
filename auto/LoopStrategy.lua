@@ -38,7 +38,7 @@ PriestLoopStrategy = {
   FlashHeal("party", 0.75, 3.5),
   PriestDynamicHeal("party", 0.85, 10, nil, 2.5),
   PriestDynamicHeal("party", 0.75, nil, nil, 2.5),
-  NotCombat(
+  OnlyNotCombat(
     PriestDynamicHeal("party", 0.90, nil, nil, 2.5)
   ),
 
@@ -50,8 +50,12 @@ PriestLoopStrategy = {
   HealFocus(0.75),
 
   NotInstance(
-    InCombat(Smite())
+    OnlyInCombat(Smite())
   ),
+
+  OnlyNotCombat(
+    PriestChampion()
+  )
 }
 
 ShamanLoopStrategy = {
@@ -75,7 +79,7 @@ ShamanLoopStrategy = {
 
   ShamanDynamicHeal("party", 0.90, 10, nil, 2),
   ShamanDynamicHeal("party", 0.85, nil, nil, 2),
-  NotCombat(
+  OnlyNotCombat(
     ShamanDynamicHeal("party", 0.90, nil, nil, 2.5)
   ),
 }
