@@ -20,7 +20,8 @@ function GetSpellIDs(spellName)
             _, _, spellRank = string.find(spellRank, " (%d+)$");
             spellRank = tonumber(spellRank);
             if not spellRank then
-                return i
+                List[1] = i; -- Just say rank 1
+                return List
             end
 
             -- print("HEY >>> spellname: " .. spellNamei .. " spellRank: " .. spellRank);
@@ -101,6 +102,8 @@ function ManualLookup(spellName, rank)
     return Fade(rank)
   elseif spellName == "Psychic Scream" then
     return Scream(rank)
+  elseif spellName == "Champion's Grace" then
+    return ChampionsGrace(rank)
   end
 
   return nil
@@ -159,6 +162,28 @@ function Scream(rank)
 
     return {
         spellname = "Psychic Scream",
+        spellrank = rank,
+        manacost = mana[rank],
+        spellnumber = spellnumber[rank],
+        averagehealnocrit = 0,
+    }
+end
+
+function ChampionsGrace(rank) 
+    if rank >= 2 then
+        return nil
+    end
+
+    mana = {
+        [1] = 250,
+    }
+
+    spellnumber = {
+        [1] = 45563,
+    }
+
+    return {
+        spellname = "Champion's Grace",
         spellrank = rank,
         manacost = mana[rank],
         spellnumber = spellnumber[rank],

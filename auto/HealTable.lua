@@ -89,6 +89,7 @@ function HealTable:Load(force)
       "Mind Blast",
       "Fade",
       "Psychic Scream",
+      "Champion's Grace",
     }
 
     single = {

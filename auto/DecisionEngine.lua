@@ -119,6 +119,13 @@ function DecisionEngine:ExecuteCast(decision)
         end
     }
 
+    -- The original target will be restored after the cast
+    local targetChanged = false
+    if decision.target_id ~= "target" then
+        TargetUnit(decision.target_id)
+        targetChanged = true
+    end
+
     if decision.spellID then
         self.castMonitor:StartMonitor(decision.spellID, decision.target_id, decision.reason, callbacks)
         CastSpell(decision.spellID, BOOKTYPE_SPELL)
@@ -128,6 +135,10 @@ function DecisionEngine:ExecuteCast(decision)
             self.castMonitor:StartMonitor(decision.spellName, decision.target_id, decision.reason, callbacks)
         end
         CastSpellByName(decision.spellName)
+    end
+
+    if targetChanged then
+        TargetLastTarget()
     end
 
     return true
