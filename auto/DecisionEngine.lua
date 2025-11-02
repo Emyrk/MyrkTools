@@ -13,6 +13,7 @@ function DecisionEngine:New()
     local strategy = {}
     local loopStrategy = NoopLoopStrategy
     if englishClass == "ROGUE" then
+        loopStrategy = RogueLoopStrategy
     elseif englishClass == "PRIEST" then
         loopStrategy = PriestLoopStrategy
     elseif englishClass == "SHAMAN" then

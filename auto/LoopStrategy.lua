@@ -8,6 +8,16 @@ NoopLoopStrategy = {
   rest = {},
 }
 
+RogueLoopStrategy = {
+  Debounce:New(0.5),
+  IsDead,
+  PlayerIsDrinking,
+  Mounted(),
+  -- Quick exit if we're already doing something
+  AlreadyCasting,
+  RogueRota,
+}
+
 PriestLoopStrategy = {
   Debounce:New(0.5),
   IsDead,

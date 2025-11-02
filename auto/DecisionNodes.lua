@@ -331,3 +331,9 @@ function HealFocus(pct)
         return BestSingleHeal(focusID, UnitMana("player"), hpMax - hp)
     end
 end
+
+function RogueRota(engine) 
+    return Action:Custom(function()
+        RogueRota:Rota()
+    end, "RogueRota")
+end
