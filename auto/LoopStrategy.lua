@@ -8,6 +8,17 @@ NoopLoopStrategy = {
   rest = {},
 }
 
+WarlockLoopStrategy = {
+  Debounce:New(0.5),
+  IsDead,
+  PlayerIsDrinking,
+  Mounted(),
+  -- Quick exit if we're already doing something
+  AlreadyCasting,
+  -- See if we can cast anything
+  OnlyInCombat(WarlockRota),
+}
+
 RogueLoopStrategy = {
   Debounce:New(0.5),
   IsDead,

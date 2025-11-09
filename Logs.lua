@@ -1,12 +1,33 @@
 -- MyrkLogs module
 MyrkLogs = MyrkAddon:NewModule("MyrkLogs")
 
-local AceGUI = LibStub("AceGUI-3.0")
+local AceGUI = LibStub("AceGUI-3.0")0
+
+-- Define default values for frame position
+local defaults = {
+    profile = {
+        framePosition = {
+            point = "CENTER",
+            relativeTo = "UIParent", 
+            relativePoint = "CENTER",
+            xOffset = 0,
+            yOffset = 0,
+            width = 600,
+            height = 300,
+            shown = true
+        },
+        syncEnabled = true, -- whether to sync logs with other players
+    },
+}
 
 function MyrkLogs:OnEnable()
   self.db = LibStub("AceDB-3.0"):New("MyrkLogsDB", defaults, true)
   self.syncEnabled = self.db.profile.syncEnabled
   self.shown = self.db.profile.framePosition.shown
+
+  if self.db.profile.framePosition == nil then
+    self.db.profile.framePosition = defaults.profile.framePosition
+  end
 
   if self.shown then
     self:CreateLogWindow()
@@ -25,23 +46,6 @@ local LEVEL_COLORS = {
   ERR = "|cffff0000", -- red
 }
 local COLOR_END = "|r"
-
--- Define default values for frame position
-local defaults = {
-    profile = {
-        framePosition = {
-            point = "CENTER",
-            relativeTo = "UIParent", 
-            relativePoint = "CENTER",
-            xOffset = 0,
-            yOffset = 0,
-            width = 600,
-            height = 300,
-            shown = true
-        },
-        syncEnabled = true, -- whether to sync logs with other players
-    },
-}
 
 function MyrkLogs:CreateLogWindow()
   self.shown = true
