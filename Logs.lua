@@ -1,7 +1,7 @@
 -- MyrkLogs module
 MyrkLogs = MyrkAddon:NewModule("MyrkLogs")
 
-local AceGUI = LibStub("AceGUI-3.0")0
+local AceGUI = LibStub("AceGUI-3.0")
 
 -- Define default values for frame position
 local defaults = {

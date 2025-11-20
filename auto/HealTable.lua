@@ -90,6 +90,7 @@ function HealTable:Load(force)
       "Fade",
       "Psychic Scream",
       "Champion's Grace",
+      "Inner Focus",
     }
 
     single = {

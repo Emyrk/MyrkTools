@@ -104,6 +104,8 @@ function ManualLookup(spellName, rank)
     return Scream(rank)
   elseif spellName == "Champion's Grace" then
     return ChampionsGrace(rank)
+  elseif spellName == "Inner Focus" then
+    return InnerFocus(rank)
   end
 
   return nil
@@ -184,6 +186,28 @@ function ChampionsGrace(rank)
 
     return {
         spellname = "Champion's Grace",
+        spellrank = rank,
+        manacost = mana[rank],
+        spellnumber = spellnumber[rank],
+        averagehealnocrit = 0,
+    }
+end
+
+function InnerFocus(rank) 
+    if rank >= 2 then
+        return nil
+    end
+
+    mana = {
+        [1] = 0,
+    }
+
+    spellnumber = {
+        [1] = 14751,
+    }
+
+    return {
+        spellname = "Inner Focus",
         spellrank = rank,
         manacost = mana[rank],
         spellnumber = spellnumber[rank],

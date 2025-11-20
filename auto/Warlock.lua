@@ -3,7 +3,12 @@ WarlockRota = {}
 
 ---@param engine DecisionEngine
 function WarlockRota:evaluate(engine)
+  if UnitIsHealable("target") then
+    ClearTarget()
+  end
+
   if not HostileTarget() then
+    TargetNearestEnemy()
     return nil
   end
 
@@ -25,7 +30,7 @@ function WarlockRota:evaluate(engine)
 	
 
 	-- Main nuke - Shadow Bolt
-  if healthPercent < 15  and mana > 20 and WarlockRota:CountSoulShards() < 20 then
+  if healthPercent < 15  and mana > 20 and WarlockRota:CountSoulShards() < 50 then
     return Action:CastByName("Drain Soul", "target", "soul shards")
   end
 

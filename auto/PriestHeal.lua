@@ -145,3 +145,15 @@ function PriestChampion()
     return engine:evaluateStep(step)
   end
 end
+
+
+function CastInnerFocus(engine)
+  local spellID = HealTable.MaxRankID("Inner Focus")
+  local _, duration = GetSpellCooldown(spellID, BOOKTYPE_SPELL)
+  if duration ~= 0 then
+    return nil -- Spell is on cooldown
+  end
+
+  CastSpell(spellID, BOOKTYPE_SPELL)
+  return nil
+end

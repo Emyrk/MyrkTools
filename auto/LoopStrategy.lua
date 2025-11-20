@@ -26,7 +26,17 @@ RogueLoopStrategy = {
   Mounted(),
   -- Quick exit if we're already doing something
   AlreadyCasting,
-  RogueRota,
+  OnlyInCombat(RogueRota),
+}
+
+WarriorLoopStrategy = {
+  Debounce:New(0.5),
+  IsDead,
+  PlayerIsDrinking,
+  Mounted(),
+  -- Quick exit if we're already doing something
+  AlreadyCasting,
+  OnlyInCombat(WarriorRota),
 }
 
 PriestLoopStrategy = {
@@ -44,6 +54,7 @@ PriestLoopStrategy = {
   -- If in spirit mode, go full send on healing
   SpiritFlashHeal,
   SpellQueueEvaluate(),
+  -- CastInnerFocus,
 
   PowerWordShield("player", 0.15),
   FlashHeal("player", 0.75, 2.5),

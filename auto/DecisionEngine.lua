@@ -20,6 +20,8 @@ function DecisionEngine:New()
         loopStrategy = ShamanLoopStrategy
     elseif englishClass == "WARLOCK" then
         loopStrategy = WarlockLoopStrategy
+    elseif englishClass == "WARRIOR" then
+        loopStrategy = WarriorLoopStrategy
     else
         DEFAULT_CHAT_FRAME:AddMessage("|cffff0000[MyrkAuto]|r Unsupported class: " .. tostring(englishClass))
         return nil
@@ -109,8 +111,8 @@ function DecisionEngine:ExecuteCast(decision)
         -- Start monitoring the cast
     local callbacks = {
         onSuccess = function(spell, target, reason)
-            DEFAULT_CHAT_FRAME:AddMessage(string.format("|cff00ff00[Auto]|r Cast successful: %s -> %s (%s)", 
-                spell, target, reason))
+            --DEFAULT_CHAT_FRAME:AddMessage(string.format("|cff00ff00[Auto]|r Cast successful: %s -> %s (%s)", 
+            --    spell, target, reason))
         end,
         onFailed = function(spell, target, reason, error)
             DEFAULT_CHAT_FRAME:AddMessage(string.format("|cffff0000[Auto]|r Cast failed: %s -> %s (%s) - %s", 

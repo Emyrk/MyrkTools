@@ -85,3 +85,60 @@ function Auto:Perform()
     
     return false
 end
+
+
+-- Shaman targeting and rotation script
+local function HasBuff(name)
+	for i=0, 31 do
+		local buffTexture, buffApplications = UnitBuff("player", i)
+        if buffTexture and string.find(buffTexture, name) then
+			return true
+		end
+	end
+	return false
+end
+
+local shamanSpellCache = {}
+
+-- Shaman targeting and rotation script
+function ShamanTag()
+    if table.getn(shamanSpellCache) == 0 then
+        shamanSpellCache["Earth Shock"] = GetSpellIDs("Earth Shock")
+        shamanSpellCache["Lightning Bolt"] = GetSpellIDs("Lightning Bolt")
+        shamanSpellCache["Lightning Shield"] = GetSpellIDs("Lightning Shield")
+        -- print(PrintTable(shamanSpellCache))
+    end
+
+    -- 0. Cast Lightning Shield if not active
+	if not HasBuff("LightningShield") then
+		CastSpell(shamanSpellCache["Lightning Shield"][1], BOOKTYPE_SPELL)
+		return
+	end
+
+	-- 1. If not targeting an enemy, target one
+	if not UnitExists("target") or not UnitCanAttack("player", "target") or UnitIsDead("target") then
+		TargetNearestEnemy()
+		return
+	end
+	
+	-- 2. If enemy has <100% health, clear target and target someone else
+	local health = UnitHealth("target")
+	local healthMax = UnitHealthMax("target")
+	if health < healthMax then
+		ClearTarget()
+		TargetNearestEnemy()
+		return
+	end
+	
+	-- 3. Cast Earth Shock if not on cooldown
+	local start, _, _ = GetSpellCooldown(shamanSpellCache["Earth Shock"][1], BOOKTYPE_SPELL)
+	if start == 0 then
+		CastSpell(shamanSpellCache["Earth Shock"][1], BOOKTYPE_SPELL)
+        ClearTarget()
+		return
+	end
+	
+	-- 4. Cast Lightning Bolt rank 1
+	CastSpell(shamanSpellCache["Lightning Bolt"][1], BOOKTYPE_SPELL)
+    ClearTarget()
+end

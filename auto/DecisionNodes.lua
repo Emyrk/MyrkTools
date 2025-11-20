@@ -337,3 +337,18 @@ function RogueRota(engine)
         RogueRota:Rota()
     end, "RogueRota")
 end
+
+function WarriorRota(engine) 
+    return Action:Custom(function()
+        if UnitIsHealable("target") then
+            ClearTarget()
+        end
+
+        if not HostileTarget() then
+            TargetNearestEnemy()
+            return nil
+        end
+
+        IWin:DoShit()
+    end, "WarriorRota")
+end
