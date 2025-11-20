@@ -54,6 +54,7 @@ PriestLoopStrategy = {
   -- If in spirit mode, go full send on healing
   SpiritFlashHeal,
   SpellQueueEvaluate(),
+  -- TODO: Only cast when the target is low hp or something
   -- CastInnerFocus,
 
   PowerWordShield("player", 0.15),
