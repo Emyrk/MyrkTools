@@ -5,6 +5,7 @@
 ---@field partyMonitor PartyMonitor
 ---@field castMonitor CastMonitor
 ---@field loopStrategy table List of decision nodes to evaluate every loop
+---@field class string Player class
 DecisionEngine = {}
 DecisionEngine.__index = DecisionEngine
 
@@ -32,7 +33,8 @@ function DecisionEngine:New()
         castMonitor = nil, 
         loopStrategy = loopStrategy,
         config = {
-        }
+        },
+        class = englishClass,
     }
     
     setmetatable(instance, DecisionEngine)
@@ -177,6 +179,10 @@ function DecisionEngine:ExecuteHeal(decision)
         end
     }
     
+    -- Might help to cast inner focus here
+    if self.class == "PRIEST" and UnitHealth(decision.target_id)/UnitHealthMax(decision.target_id) < 0.5 then
+        CastInnerFocus(self) 
+    end
 
     local result = WithAutoSelfCastOff(RetainTarget(function (engine)
         engine.castMonitor:StartMonitor(decision.spellID, decision.target_id, decision.reason, callbacks)
