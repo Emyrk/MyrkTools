@@ -191,6 +191,7 @@ function DecisionEngine:ExecuteHeal(decision)
         CastSpell(decision.spellID, BOOKTYPE_SPELL)
 
         if not SpellIsTargeting() then
+            SpellStopCasting() -- This might help
             return Action:Error("Spell is not targeting")
         end
 
@@ -200,6 +201,7 @@ function DecisionEngine:ExecuteHeal(decision)
         -- We should no longer be targeting after this point.
         if SpellIsTargeting() then
             SpellStopTargeting()
+            SpellStopCasting()
             return Action:Error("Failed to target unit")
         end
 

@@ -186,7 +186,6 @@ function CastBestSingleHealMouseover()
   if action == nil then
     return nil
   end
-    
 
   Auto.engine:ExecuteHeal(action)
 end
