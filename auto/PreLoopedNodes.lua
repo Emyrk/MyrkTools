@@ -54,6 +54,10 @@ function SpiritFlashHeal(engine)
 
     local action = nil
     engine:ForEach("party", function(player)
+        if player.id == "player" then
+            return false -- Skip self
+        end
+
         if not player.castable or not player.healable then
             return false
         end

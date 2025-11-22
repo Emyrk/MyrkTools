@@ -86,7 +86,9 @@ PriestLoopStrategy = {
 
   OnlyNotCombat(
     PriestChampion()
-  )
+  ),
+ 
+  Wanding:New()
 }
 
 ShamanLoopStrategy = {

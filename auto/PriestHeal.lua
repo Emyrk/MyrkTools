@@ -157,3 +157,25 @@ function CastInnerFocus(engine)
   CastSpell(spellID, BOOKTYPE_SPELL)
   return nil
 end
+
+function CastBestSingleHealMouseover()
+  local ok, id = UnitExists("mouseover")
+  if not ok then
+    -- Cast on self
+    id = "player"
+  end
+
+  if not UnitIsHealable(id) then  
+    return nil
+  end
+
+  local mana = UnitMana("player")
+  local action = BestSingleHeal(id, mana, 1000000)
+  if action == nil then
+    return nil
+  end
+
+
+    
+  Auto.engine:ExecuteHeal(action)
+end

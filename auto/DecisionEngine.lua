@@ -52,12 +52,15 @@ function DecisionEngine:LoadModules()
         end
     end
 
+    self:CastMonitor()
+end
+
+function DecisionEngine:CastMonitor()
     if not self.castMonitor then
-        if not self.castMonitor then
-            self.castMonitor = MyrkAddon:GetModule("MyrkCastMonitor")
-            DEFAULT_CHAT_FRAME:AddMessage("|cffff0000[MyrkAuto]|r MyrkCastMonitor not found")
-        end
+        self.castMonitor = MyrkAddon:GetModule("MyrkCastMonitor")
+        DEFAULT_CHAT_FRAME:AddMessage("|cffff0000[MyrkAuto]|r MyrkCastMonitor not found")
     end
+    return self.castMonitor
 end
 
 function DecisionEngine:Ready()
@@ -95,14 +98,11 @@ end
 
 -- Helper function to check if we're already casting
 function DecisionEngine:IsMonitoredCasting()
-    return self.castMonitor:IsMonitoredCasting()
+    return self:CastMonitor():IsMonitoredCasting()
 end
 
 function DecisionEngine:IsGlobalCasting()
-    if not self.castMonitor then
-        self.castMonitor = MyrkAddon:GetModule("MyrkCastMonitor")
-    end
-    return self.castMonitor:IsGlobalCasting()
+    return self:CastMonitor():IsGlobalCasting()
 end
 
 function DecisionEngine:ExecuteCast(decision)
@@ -134,12 +134,12 @@ function DecisionEngine:ExecuteCast(decision)
     end
 
     if decision.spellID then
-        self.castMonitor:StartMonitor(decision.spellID, decision.target_id, decision.reason, callbacks)
+        self:CastMonitor():StartMonitor(decision.spellID, decision.target_id, decision.reason, callbacks)
         CastSpell(decision.spellID, BOOKTYPE_SPELL)
     else
         -- Assume the target is already correctly selected
         if decision.spellName ~= "Shoot" then
-            self.castMonitor:StartMonitor(decision.spellName, decision.target_id, decision.reason, callbacks)
+            self:CastMonitor():StartMonitor(decision.spellName, decision.target_id, decision.reason, callbacks)
         end
         CastSpellByName(decision.spellName)
     end
@@ -185,7 +185,7 @@ function DecisionEngine:ExecuteHeal(decision)
     end
 
     local result = WithAutoSelfCastOff(RetainTarget(function (engine)
-        engine.castMonitor:StartMonitor(decision.spellID, decision.target_id, decision.reason, callbacks)
+        engine:CastMonitor():StartMonitor(decision.spellID, decision.target_id, decision.reason, callbacks)
         CastSpell(decision.spellID, BOOKTYPE_SPELL)
 
         if not SpellIsTargeting() then
@@ -215,7 +215,7 @@ end
 
 -- Get current cast information
 function DecisionEngine:GetCurrentCast()
-    return self.castMonitor:GetCurrentCast()
+    return self:CastMonitor():GetCurrentCast()
 end
 
 ---@param ptype string "player", "tank", or "party"
