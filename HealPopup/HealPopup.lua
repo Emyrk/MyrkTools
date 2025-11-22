@@ -9,11 +9,23 @@ local fadeTime = 0.5
 local endTime = 0
 
 function HealPopup:OnEnable()
+    -- Initialize saved variables
+    if not HealPopupDB then
+        HealPopupDB = {
+            position = {
+                point = "CENTER",
+                relativeTo = "UIParent",
+                relativePoint = "CENTER",
+                xOfs = 0,
+                yOfs = 200
+            }
+        }
+    end
+
     -- Create popup frame
     popupFrame = CreateFrame("Frame", "HealPopupFrame", UIParent)
     popupFrame:SetWidth(300)
     popupFrame:SetHeight(120)
-    popupFrame:SetPoint("CENTER", UIParent, "CENTER", 0, 200) -- Above center
     popupFrame:SetFrameStrata("HIGH")
     popupFrame:SetBackdrop({
         bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
@@ -23,6 +35,26 @@ function HealPopup:OnEnable()
         edgeSize = 32,
         insets = { left = 11, right = 12, top = 12, bottom = 11 }
     })
+    
+    -- Load saved position
+    local pos = HealPopupDB.position
+    popupFrame:SetPoint(pos.point, UIParent, pos.relativePoint, pos.xOfs, pos.yOfs)
+    
+    -- Make frame movable
+    popupFrame:SetMovable(true)
+    popupFrame:EnableMouse(true)
+    popupFrame:RegisterForDrag("LeftButton")
+    popupFrame:SetClampedToScreen(true)
+    
+    popupFrame:SetScript("OnDragStart", function()
+        popupFrame:StartMoving()
+    end)
+    
+    popupFrame:SetScript("OnDragStop", function()
+        popupFrame:StopMovingOrSizing()
+        HealPopup:SavePosition()
+    end)
+    
     popupFrame:Hide()
 
     -- Title text
@@ -64,7 +96,22 @@ function HealPopup:OnEnable()
         end
     end)
 
-    DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[HealPopup]|r Loaded")
+    DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[HealPopup]|r Loaded (drag to reposition)")
+end
+
+function HealPopup:SavePosition()
+    if not popupFrame then return end
+    
+    local point, relativeTo, relativePoint, xOfs, yOfs = popupFrame:GetPoint()
+    HealPopupDB.position = {
+        point = point,
+        relativeTo = "UIParent",
+        relativePoint = relativePoint,
+        xOfs = xOfs,
+        yOfs = yOfs
+    }
+    
+    DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[HealPopup]|r Position saved")
 end
 
 function HealPopup:Show(targetName, spellName, spellRank, healAmount, incomingDamage, hpNeeded)
