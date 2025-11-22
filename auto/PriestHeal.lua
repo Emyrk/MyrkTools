@@ -185,7 +185,7 @@ function CastBestSingleHealMouseover()
   local hpmax = UnitHealthMax(id)
   local hp_needed = hpmax - hp
   local recentDmg = DamageComm.UnitGetIncomingDamage(UnitName(id)) or 0
-  print("Incoming damage for " .. UnitName(id) .. ": " .. tostring(recentDmg))
+  -- print("Incoming damage for " .. UnitName(id) .. ": " .. tostring(recentDmg))
 
   local incDamage = recentDmg / 2 -- Over 2.5s
 
