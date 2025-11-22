@@ -72,8 +72,8 @@ function PriestDynamicHeal(ptype, pct, ttd, prevent, incDmgTime)
   end)
 end
 
----@return Action|nil
-function BestSingleHeal(pid, mana, hp_needed)
+---@return table|nil The selected healing spell with spellname, spellrank, manacost, averagehealnocrit
+function GetBestSingleHealSpell(pid, mana, hp_needed)
   HealTable:Load(false)
 
   local healingSpell = nil
@@ -97,6 +97,13 @@ function BestSingleHeal(pid, mana, hp_needed)
       break
     end
   end
+
+  return healingSpell
+end
+
+---@return Action|nil
+function BestSingleHeal(pid, mana, hp_needed)
+  local healingSpell = GetBestSingleHealSpell(pid, mana, hp_needed)
 
   if healingSpell == nil then
     return nil -- No heal found
@@ -185,6 +192,19 @@ function CastBestSingleHealMouseover()
   local action = BestSingleHeal(id, mana, hp_needed + incDamage)
   if action == nil then
     return nil
+  end
+
+  -- Get the spell info for the popup
+  local healingSpell = GetBestSingleHealSpell(id, mana, hp_needed + incDamage)
+  if healingSpell and HealPopup then
+    HealPopup:Show(
+      UnitName(id),
+      healingSpell.spellname,
+      healingSpell.spellrank,
+      healingSpell.averagehealnocrit,
+      recentDmg,
+      hp_needed
+    )
   end
 
   Auto.engine:ExecuteHeal(action)

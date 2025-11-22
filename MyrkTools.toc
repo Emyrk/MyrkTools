@@ -57,3 +57,7 @@ auto\Auto.lua
 
 # Overlay
 HealingIndicator\HealingIndicator.lua
+
+
+# HealPopup
+HealPopup\HealPopup.lua
