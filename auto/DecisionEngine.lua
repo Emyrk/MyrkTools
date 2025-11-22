@@ -45,14 +45,16 @@ function DecisionEngine:New()
 end
 
 function DecisionEngine:LoadModules()
+    self:PartyMonitor()
+    self:CastMonitor()
+end
+
+function DecisionEngine:PartyMonitor()
     if not self.partyMonitor then
         self.partyMonitor = MyrkAddon:GetModule("MyrkPartyMonitor")
-        if not self.partyMonitor then
-            DEFAULT_CHAT_FRAME:AddMessage("|cffff0000[MyrkAuto]|r PartyMonitor not found")
-        end
+        DEFAULT_CHAT_FRAME:AddMessage("|cffff0000[MyrkAuto]|r MyrkPartyMonitor not found")
     end
-
-    self:CastMonitor()
+    return self.partyMonitor
 end
 
 function DecisionEngine:CastMonitor()
@@ -161,11 +163,11 @@ function DecisionEngine:ExecuteHeal(decision)
         onSuccess = function(spell, target, reason)
             -- DEFAULT_CHAT_FRAME:AddMessage(string.format("|cff00ff00[Auto]|r Cast successful: %s -> %s (%s)", 
             --     spell, target, reason))
-            self.partyMonitor:UpdatePartyMembers()
+            self:PartyMonitor():UpdatePartyMembers()
         end,
         onFailed = function(spell, target, reason, error)
             if error ~= "LeftButton" then
-                self.partyMonitor:BlackList(target, 5)
+                self:PartyMonitor():BlackList(target, 5)
                 Logs.Error(string.format("Cast failed, blacklist: %s -> %s (%s) - %s", 
                 spell, target, reason, error or "Unknown"))
             end
@@ -221,7 +223,7 @@ end
 ---@param ptype string "player", "tank", or "party"
 ---@param callback function(player: PartyPlayer): boolean|nil Return true to stop iteration
 function DecisionEngine:ForEach(ptype, callback)
-    self.partyMonitor:ForEach(function(player)
+    self:PartyMonitor():ForEach(function(player)
         if ptype == "player" and player.unitId == "player" then
             return callback(player)
         elseif ptype == "tank" and player.role == "Tank" then

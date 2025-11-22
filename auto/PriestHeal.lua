@@ -159,6 +159,10 @@ function CastInnerFocus(engine)
 end
 
 function CastBestSingleHealMouseover()
+  if Auto.engine:IsGlobalCasting() or Auto.engine:IsMonitoredCasting() then
+    return nil
+  end
+
   local ok, id = UnitExists("mouseover")
   if not ok then
     -- Cast on self
@@ -170,12 +174,19 @@ function CastBestSingleHealMouseover()
   end
 
   local mana = UnitMana("player")
-  local action = BestSingleHeal(id, mana, 1000000)
+  local hp = UnitHealth(id)
+  local hpmax = UnitHealthMax(id)
+  local hp_needed = hpmax - hp
+  local recentDmg = DamageComm.UnitGetIncomingDamage(UnitName(id)) or 0
+  print("Incoming damage for " .. UnitName(id) .. ": " .. tostring(recentDmg))
+
+  local incDamage = recentDmg / 2 -- Over 2.5s
+
+  local action = BestSingleHeal(id, mana, hp_needed + incDamage)
   if action == nil then
     return nil
   end
-
-
     
+
   Auto.engine:ExecuteHeal(action)
 end
