@@ -16,6 +16,7 @@ function HealPopup:OnEnable()
                 point = "CENTER",
                 relativeTo = "UIParent",
                 relativePoint = "CENTER",
+                -- I like 250, -290
                 xOfs = 0,
                 yOfs = 200
             }
