@@ -29,6 +29,15 @@ function PlayerIsDrinking(engine)
     return nil
 end
 
+function IsGhostWolf()
+    return function(engine)
+        if engine:hasBuff("player", "Spell_Nature_SpiritWolf") then
+            return Action:Busy("player is ghost wolf")
+        end
+        return nil
+    end
+end
+
 function Mounted()
     return function(engine)
         if engine:hasBuff("player", "inv_pet_speedy") then

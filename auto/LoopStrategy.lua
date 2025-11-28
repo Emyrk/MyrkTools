@@ -97,6 +97,7 @@ ShamanLoopStrategy = {
   IsDead,
   PlayerIsDrinking,
   Mounted(),
+  IsGhostWolf(),
   -- Quick exit if we're already doing something
   AlreadyCasting,
   -- Calc incoming dmg, heals, etc
