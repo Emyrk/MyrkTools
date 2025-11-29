@@ -92,7 +92,6 @@ PriestLoopStrategy = {
 }
 
 ShamanLoopStrategy = {
-
   Debounce:New(0.5),
   IsDead,
   PlayerIsDrinking,
