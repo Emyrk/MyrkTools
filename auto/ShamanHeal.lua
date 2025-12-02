@@ -47,7 +47,7 @@ function ShamanDynamicHeal(ptype, pct, ttd, prevent, incDmgTime)
     end
 
     local hp_needed = player:HPNeeded(incDmgTime or 0)
-    local action = BestSingleHeal(player.id, UnitMana("player"), hp_needed)
+    local action = BestSingleHeal(player.id, UnitMana("player"), hp_needed, false)
     return action
   end)
 end

@@ -337,7 +337,7 @@ function HealFocus(pct)
         end
 
 
-        return BestSingleHeal(focusID, UnitMana("player"), hpMax - hp)
+        return BestSingleHeal(focusID, UnitMana("player"), hpMax - hp, false)
     end
 end
 
