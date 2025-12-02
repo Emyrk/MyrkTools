@@ -342,7 +342,6 @@ function CancelOverheal(overPct)
             return nil
         end
 
-        print("Enter overheal")
         local hp = UnitHealth(cast.target)
         local hpMax = UnitHealthMax(cast.target)
         local hpPct = hp / hpMax
