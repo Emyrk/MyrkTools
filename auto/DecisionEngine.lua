@@ -187,7 +187,7 @@ function DecisionEngine:ExecuteHeal(decision)
     -- end
 
     local result = WithAutoSelfCastOff(RetainTarget(function (engine)
-        engine:CastMonitor():StartMonitor(decision.spellID, decision.target_id, decision.reason, callbacks)
+        engine:CastMonitor():StartMonitor(decision.spellID, decision.target_id, decision.reason, callbacks, true)
         CastSpell(decision.spellID, BOOKTYPE_SPELL)
 
         if not SpellIsTargeting() then
@@ -197,7 +197,7 @@ function DecisionEngine:ExecuteHeal(decision)
 
         SpellTargetUnit(decision.target_id)
 
-        -- If the target failed to acquire, throw an error.
+        -- If the target failed to acquire, throw000000 an error.
         -- We should no longer be targeting after this point.
         if SpellIsTargeting() then
             SpellStopTargeting()

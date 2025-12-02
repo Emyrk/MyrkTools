@@ -44,6 +44,8 @@ PriestLoopStrategy = {
   IsDead,
   PlayerIsDrinking,
   Mounted(),
+  -- Stop casting overheals
+  CancelOverheal(0.98),
   -- Quick exit if we're already doing something
   AlreadyCasting,
   -- Calc incoming dmg, heals, etc
