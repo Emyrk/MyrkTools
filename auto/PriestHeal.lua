@@ -132,6 +132,12 @@ function PriestChampion()
       return nil
     end
 
+    if engine:hasBuff(player.id, function(icon, id) 
+      return id == 45563 or id == 45564 or id == 45565 or id == 45570
+    end) then
+      return nil
+    end
+
     if engine:hasBuff(player.id, "Spell_Holy_ChampionsGrace") then
       return nil
     end

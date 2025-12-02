@@ -182,9 +182,9 @@ function DecisionEngine:ExecuteHeal(decision)
     }
     
     -- Might help to cast inner focus here
-    if self.class == "PRIEST" and UnitHealth(decision.target_id)/UnitHealthMax(decision.target_id) < 0.5 then
-        CastInnerFocus(self) 
-    end
+    -- if self.class == "PRIEST" and UnitHealth(decision.target_id)/UnitHealthMax(decision.target_id) < 0.5 then
+    --     CastInnerFocus(self) 
+    -- end
 
     local result = WithAutoSelfCastOff(RetainTarget(function (engine)
         engine:CastMonitor():StartMonitor(decision.spellID, decision.target_id, decision.reason, callbacks)
@@ -249,12 +249,24 @@ function DecisionEngine:PrintBuffs(unitId, buffName)
 end
 
 -- Helper function to check if target has a specific buff
-function DecisionEngine:hasBuff(unitId, buffName)
+---@arg unitId string Unit ID to check
+---@param selector string|number|function(string,number):boolean
+function DecisionEngine:hasBuff(unitId, selector)
     local i = 1
     while UnitBuff(unitId, i) do
-        local icon, _, _, id = UnitBuff(unitId, i)
-        if string.find(icon, buffName) then
-            return true
+        local icon, _, id = UnitBuff(unitId, i)
+        if type(selector) == "string" then
+            if string.find(icon, selector) then
+                return true
+            end
+        elseif type(selector) == "number" then
+            if id == selector then
+                return true
+            end
+        elseif type(selector) == "function" then
+            if selector(icon, id) then
+                return true
+            end
         end
         i = i + 1
     end
