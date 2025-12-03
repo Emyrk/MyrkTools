@@ -198,6 +198,7 @@ function DecisionEngine:ExecuteHeal(decision)
 
         if not SpellIsTargeting() then
             SpellStopCasting() -- This might help
+            SpellStopTargeting()
             return Action:Error("Spell is not targeting")
         end
 
