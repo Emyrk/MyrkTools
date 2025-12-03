@@ -72,7 +72,7 @@ end
 
 function DecisionEngine:ExecuteLoopedStrategy()
     self.ctx = {}
-    if GetNumRaidMembers() > 0 and self.loopStrategy["raid"] then
+    if 0 and self.loopStrategy["raid"] then
         return self:executeSteps(self.loopStrategy["raid"])
     end
     if self.loopStrategy["default"] then

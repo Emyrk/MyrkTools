@@ -28,6 +28,7 @@ function HealPopup:OnEnable()
     popupFrame:SetWidth(300)
     popupFrame:SetHeight(120)
     popupFrame:SetFrameStrata("HIGH")
+    popupFrame:SetMovable(true)
     popupFrame:SetBackdrop({
         bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
         edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
