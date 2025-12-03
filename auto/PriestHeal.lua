@@ -176,45 +176,47 @@ function CastInnerFocus(engine)
   return nil
 end
 
-function CastBestSingleHealMouseover(fast)
+function CastBestSingleHealTarget(id, fast)
   if Auto.engine:IsGlobalCasting() or Auto.engine:IsMonitoredCasting() then
     return nil
   end
 
-  local ok, id = UnitExists("mouseover")
+  local ok, guid = UnitExists(id)
   if not ok then
-    -- Cast on self
-    id = "player"
+    UIErrorsFrame:AddMessage(string.format("%s does not exists", tostring(id)), 1, 0, 0)
+    return nil
   end
 
-  if not UnitIsHealable(id) then  
+  if not UnitIsHealable(guid) then  
+    local name = UnitName(guid) or tostring(guid)
+    UIErrorsFrame:AddMessage(string.format("%s is not healable", name), 1, 0, 0)
     return nil
   end
 
   local mana = UnitMana("player")
-  local hp = UnitHealth(id)
-  local hpmax = UnitHealthMax(id)
+  local hp = UnitHealth(guid)
+  local hpmax = UnitHealthMax(guid)
   local hp_needed = hpmax - hp
-  local recentDmg = DamageComm.UnitGetIncomingDamage(UnitName(id)) or 0
-  -- print("Incoming damage for " .. UnitName(id) .. ": " .. tostring(recentDmg))
+  local recentDmg = DamageComm.UnitGetIncomingDamage(UnitName(guid)) or 0
+  -- print("Incoming damage for " .. UnitName(guid) .. ": " .. tostring(recentDmg))
 
   local incDamage = recentDmg / 2 -- Over 2.5s
 
   -- Get the spell info for the popup
-  local healingSpell = GetBestSingleHealSpell(id, mana, hp_needed + incDamage, fast)
+  local healingSpell = GetBestSingleHealSpell(guid, mana, hp_needed + incDamage, fast)
   if healingSpell == nil then
     return nil
   end
 
   local action = Action:Heal(
     HealTable.SpellIndex[healingSpell.spellname][healingSpell.spellrank],
-    id,
+    guid,
     -- "dynamic heal",
     string.format("fast=%s, dynamic %s %d", tostring(fast), healingSpell.spellname, healingSpell.spellrank)
   )
   if healingSpell and HealPopup then
     HealPopup:Show(
-      UnitName(id),
+      UnitName(guid),
       healingSpell.spellname,
       healingSpell.spellrank,
       healingSpell.averagehealnocrit,

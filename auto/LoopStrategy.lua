@@ -39,11 +39,6 @@ WarriorLoopStrategy = {
   OnlyInCombat(WarriorRota),
 }
 
-PriestLoopStrategy = {
-  ["default"] = PriestDefaultStrategy,
-  ["raid"] = PriestRaidStrategy,
-}
-
 PriestRaidStrategy = {
   Debounce:New(0.5),
   IsDead,
@@ -120,6 +115,11 @@ PriestDefaultStrategy = {
   ),
  
   Wanding:New()
+}
+
+PriestLoopStrategy = {
+  ["default"] = PriestDefaultStrategy,
+  ["raid"] = PriestRaidStrategy,
 }
 
 ShamanLoopStrategy = {
