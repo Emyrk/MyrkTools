@@ -1,5 +1,6 @@
 Debounce = {}
 Debounce.__index = Debounce
+---@param cooldown number seconds
 function Debounce:New(cooldown)
   local instance = {
     lastTime = 0,
@@ -174,19 +175,64 @@ function Smite()
   end
 end
 
-function SmartBuff(manaThreshold)
-  return function(engine)
-    if not SMARTBUFF_command then
-      return nil
-    end
-    
-    local pct = UnitMana("player") / UnitManaMax("player");
-    if pct < manaThreshold then
-      return nil
-    end
+SmartBuffNode = {}
+SmartBuffNode.__index = SmartBuffNode
 
-    return Action:Custom(function (engine)
-      SMARTBUFF_command("")
-    end, "smart_buff")
+function SmartBuffNode:New(manaPct, cooldown)
+  local instance = {
+    lastTime = 0,
+    cooldown = cooldown or 30, -- seconds
+    manaPct = manaPct or 0.4,
+    hooked = 0,
+    buffCasted = false,
+  }
+
+  setmetatable(instance, SmartBuffNode)
+  return instance
+end
+
+function SmartBuffNode:evaluate(engine)
+  if self.hooked == -1 then
+    return
   end
+  if self.hooked == 0 then
+    if SMARTBUFF_doCast == nil then
+      Logs.Warn("SmartBuffNode: SMARTBUFF_doCast is not defined, cannot use SmartBuffNode")
+      self.hooked = -1
+    else 
+      local oldFunction = SMARTBUFF_doCast
+      SMARTBUFF_doCast = function(unit, id, actionSlot, levels, type)
+
+        self.buffCasted = true
+        oldFunction(unit, id, actionSlot, levels, type)
+      end
+      self.hooked = 1
+    end
+  end
+
+  local now = GetTime()
+  if now - self.lastTime < self.cooldown then
+    return nil
+  end
+
+  if not SMARTBUFF_command then
+    return nil
+  end
+
+  local pct = UnitMana("player") / UnitManaMax("player");
+  if pct < self.manaPct then
+    return nil
+  end
+
+  local node = self
+  return Action:Custom(function (engine)
+    SMARTBUFF_command("")
+    if not node.buffCasted then
+      Logs.Info("SmartBuffNode: No buffs to cast")
+      node.lastTime = GetTime()
+    else
+      Logs.Info("SmartBuffNode: Buffs casted")
+    end
+    node.buffCasted = false
+  end, "smart_buff")
 end

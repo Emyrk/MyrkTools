@@ -1,3 +1,10 @@
+local function PrintNode(msg) 
+  return function(engine)
+    DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[DecisionEngine]|r " .. msg)
+    return nil
+  end
+end
+
 NoopLoopStrategy = {
   always = {
     Debounce:New(0.5),
@@ -113,8 +120,14 @@ PriestDefaultStrategy = {
   OnlyNotCombat(
     PriestChampion()
   ),
- 
-  Wanding:New()
+
+  OnlyInCombat(
+    Wanding:New()
+  ),
+
+  OnlyNotCombat(
+    SmartBuffNode:New(0.40, 30)
+  )
 }
 
 PriestLoopStrategy = {
@@ -147,7 +160,6 @@ ShamanLoopStrategy = {
     ShamanDynamicHeal("party", 0.90, nil, nil, 2.5)
   ),
 }
-
 
 function DebugExecution(message) 
   -- print("DEBUG: " .. message)
