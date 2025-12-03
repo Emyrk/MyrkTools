@@ -61,12 +61,13 @@ function SpellQueue:PriestWhisper()
     end
 
     if text == "shield" then
-
+      Logs.Info("Queuing PWS for " .. player.name)
       SpellQueue:PWS(player, "priest_whisper_shield")
       return
     end
 
     if text == "renew" then
+      Logs.Info("Queuing Renew for " .. player.name)
       SpellQueue:Renew(player, "priest_whisper_renew")
       return
     end

@@ -68,22 +68,27 @@ function PriestDynamicHeal(ptype, pct, ttd, prevent, incDmgTime)
 
     DebugExecution(string.format("PriestDynamicHeal: considering heal for %s pct=%.2f ttd=%.2f", player.id, playerPct, playerTTD))
     local hp_needed = player:HPNeeded(incDmgTime or 0)
-    return BestSingleHeal(player.id, UnitMana("player"), hp_needed)
+    return BestSingleHeal(player.id, UnitMana("player"), hp_needed, false)
   end)
 end
 
 ---@return table|nil The selected healing spell with spellname, spellrank, manacost, averagehealnocrit
-function GetBestSingleHealSpell(pid, mana, hp_needed)
+function GetBestSingleHealSpell(pid, mana, hp_needed, fast)
   HealTable:Load(false)
 
   local healingSpell = nil
-  for _, spell in ipairs(HealTable.SingleHeals) do
+  local list = HealTable.SingleHeals
+  if fast then
+    list = HealTable.FastHeals
+  end
+
+  for _, spell in ipairs(list) do
     healingSpell = spell
 
     if not spell.manacost then
       -- Debug log this error
       HealTable:Load(true)
-      Logs.Error(string.format("SingleHeals=%d", table.getn(HealTable.SingleHeals)))
+      Logs.Error(string.format("SingleHeals=%d", table.getn(list)))
       Logs.Error("No manacost for spell " .. tostring(spell.spellname) .. " rank " .. tostring(spell.spellrank))
       healingSpell = nil
       break
@@ -102,8 +107,8 @@ function GetBestSingleHealSpell(pid, mana, hp_needed)
 end
 
 ---@return Action|nil
-function BestSingleHeal(pid, mana, hp_needed)
-  local healingSpell = GetBestSingleHealSpell(pid, mana, hp_needed)
+function BestSingleHeal(pid, mana, hp_needed, fast)
+  local healingSpell = GetBestSingleHealSpell(pid, mana, hp_needed, fast)
 
   if healingSpell == nil then
     return nil -- No heal found
@@ -113,7 +118,7 @@ function BestSingleHeal(pid, mana, hp_needed)
     HealTable.SpellIndex[healingSpell.spellname][healingSpell.spellrank],
     pid,
     -- "dynamic heal",
-    string.format("dynamic %s %d", healingSpell.spellname, healingSpell.spellrank)
+    string.format("fast=%s, dynamic %s %d", tostring(fast), healingSpell.spellname, healingSpell.spellrank)
   )
 end 
 
@@ -129,6 +134,12 @@ function PriestChampion()
     end
 
     if not engine:hasBuff(player.id, "Spell_Holy_ProclaimChampion_02") then
+      return nil
+    end
+
+    if engine:hasBuff(player.id, function(icon, id) 
+      return id == 45563 or id == 45564 or id == 45565 or id == 45570
+    end) then
       return nil
     end
 
@@ -165,7 +176,7 @@ function CastInnerFocus(engine)
   return nil
 end
 
-function CastBestSingleHealMouseover()
+function CastBestSingleHealMouseover(fast)
   if Auto.engine:IsGlobalCasting() or Auto.engine:IsMonitoredCasting() then
     return nil
   end
@@ -189,13 +200,18 @@ function CastBestSingleHealMouseover()
 
   local incDamage = recentDmg / 2 -- Over 2.5s
 
-  local action = BestSingleHeal(id, mana, hp_needed + incDamage)
-  if action == nil then
+  -- Get the spell info for the popup
+  local healingSpell = GetBestSingleHealSpell(id, mana, hp_needed + incDamage, fast)
+  if healingSpell == nil then
     return nil
   end
 
-  -- Get the spell info for the popup
-  local healingSpell = GetBestSingleHealSpell(id, mana, hp_needed + incDamage)
+  local action = Action:Heal(
+    HealTable.SpellIndex[healingSpell.spellname][healingSpell.spellrank],
+    id,
+    -- "dynamic heal",
+    string.format("fast=%s, dynamic %s %d", tostring(fast), healingSpell.spellname, healingSpell.spellrank)
+  )
   if healingSpell and HealPopup then
     HealPopup:Show(
       UnitName(id),

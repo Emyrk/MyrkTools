@@ -40,10 +40,41 @@ WarriorLoopStrategy = {
 }
 
 PriestLoopStrategy = {
+  ["default"] = PriestDefaultStrategy,
+  ["raid"] = PriestRaidStrategy,
+}
+
+PriestRaidStrategy = {
   Debounce:New(0.5),
   IsDead,
   PlayerIsDrinking,
   Mounted(),
+  -- Stop casting overheals
+  CancelOverheal(0.98),
+  -- Quick exit if we're already doing something
+  AlreadyCasting,
+  -- Calc incoming dmg, heals, etc
+  RefreshPartyState,
+  -- TODO: If spell targeting, reset it.
+  -- See if we can cast anything
+  CastableHeal("Lesser Heal(Rank 1)", "Renew(Rank 1)"),
+  -- If in spirit mode, go full send on healing
+  SpiritFlashHeal,
+  SpellQueueEvaluate(),
+
+  PowerWordShield("party", 0.15, 4),
+  FlashHeal("party", 0.75, 3.5),
+  PriestDynamicHeal("party", 0.90, nil, nil, 2.5),
+  Renew("party", 0.75, 0, 45)
+}
+
+PriestDefaultStrategy = {
+  Debounce:New(0.5),
+  IsDead,
+  PlayerIsDrinking,
+  Mounted(),
+  -- Stop casting overheals
+  CancelOverheal(0.98),
   -- Quick exit if we're already doing something
   AlreadyCasting,
   -- Calc incoming dmg, heals, etc
@@ -92,11 +123,11 @@ PriestLoopStrategy = {
 }
 
 ShamanLoopStrategy = {
-
   Debounce:New(0.5),
   IsDead,
   PlayerIsDrinking,
   Mounted(),
+  IsGhostWolf(),
   -- Quick exit if we're already doing something
   AlreadyCasting,
   -- Calc incoming dmg, heals, etc

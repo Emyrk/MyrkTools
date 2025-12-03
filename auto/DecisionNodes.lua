@@ -29,6 +29,15 @@ function PlayerIsDrinking(engine)
     return nil
 end
 
+function IsGhostWolf()
+    return function(engine)
+        if engine:hasBuff("player", "Spell_Nature_SpiritWolf") then
+            return Action:Busy("player is ghost wolf")
+        end
+        return nil
+    end
+end
+
 function Mounted()
     return function(engine)
         if engine:hasBuff("player", "inv_pet_speedy") then
@@ -37,18 +46,6 @@ function Mounted()
         return nil
     end
 end
-
-
--- function CancelOverHeal()
---     return function(engine)
---         if not engine.busy then
---             return nil
---         end
-
---         -- Detect overheal somehow and do 'SpellStopCasting()'
---         return nil
---     end
--- end
 
 -- Quick exit if already casting
 function AlreadyCasting(engine)
@@ -328,7 +325,35 @@ function HealFocus(pct)
         end
 
 
-        return BestSingleHeal(focusID, UnitMana("player"), hpMax - hp)
+        return BestSingleHeal(focusID, UnitMana("player"), hpMax - hp, false)
+    end
+end
+
+---@param overPct number Percentage of hp to cancel a heal at
+function CancelOverheal(overPct)
+    ---@param engine DecisionEngine
+    return function(engine)
+        local cm = engine:CastMonitor()
+        local cast = cm:GetCurrentCast()
+        if not cast then
+            return nil
+        end
+        if not cast.isHeal then
+            return nil
+        end
+
+        local hp = UnitHealth(cast.target)
+        local hpMax = UnitHealthMax(cast.target)
+        local hpPct = hp / hpMax
+        if hpPct >= overPct then
+            local spell = cast.spell or "unknown"
+            Logs.Info(string.format("CancelOverheal: Cancelling heal %s to %s at %.2f%% (over %.2f%%)", tostring(spell), tostring(cast.target), hpPct * 100, overPct * 100))
+            SpellStopCasting()
+            return Action:Busy("Cancelled overheal")
+        end
+
+        -- Detect overheal somehow and do 'SpellStopCasting()'
+        return nil
     end
 end
 

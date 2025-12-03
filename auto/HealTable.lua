@@ -7,6 +7,7 @@
 ---@class HealTable
 ---@field Spells table<string, table<number, SpellData>> spellName -> rank -> spellData
 ---@field SingleHeals table<HealSpell>
+---@field FastHeals table<HealSpell> Flash heal and other quicker casts
 ---@field SpellIndex table<string, table<number, number>> spellName -> rank -> spellID
 HealTable = MyrkAddon:NewModule("MyrkHealTable", "AceEvent-3.0")
 HealTable.loaded = false
@@ -22,6 +23,7 @@ function HealTable:OnEnable()
   self.Spells = {}
   self.SingleHeals = {}
   self.SpellIndex = {}
+  self.FastHeals = {}
 end
 
 --- @return number|nil spellID
@@ -74,6 +76,7 @@ function HealTable:Load(force)
 
   local spells = {}
   local single = {}
+  local fast = {}
 
   local localizedClass, englishClass = UnitClass("player")
   if englishClass == "PRIEST" then
@@ -98,6 +101,10 @@ function HealTable:Load(force)
       "Lesser Heal",
       "Heal",
     }
+
+    fast = {
+      "Flash Heal",
+    }
   elseif englishClass == "SHAMAN" then
     spells = {
       "Healing Wave",
@@ -109,15 +116,21 @@ function HealTable:Load(force)
       -- "Lesser Healing Wave",
     }
 
+    fast = {
+      "Lesser Healing Wave",
+    }
+
   else
     spells = {}
     single = {}
+    fast = {}
   end
 
-  local all, index, partial = self:ReloadSpells(spells, single)
+  local all, index, partial, quick = self:ReloadSpells(spells, single, fast)
   self.Spells = all
   self.SpellIndex = index
   self.SingleHeals = partial
+  self.FastHeals = quick
   self.loaded = true
   Logs.Debug(string.format("Reloaded %d Single heals", table.getn(partial)))
 end
@@ -126,10 +139,11 @@ function HealTable:Unload()
   self.Spells = {}
   self.SingleHeals = {}
   self.SpellIndex = {}
+  self.FastHeals = {}
   self.loaded = false
 end
 
-function HealTable:ReloadSpells(all, single)
+function HealTable:ReloadSpells(all, single, fast)
   local spells = {}
   local index = {}
   for _, spellName in ipairs(all) do
@@ -147,7 +161,19 @@ function HealTable:ReloadSpells(all, single)
   table.sort(singles, function(a, b) 
     return a.averagehealnocrit < b.averagehealnocrit
   end)
-  return spells, index, singles
+
+  local quickList = {}
+  for _, spellName in ipairs(fast) do
+    for _, spellRank in ipairs(spells[spellName]) do
+      table.insert(quickList, spellRank)
+    end
+  end
+
+  table.sort(quickList, function(a, b) 
+    return a.averagehealnocrit < b.averagehealnocrit
+  end)
+  
+  return spells, index, singles, quickList
 end
 
 function HealTable:Print()

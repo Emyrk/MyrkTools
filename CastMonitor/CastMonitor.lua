@@ -28,6 +28,7 @@ function CastMonitor:OnEnable()
         currentSpell = nil,
         currentReason = nil,
         startTime = nil,
+        isHeal = false,
         callbacks = {
             onSuccess = nil,
             onFailed = nil,
@@ -98,7 +99,10 @@ function CastMonitor:CastSpellByNameAndLog(spell)
 end
 
 -- Start monitoring a spell cast
-function CastMonitor:StartMonitor(spell, target, reason, callbacks)
+function CastMonitor:StartMonitor(spell, target, reason, callbacks, isHeal)
+    if not isHeal then
+        isHeal = false
+    end
     -- Stop any existing monitor
     self:StopMonitor("Starting new cast")
     if not callbacks then
@@ -113,6 +117,7 @@ function CastMonitor:StartMonitor(spell, target, reason, callbacks)
         currentSpell = spell,
         currentReason = reason or "unknown",
         startTime = GetTime(),
+        isHeal = isHeal or false,
         callbacks = {
             onSuccess = callbacks.onSuccess or nil,
             onFailed = callbacks.onFailed or nil,
@@ -169,6 +174,7 @@ function CastMonitor:StopMonitor(trigger)
         currentReason = nil,
         startTime = nil,
         castedAt = nil,
+        isHeal = false,
     }
     
     -- Clear callbacks
@@ -246,7 +252,8 @@ function CastMonitor:GetCurrentCast()
         target = self.instance.currentTarget,
         reason = self.instance.currentReason,
         startTime = self.instance.startTime,
-        duration = GetTime() - (self.instance.startTime or 0)
+        duration = GetTime() - (self.instance.startTime or 0),
+        isHeal = self.instance.isHeal,
     }
 end
 
