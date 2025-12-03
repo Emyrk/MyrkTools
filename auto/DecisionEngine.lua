@@ -192,6 +192,12 @@ function DecisionEngine:ExecuteHeal(decision)
     --     CastInnerFocus(self) 
     -- end
 
+    if UnitIsUnit(decision.target_id, "target") then
+        -- No magic needed
+        CastSpell(decision.spellID, BOOKTYPE_SPELL)
+        return true
+    end
+
     local result = WithAutoSelfCastOff(RetainTarget(function (engine)
         engine:CastMonitor():StartMonitor(decision.spellID, decision.target_id, decision.reason, callbacks, true)
         CastSpell(decision.spellID, BOOKTYPE_SPELL)
