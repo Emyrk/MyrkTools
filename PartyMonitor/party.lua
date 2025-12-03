@@ -281,7 +281,8 @@ function AllyPlayer:GetHealthPercent()
   if self.hpmax == 0 then
     return 1.0
   end
-  return self.hp / self.hpmax
+  -- Include the incoming heal in the pct to not overheal
+  return (self.hp + self.incHeal) / self.hpmax
 end
 
 function AllyPlayer:IsTank()
