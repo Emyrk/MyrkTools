@@ -69,14 +69,14 @@ function PriestDynamicHeal(ptype, pct, ttd, prevent, incDmgTime)
     DebugExecution(string.format("PriestDynamicHeal: considering heal for %s pct=%.2f ttd=%.2f", player.id, playerPct, playerTTD))
     local hp_needed, recentDamage = player:HPNeeded(incDmgTime or 0)
 
-    local healingSpell = GetBestSingleHealSpell(pid, mana, hp_needed, fast)
+    local healingSpell = GetBestSingleHealSpell(player.id, UnitMana("player"), hp_needed, false)
     if healingSpell == nil then
       return nil -- No heal found
     end
 
     if healingSpell and HealPopup then
       HealPopup:Show(
-        UnitName(guid),
+        UnitName(player.id),
         healingSpell.spellname,
         healingSpell.spellrank,
         healingSpell.averagehealnocrit,
@@ -87,7 +87,7 @@ function PriestDynamicHeal(ptype, pct, ttd, prevent, incDmgTime)
 
     return Action:Heal(
       HealTable.SpellIndex[healingSpell.spellname][healingSpell.spellrank],
-      pid,
+      player.id,
       -- "dynamic heal",
       string.format("fast=%s, dynamic %s %d", tostring(fast), healingSpell.spellname, healingSpell.spellrank)
     )
@@ -115,12 +115,13 @@ function GetBestSingleHealSpell(pid, mana, hp_needed, fast)
       healingSpell = nil
       break
     end
-    if (spell.manacost or 0) > mana then
+
+    if healingSpell.manacost > mana then
       -- Can't afford this spell, will use a lower rank
       break
     end
 
-    if spell.averagehealnocrit >= hp_needed then
+    if healingSpell.averagehealnocrit >= hp_needed then
       break
     end
   end
