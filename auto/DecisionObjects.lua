@@ -86,11 +86,13 @@ function HealSpell:evaluatePlayer(engine, player)
     return nil
   end
 
+  local rank = self.spellRank or 0
   local spellid = nil
   if self.spellRank then
     spellid = HealTable:RankID(self.spellName, self.spellRank)
+    rank = self.spellRank
   else
-    spellid = HealTable:MaxRankID(self.spellName)-- Highest rank
+    spellid, rank= HealTable:MaxRankID(self.spellName)-- Highest rank
   end
 
   local _, duration = GetSpellCooldown(spellid, BOOKTYPE_SPELL)
@@ -107,9 +109,21 @@ function HealSpell:evaluatePlayer(engine, player)
     if self.prevent and self.prevent(engine, player) then
       -- preventing this heal
     else
-      local hp_needed = player:HPNeeded(self.incDmgTime or 0)
+      local hp_needed, recentDamage = player:HPNeeded(self.incDmgTime or 0)
       if self.smartRank then
-        spellid = HealTable:RankID(self.spellName, GetOptimalRank(self.spellName, hp_needed))
+        rank = GetOptimalRank(self.spellName, hp_needed)
+        spellid = HealTable:RankID(self.spellName, rank)
+      end
+
+      if HealPopup then
+        HealPopup:Show(
+          UnitName(player.id),
+          self.spellName,
+          rank,
+          -1,
+          recentDamage,
+          hp_needed
+        )
       end
 
       return Action:Heal(spellid, player.id, "heal")

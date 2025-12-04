@@ -42,9 +42,9 @@ function HealTable:MaxRankID(spellName)
   self:Load(false)
   local ranks = self.SpellIndex[spellName]
   if ranks == nil or table.getn(ranks) == 0 then
-    return nil
+    return nil, nil
   end
-  return ranks[table.getn(ranks)]
+  return ranks[table.getn(ranks)], table.getn(ranks)
 end
 
 function HealTable:RankData(spellName, rank)
