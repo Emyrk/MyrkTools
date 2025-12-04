@@ -291,12 +291,13 @@ end
 
 function AllyPlayer:HPNeeded(time)
   local dps = (self.recentDmg or 0) / 5
-  local exp_hp = self.hp + (self.incHeal or 0) - (dps * (time or 0))
+  local incDamage =  (dps * (time or 0))
+  local exp_hp = self.hp + (self.incHeal or 0) - incDamage
   local hp_needed = self.hpmax - exp_hp
   if hp_needed < 0 then
     hp_needed = 0
   end
-  return hp_needed
+  return hp_needed, incDamage
 end
 
 function AllyPlayer:CalculateTimeToDeath()
