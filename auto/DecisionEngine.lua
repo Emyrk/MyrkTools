@@ -199,12 +199,12 @@ function DecisionEngine:ExecuteHeal(decision)
     end
 
     local result = WithAutoSelfCastOff(RetainTarget(function (engine)
+        SpellStopTargeting()
+        SpellStopCasting()
         engine:CastMonitor():StartMonitor(decision.spellID, decision.target_id, decision.reason, callbacks, true)
         CastSpell(decision.spellID, BOOKTYPE_SPELL)
 
         if not SpellIsTargeting() then
-            SpellStopCasting() -- This might help
-            SpellStopTargeting()
             return Action:Error("Spell is not targeting")
         end
 
@@ -213,8 +213,6 @@ function DecisionEngine:ExecuteHeal(decision)
         -- If the target failed to acquire, throw000000 an error.
         -- We should no longer be targeting after this point.
         if SpellIsTargeting() then
-            SpellStopTargeting()
-            SpellStopCasting()
             return Action:Error("Failed to target unit")
         end
 
