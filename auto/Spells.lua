@@ -54,7 +54,7 @@ function GetOptimalRank(spell, hp_needed)
         spellData = TheoryCraft ~= nil and TheoryCraft_GetSpellDataByName(spell, i)
         if spellData then
             if mana >= spellData.manacost then
-                if spellData.averagehealnocrit > (hp_needed) then
+                if spellData.averageheal > (hp_needed) then
                     rank = i
                 else
                     break
@@ -74,8 +74,8 @@ function GetOptimalRank(spell, hp_needed)
     --[[
     self:Print(spell
             .. ' rank ' .. rank
-            .. ' hp ' .. math.floor(spellData.averagehealnocrit)
-            .. ' hpm ' .. (spellData.averagehealnocrit / spellData.manacost)
+            .. ' hp ' .. math.floor(spellData.averageheal)
+            .. ' hpm ' .. (spellData.averageheal / spellData.manacost)
             .. ' mana ' .. spellData.manacost )
     ]]
     return rank
@@ -140,6 +140,7 @@ function Fade(rank)
         manacost = mana[rank],
         spellnumber = spellnumber[rank],
         averagehealnocrit = 0,
+        averageheal = 0
     }
 end
 
@@ -168,6 +169,7 @@ function Scream(rank)
         manacost = mana[rank],
         spellnumber = spellnumber[rank],
         averagehealnocrit = 0,
+        averageheal = 0
     }
 end
 
@@ -190,6 +192,7 @@ function ChampionsGrace(rank)
         manacost = mana[rank],
         spellnumber = spellnumber[rank],
         averagehealnocrit = 0,
+        averageheal = 0
     }
 end
 
@@ -212,5 +215,6 @@ function InnerFocus(rank)
         manacost = mana[rank],
         spellnumber = spellnumber[rank],
         averagehealnocrit = 0,
+        averageheal = 0
     }
 end

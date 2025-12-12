@@ -3,13 +3,13 @@
 --   for spellName, ranks in pairs(ShamanHeals) do
 --     Logs.Debug("Spell: " .. spellName)
 --     for _, rank in ipairs(ranks) do
---       Logs.Debug(string.format("  Rank %d: id=%d mana=%d heal=%d", rank.spellrank, rank.spellnumber, rank.manacost, math.floor(rank.averagehealnocrit)))
+--       Logs.Debug(string.format("  Rank %d: id=%d mana=%d heal=%d", rank.spellrank, rank.spellnumber, rank.manacost, math.floor(rank.averageheal)))
 --     end
 --   end
 
 --   Logs.Debug("Single heals:")
 --   for _, spell in ipairs(ShamanSingleHeals) do
---     Logs.Debug(spell.spellname .. " rank " .. tostring(spell.spellrank) .. " heal " .. tostring(math.floor(spell.averagehealnocrit)) .. "with mana " .. tostring(spell.manacost))
+--     Logs.Debug(spell.spellname .. " rank " .. tostring(spell.spellrank) .. " heal " .. tostring(math.floor(spell.averageheal)) .. "with mana " .. tostring(spell.manacost))
 --   end
 -- end
 

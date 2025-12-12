@@ -25,7 +25,8 @@ function LoadSpellRanks(spellName)
       spellrank = tcinfo.spellrank,
       manacost = tcinfo.manacost,
       spellnumber = tcinfo.spellnumber,
-      averagehealnocrit = tcinfo.averagehealnocrit
+      averagehealnocrit = tcinfo.averagehealnocrit,
+      averageheal = tcinfo.averageheal
     })
     i = i + 1
   end
@@ -79,7 +80,7 @@ function PriestDynamicHeal(ptype, pct, ttd, prevent, incDmgTime)
         UnitName(player.id),
         healingSpell.spellname,
         healingSpell.spellrank,
-        healingSpell.averagehealnocrit,
+        healingSpell.averageheal,
         recentDamage,
         hp_needed
       )
@@ -94,7 +95,7 @@ function PriestDynamicHeal(ptype, pct, ttd, prevent, incDmgTime)
   end)
 end
 
----@return table|nil The selected healing spell with spellname, spellrank, manacost, averagehealnocrit
+---@return table|nil The selected healing spell with spellname, spellrank, manacost, averageheal
 function GetBestSingleHealSpell(pid, mana, hp_needed, fast)
   HealTable:Load(false)
 
@@ -121,7 +122,7 @@ function GetBestSingleHealSpell(pid, mana, hp_needed, fast)
       break
     end
 
-    if healingSpell.averagehealnocrit >= hp_needed then
+    if healingSpell.averageheal >= hp_needed then
       break
     end
   end
@@ -242,7 +243,7 @@ function CastBestSingleHealTarget(id, fast)
       UnitName(guid),
       healingSpell.spellname,
       healingSpell.spellrank,
-      healingSpell.averagehealnocrit,
+      healingSpell.averageheal,
       recentDmg,
       hp_needed
     )

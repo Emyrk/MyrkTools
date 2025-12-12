@@ -159,7 +159,7 @@ function HealTable:ReloadSpells(all, single, fast)
   end
 
   table.sort(singles, function(a, b) 
-    return a.averagehealnocrit < b.averagehealnocrit
+    return a.averageheal < b.averageheal
   end)
 
   local quickList = {}
@@ -170,7 +170,7 @@ function HealTable:ReloadSpells(all, single, fast)
   end
 
   table.sort(quickList, function(a, b) 
-    return a.averagehealnocrit < b.averagehealnocrit
+    return a.averageheal < b.averageheal
   end)
   
   return spells, index, singles, quickList
@@ -184,13 +184,13 @@ function HealTable:Print()
       if rank.manacost == nil then
         Logs.Error("No manacost for spell " .. tostring(spellName) .. " rank " .. tostring(rank.spellrank))
       else
-        Logs.Debug(string.format("  Rank %d: id=%d mana=%d heal=%d", rank.spellrank, rank.spellnumber, rank.manacost, math.floor(rank.averagehealnocrit or 0)))
+        Logs.Debug(string.format("  Rank %d: id=%d mana=%d heal=%d", rank.spellrank, rank.spellnumber, rank.manacost, math.floor(rank.averageheal or 0)))
       end
     end
   end
 
   Logs.Debug("Single heals:")
   for _, spell in ipairs(self.SingleHeals) do
-    Logs.Debug(spell.spellname .. " rank " .. tostring(spell.spellrank) .. " heal " .. tostring(math.floor(spell.averagehealnocrit)) .. "with mana " .. tostring(spell.manacost))
+    Logs.Debug(spell.spellname .. " rank " .. tostring(spell.spellrank) .. " heal " .. tostring(math.floor(spell.averageheal)) .. "with mana " .. tostring(spell.manacost))
   end
 end
