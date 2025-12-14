@@ -225,6 +225,15 @@ function CastBestSingleHealTarget(id, fast)
   -- print("Incoming damage for " .. UnitName(guid) .. ": " .. tostring(recentDmg))
 
   local incDamage = recentDmg / 2 -- Over 2.5s
+  -- Incoming dmg worked really well in dungeons, but now I am overhealing a lot.
+  if UnitInRaid("player") == 1 then
+    -- In raids, with heal sniping, overhealing is a bigger waste.
+    incDamage = 0
+  end
+
+  if incDamage > hpmax * 0.2 then
+    incDamage = hpmax * 0.2 -- Cap at 20% of max health
+  end
 
   -- Get the spell info for the popup
   local healingSpell = GetBestSingleHealSpell(guid, mana, hp_needed + incDamage, fast)
