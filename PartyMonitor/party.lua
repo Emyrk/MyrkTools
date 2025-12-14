@@ -292,6 +292,10 @@ end
 function AllyPlayer:HPNeeded(time)
   local dps = (self.recentDmg or 0) / 5
   local incDamage =  (dps * (time or 0))
+  if incDamage > self.hpmax * 0.2 then
+    incDamage = self.hpmax * 0.2 -- Cap at 20% of max health
+  end
+
   local exp_hp = self.hp + (self.incHeal or 0) - incDamage
   local hp_needed = self.hpmax - exp_hp
   if hp_needed < 0 then
