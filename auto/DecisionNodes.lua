@@ -43,6 +43,9 @@ function Mounted()
         if engine:hasBuff("player", "inv_pet_speedy") then
             return Action:Busy("player is mounted")
         end
+        if engine:hasBuff("player", "INV_Misc_Branch_01") then
+            return Action:Busy("player is mounted")
+        end
         return nil
     end
 end
