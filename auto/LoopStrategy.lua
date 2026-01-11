@@ -65,7 +65,7 @@ PriestRaidStrategy = {
   SpellQueueEvaluate(),
 
   PowerWordShield("party", 0.15, 4),
-  FlashHeal("party", 0.75, 3.5),
+  RaidFlashHeal("party", 0.75),
   PriestDynamicHeal("party", 0.90, nil, nil, 2.5),
   Renew("party", 0.75, 0, 45)
 }

@@ -229,6 +229,7 @@ function CastBestSingleHealTarget(id, fast)
   if UnitInRaid("player") == 1 then
     -- In raids, with heal sniping, overhealing is a bigger waste.
     incDamage = 0
+    hp_needed = hp_needed -350 -- Offset to save mana
   end
 
   if incDamage > hpmax * 0.2 then

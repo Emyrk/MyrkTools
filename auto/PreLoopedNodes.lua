@@ -25,6 +25,23 @@ function PowerWordShield(ptype, pct, ttd)
     })
 end
 
+function RaidFlashHeal(ptype, pct)
+   return HealSpell:new({
+        playerType = ptype,
+        spellName = "Flash Heal",
+        instant = false,
+        smartRank = true,
+        incDmgTime = 0,
+        minimumMana = 125,
+        pct = pct,
+        hpOffset = 500,
+        prevent = function(engine, player)
+            return nil;
+        end
+    })
+end
+
+
 -- Emergency flash heal for specific target type
 ---@param pct number Health percentage threshold to consider
 ---@param ttd number|nil Time to death threshold in seconds

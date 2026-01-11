@@ -23,6 +23,7 @@ end
 ---@field playerType string "player", "tank", or "party"
 ---@field spellName string
 ---@field spellRank? number
+---@field hpOffset? number amount of health to offset when calculating hp needed
 ---@field smartRank? boolean
 ---@field incDmgTime? number seconds to expect for incoming damage
 ---@field targetType? string TODO REMOVE
@@ -110,6 +111,10 @@ function HealSpell:evaluatePlayer(engine, player)
       -- preventing this heal
     else
       local hp_needed, recentDamage = player:HPNeeded(self.incDmgTime or 0)
+      if self.hpOffset > 0 then
+        hp_needed = hp_needed - self.hpOffset
+      end
+
       if self.smartRank then
         rank = GetOptimalRank(self.spellName, hp_needed)
         spellid = HealTable:RankID(self.spellName, rank)
