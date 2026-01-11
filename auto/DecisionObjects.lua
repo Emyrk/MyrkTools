@@ -111,7 +111,7 @@ function HealSpell:evaluatePlayer(engine, player)
       -- preventing this heal
     else
       local hp_needed, recentDamage = player:HPNeeded(self.incDmgTime or 0)
-      if self.hpOffset > 0 then
+      if self.hpOffset and self.hpOffset > 0 then
         hp_needed = hp_needed - self.hpOffset
       end
 

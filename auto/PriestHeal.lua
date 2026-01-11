@@ -200,7 +200,7 @@ function CastInnerFocus(engine)
   return nil
 end
 
-function CastBestSingleHealTarget(id, fast)
+function CastBestSingleHealTarget(id, fast, offset)
   if Auto.engine:IsGlobalCasting() or Auto.engine:IsMonitoredCasting() then
     return nil
   end
@@ -229,7 +229,10 @@ function CastBestSingleHealTarget(id, fast)
   if UnitInRaid("player") == 1 then
     -- In raids, with heal sniping, overhealing is a bigger waste.
     incDamage = 0
-    hp_needed = hp_needed -350 -- Offset to save mana
+  end
+
+  if offset and offset > 0 then
+    hp_needed = hp_needed - offset
   end
 
   if incDamage > hpmax * 0.2 then

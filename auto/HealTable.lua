@@ -81,7 +81,6 @@ function HealTable:Load(force)
   local localizedClass, englishClass = UnitClass("player")
   if englishClass == "PRIEST" then
     spells = {
-      "Lesser Heal",
       "Flash Heal",
       "Heal",
       "Greater Heal",
@@ -98,7 +97,6 @@ function HealTable:Load(force)
 
     single = {
       "Greater Heal",
-      "Lesser Heal",
       "Heal",
     }
 
